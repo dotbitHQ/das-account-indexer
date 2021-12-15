@@ -52,7 +52,7 @@ curl -X POST http://127.0.0.1:8121/v1/indexer/info
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_indexerInfo","params": []}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_indexerInfo","params": []}'
 ```
 
 ### Get Account's Basic Info
@@ -96,7 +96,7 @@ curl -X POST http://127.0.0.1:8121/v1/account/info -d'{"account":"phone.bit"}'
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
 ```
 
 ### Get Account Records Info
@@ -137,7 +137,7 @@ curl -X POST http://127.0.0.1:8121/v1/account/records -d'{"account":"phone.bit"}
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
 ```
 
 ### Get Address Reverse Record Info
@@ -167,7 +167,7 @@ curl -X POST http://127.0.0.1:8121/v1/reverse/record -d'{"chain_type":1,"address
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
 ```
 ## _Deprecated API List_
 Deprecated APIs will be removed in the future, if you rely on these APIs, please see [das-database](https://github.com/DeAccountSystems/das-database) for more help or do some secondary developments based on this repo
@@ -227,7 +227,7 @@ curl -X POST http://127.0.0.1:8121/v1/search/account -d'{"account":"phone.bit"}'
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_searchAccount","params": ["phone.bit"]}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_searchAccount","params": ["phone.bit"]}'
 ```
 ### _Get Related Accounts By Owner Address_
 #### _Request_
@@ -287,7 +287,7 @@ curl -X POST http://127.0.0.1:8121/v1/address/account -d'{"address":"0x773BCCE3B
 ```
 or json rpc style:
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_getAddressAccount","params": ["0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"]}'
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": "1","method": "das_getAddressAccount","params": ["0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"]}'
 ```
 
 ## Others

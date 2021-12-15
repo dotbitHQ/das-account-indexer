@@ -44,7 +44,7 @@ func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *code.ApiRe
 	var req []ReqSearchAccount
 	err := json.Unmarshal(p, &req)
 	if err != nil {
-		log.Error("json.Unmarshal err:", err.Error())
+		log.Warn("json.Unmarshal err:", err.Error())
 		var reqOld []string
 		if err = json.Unmarshal(p, &reqOld); err != nil {
 			log.Error("json.Unmarshal old req err:", err.Error())

@@ -3,14 +3,14 @@ package code
 import "encoding/json"
 
 type JsonRequest struct {
-	ID      string          `json:"id"`
+	ID      interface{}     `json:"id"`
 	JsonRpc string          `json:"jsonrpc"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params"`
 }
 
 type JsonResponse struct {
-	ID      string      `json:"id"`
+	ID      interface{} `json:"id"`
 	JsonRpc string      `json:"jsonrpc"`
 	Result  interface{} `json:"result"`
 }

@@ -29,75 +29,6 @@ make default
 
 
 ## API List
-### Get DAS Account-Indexer Info
-Shows the current status of das-account-indexer-server
-#### Request
-* path: `/v1/indexer/info`
-* param: None
-#### Response
-
-```json
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "is_latest_block_number": true,
-    "current_block_number": 0
-  }
-}
-```
-#### Usage
-```shell
-curl -X POST http://127.0.0.1:8121/v1/indexer/info
-```
-or json rpc style:
-```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_indexerInfo","params": []}'
-```
-
-### Get Account's Basic Info
-#### Request
-* path: `/v1/account/info`
-* param: 
-```json
-{"account": "phone.bit"}
-```
-#### Response
-```JavaScript
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "out_point": {
-      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
-      "index": 0
-    },
-    "account_info": {
-      "account": "phone.bit",
-      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
-      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
-      "create_at_unix": 1626955542,
-      "expired_at_unix": 1658491542,
-      "status": 1, // 0: normal 1: on sale
-      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
-      "owner_algorithm_id": 5, // 3: eth personal sign 4: tron sign 5: eip-712
-      "owner_das_type": 1, // 1: evm chain 3: tron
-      "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
-      "manager_algorithm_id": 5,
-      "manager_das_type": 1,
-      "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
-    }
-  }
-}
-```
-#### Usage
-```shell
-curl -X POST http://127.0.0.1:8121/v1/account/info -d'{"account":"phone.bit"}'
-```
-or json rpc style:
-```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
-```
 
 ### Get Account Records Info
 #### Request
@@ -169,6 +100,77 @@ or json rpc style:
 ```shell
 curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
 ```
+
+### Get Account's Basic Info
+#### Request
+* path: `/v1/account/info`
+* param: 
+```json
+{"account": "phone.bit"}
+```
+#### Response
+```JavaScript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "out_point": {
+      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
+      "index": 0
+    },
+    "account_info": {
+      "account": "phone.bit",
+      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
+      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
+      "create_at_unix": 1626955542,
+      "expired_at_unix": 1658491542,
+      "status": 1, // 0: normal 1: on sale
+      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
+      "owner_algorithm_id": 5, // 3: eth personal sign 4: tron sign 5: eip-712
+      "owner_das_type": 1, // 1: evm chain 3: tron
+      "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
+      "manager_algorithm_id": 5,
+      "manager_das_type": 1,
+      "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
+    }
+  }
+}
+```
+#### Usage
+```shell
+curl -X POST http://127.0.0.1:8121/v1/account/info -d'{"account":"phone.bit"}'
+```
+or json rpc style:
+```shell
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+```
+
+### Get DAS Account-Indexer Info
+Shows the current status of das-account-indexer-server
+#### Request
+* path: `/v1/indexer/info`
+* param: None
+#### Response
+
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "is_latest_block_number": true,
+    "current_block_number": 0
+  }
+}
+```
+#### Usage
+```shell
+curl -X POST http://127.0.0.1:8121/v1/indexer/info
+```
+or json rpc style:
+```shell
+curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_indexerInfo","params": []}'
+```
+
 ## _Deprecated API List_
 Deprecated APIs will be removed in the future, if you rely on these APIs, please see [das-database](https://github.com/DeAccountSystems/das-database) for more help or do some secondary developments based on this repo
 ### _Get Account's Basic Info And Records_

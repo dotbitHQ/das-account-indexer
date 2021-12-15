@@ -11,7 +11,7 @@ require (
 	github.com/nervosnetwork/ckb-sdk-go v0.43.2
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/scorpiotzh/mylog v1.0.9
-	github.com/scorpiotzh/toolib v1.1.2
+	github.com/scorpiotzh/toolib v1.1.3
 	github.com/urfave/cli/v2 v2.3.0
 	gorm.io/gorm v1.22.4
 	moul.io/http2curl v1.0.0 // indirect

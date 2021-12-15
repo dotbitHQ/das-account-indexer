@@ -453,8 +453,8 @@ github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/scorpiotzh/mylog v1.0.9 h1:d7OGBnPeVy4zzldxULEuU3KY2TItrO4V/SRw4b/PjhY=
 github.com/scorpiotzh/mylog v1.0.9/go.mod h1:pWl6kLNpTQK77W9eTWS70qaUsU9LKggSwm0rEyQ2Zyw=
-github.com/scorpiotzh/toolib v1.1.2 h1:f4MWSbhUPzEihrpYwzqeawZFzvNTFnx/YtkaD3JzVOY=
-github.com/scorpiotzh/toolib v1.1.2/go.mod h1:ewfWxp6NUrCLuaJAf+wL5iqYRGqp9VAAyNuRsydk2OE=
+github.com/scorpiotzh/toolib v1.1.3 h1:XSj4GC/XpiGfGbuFfzL1IhXW/B81wzQTMN9TCk+KcJQ=
+github.com/scorpiotzh/toolib v1.1.3/go.mod h1:ewfWxp6NUrCLuaJAf+wL5iqYRGqp9VAAyNuRsydk2OE=
 github.com/segmentio/kafka-go v0.1.0/go.mod h1:X6itGqS9L4jDletMsxZ7Dz+JFWxM6JHfPOCvTvk+EJo=
 github.com/segmentio/kafka-go v0.2.0/go.mod h1:X6itGqS9L4jDletMsxZ7Dz+JFWxM6JHfPOCvTvk+EJo=
 github.com/sergi/go-diff v1.0.0/go.mod h1:0CfEIISq7TuYL3j771MWULgwwjU+GofnZX9QAmXWZgo=

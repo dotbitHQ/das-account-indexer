@@ -13,6 +13,8 @@ func (h *HttpServer) initRouter() {
 	shortDataTime, lockTime, shortExpireTime := time.Minute, time.Second*30, time.Second*5
 	cacheHandle := toolib.MiddlewareCacheByRedis(h.H.Red, false, shortDataTime, lockTime, shortExpireTime, respHandle)
 
+	h.engine.Use(toolib.MiddlewareCors())
+
 	h.engine.POST("", cacheHandle, h.H.Query)
 
 	v1 := h.engine.Group("v1")

@@ -216,7 +216,7 @@ github.com/russross/blackfriday/v2
 # github.com/scorpiotzh/mylog v1.0.9
 ## explicit
 github.com/scorpiotzh/mylog
-# github.com/scorpiotzh/toolib v1.1.2
+# github.com/scorpiotzh/toolib v1.1.3
 ## explicit
 github.com/scorpiotzh/toolib
 # github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible

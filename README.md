@@ -173,7 +173,7 @@ curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_i
 
 ## _Deprecated API List_
 Deprecated APIs will be removed in the future, if you rely on these APIs, please see [das-database](https://github.com/DeAccountSystems/das-database) for more help or do some secondary developments based on this repo
-### _Get Account's Basic Info And Records_
+### _Get Account's Basic Info And Records_ `Deprecated`
 #### _Request_
 * path: `/v1/search/account`
 * param:
@@ -231,7 +231,7 @@ or json rpc style:
 ```shell
 curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_searchAccount","params": ["phone.bit"]}'
 ```
-### _Get Related Accounts By Owner Address_
+### _Get Related Accounts By Owner Address_ `Deprecated`
 #### _Request_
 * path: `/v1/address/account`
 * param:

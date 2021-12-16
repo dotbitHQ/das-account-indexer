@@ -65,7 +65,7 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
 
 	if err = h.doReverseRecord(&req, &apiResp); err != nil {
 		log.Error("doReverseRecord err:", err.Error(), funcName)

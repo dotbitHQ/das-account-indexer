@@ -6,10 +6,11 @@ type ChainId string //BIP-44
 
 const (
 	ChainIdEthMainNet     = "1"
-	ChainIdEthTestNet     = "5" // Goerli
 	ChainIdBscMainNet     = "56"
-	ChainIdBscTestNet     = "97"
 	ChainIdPolygonMainNet = "137"
+
+	ChainIdEthTestNet     = "5" // Goerli
+	ChainIdBscTestNet     = "97"
 	ChainIdPolygonTestNet = "80001"
 )
 

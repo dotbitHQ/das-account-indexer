@@ -60,7 +60,7 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
 
 	if err = h.doAccountRecords(&req, &apiResp); err != nil {
 		log.Error("doAccountRecords err:", err.Error(), funcName)
@@ -78,6 +78,17 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 		log.Error("checkAccount err: ", err.Error())
 		return nil
 	}
+
+	accountInfo, err := h.DbDao.FindAccountInfoByAccountName(req.Account)
+	if err != nil {
+		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
+		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
+		return nil
+	} else if accountInfo.Id == 0 {
+		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		return nil
+	}
+
 	resp.Account = req.Account
 
 	list, err := h.DbDao.FindAccountRecords(req.Account)

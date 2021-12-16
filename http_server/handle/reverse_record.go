@@ -92,6 +92,7 @@ func checkReqReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) *format
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
 		return &res
 	}
+	res.ChainType = dasChainType
 	res.Address = core.FormatAddressToHex(dasChainType, req.KeyInfo.Key)
 	return &res
 }

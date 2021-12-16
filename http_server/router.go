@@ -18,7 +18,7 @@ func (h *HttpServer) initRouter() {
 	h.engine.POST("", cacheHandle, h.H.Query)
 	v1 := h.engine.Group("v1")
 	{
-		v1.POST("/server/info", h.H.ServerInfo)
+		v1.POST("/server/info", cacheHandle, h.H.ServerInfo)
 		v1.POST("/search/account", cacheHandle, h.H.SearchAccount)
 		v1.POST("/address/account", cacheHandle, h.H.AddressAccount)
 	}

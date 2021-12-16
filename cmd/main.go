@@ -122,6 +122,7 @@ func runServer(ctx *cli.Context) error {
 	hs := &http_server.HttpServer{
 		Ctx:            ctxServer,
 		Address:        config.Cfg.Server.HttpServerAddr,
+		AddressIndexer: config.Cfg.Server.HttpServerAddrIndexer,
 		AddressReverse: config.Cfg.Server.HttpServerAddrReverse,
 		H: &handle.HttpHandle{
 			Ctx:           ctxServer,

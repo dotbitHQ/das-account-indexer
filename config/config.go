@@ -40,8 +40,9 @@ func AddCfgFileWatcher(configFilePath string) (*fsnotify.Watcher, error) {
 
 type CfgServer struct {
 	Server struct {
-		Net            common.DasNetType `json:"net" yaml:"net"`
-		HttpServerAddr string            `json:"http_server_addr" yaml:"http_server_addr"`
+		Net                   common.DasNetType `json:"net" yaml:"net"`
+		HttpServerAddr        string            `json:"http_server_addr" yaml:"http_server_addr"`
+		HttpServerAddrReverse string            `json:"http_server_addr_reverse" yaml:"http_server_addr_reverse"`
 	} `json:"server" yaml:"server"`
 	Chain struct {
 		CkbUrl             string `json:"ckb_url" yaml:"ckb_url"`

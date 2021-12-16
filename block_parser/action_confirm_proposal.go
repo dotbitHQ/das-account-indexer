@@ -32,9 +32,7 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 	}
 	var accounts []tables.TableAccountInfo
 	var records []tables.TableRecordsInfo
-	var accountList []string
 	for _, builder := range mapBuilder {
-		accountList = append(accountList, builder.Account)
 		oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(req.Tx.Outputs[builder.Index].Lock.Args)
 		accounts = append(accounts, tables.TableAccountInfo{
 			BlockNumber:        req.BlockNumber,
@@ -68,7 +66,7 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 		}
 	}
 
-	if err = b.DbDao.UpdateAccountInfoList(accounts, records, accountList); err != nil {
+	if err = b.DbDao.UpdateAccountInfoList(accounts, records); err != nil {
 		resp.Err = fmt.Errorf("UpdateAccountInfo err: %s", err.Error())
 		return
 	}

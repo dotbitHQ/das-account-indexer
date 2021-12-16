@@ -1,6 +1,7 @@
 server:
   net: 1 # 1-mainnet 2-testnet
   http_server_addr: ":8121"
+  http_server_addr_reverse: ":8122"
 chain:
   ckb_url: "http://127.0.0.1:8114"
   index_url: "http://127.0.0.1:8116"

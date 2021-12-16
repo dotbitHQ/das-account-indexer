@@ -27,7 +27,7 @@ func (h *HttpHandle) ServerInfo(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 
-	log.Info("ApiReq:", funcName, clientIp)
+	log.Info("ApiReq:", ctx.Request.RequestURI, funcName, clientIp)
 
 	if err = h.doServerInfo(&apiResp); err != nil {
 		log.Error("doServerInfo err:", err.Error(), funcName)

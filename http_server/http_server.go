@@ -29,42 +29,55 @@ type HttpServer struct {
 }
 
 func (h *HttpServer) Run() {
-	h.engine = gin.New()
-	h.engineIndexer = gin.New()
-	h.engineReverse = gin.New()
+	if h.Address != "" {
+		h.engine = gin.New()
+	}
+	if h.AddressIndexer != "" {
+		h.engineIndexer = gin.New()
+	}
+	if h.AddressReverse != "" {
+		h.engineReverse = gin.New()
+	}
 
 	h.initRouter()
 
-	h.srv = &http.Server{
-		Addr:    h.Address,
-		Handler: h.engine,
-	}
-	h.srvIndexer = &http.Server{
-		Addr:    h.AddressIndexer,
-		Handler: h.engineIndexer,
-	}
-	h.srvReverse = &http.Server{
-		Addr:    h.AddressReverse,
-		Handler: h.engineReverse,
+	if h.Address != "" {
+		h.srv = &http.Server{
+			Addr:    h.Address,
+			Handler: h.engine,
+		}
+		go func() {
+			if err := h.srv.ListenAndServe(); err != nil {
+				log.Error("http_server old api run err:", err)
+			}
+		}()
 	}
 
-	go func() {
-		if err := h.srv.ListenAndServe(); err != nil {
-			log.Error("http_server old api run err:", err)
+	if h.AddressIndexer != "" {
+		h.srvIndexer = &http.Server{
+			Addr:    h.AddressIndexer,
+			Handler: h.engineIndexer,
 		}
-	}()
+		go func() {
+			if err := h.srvIndexer.ListenAndServe(); err != nil {
+				log.Error("http_server indexer api run err:", err)
+			}
+		}()
+	}
 
-	go func() {
-		if err := h.srvIndexer.ListenAndServe(); err != nil {
-			log.Error("http_server indexer api run err:", err)
+	if h.AddressReverse != "" {
+		h.srvReverse = &http.Server{
+			Addr:    h.AddressReverse,
+			Handler: h.engineReverse,
 		}
-	}()
 
-	go func() {
-		if err := h.srvReverse.ListenAndServe(); err != nil {
-			log.Error("http_server reverse api run err:", err)
-		}
-	}()
+		go func() {
+			if err := h.srvReverse.ListenAndServe(); err != nil {
+				log.Error("http_server reverse api run err:", err)
+			}
+		}()
+	}
+
 }
 
 func (h *HttpServer) Shutdown() {

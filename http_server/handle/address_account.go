@@ -56,7 +56,7 @@ func (h *HttpHandle) AddressAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
 
 	if err = h.doAddressAccount(&req, &apiResp); err != nil {
 		log.Error("doAddressAccount err:", err.Error(), funcName)

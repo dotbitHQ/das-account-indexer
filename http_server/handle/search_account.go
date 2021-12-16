@@ -80,7 +80,7 @@ func (h *HttpHandle) SearchAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
 
 	if err = h.doSearchAccount(&req, &apiResp); err != nil {
 		log.Error("doSearchAccount err:", err.Error(), funcName)

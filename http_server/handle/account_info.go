@@ -32,10 +32,8 @@ type AccountInfo struct {
 	Status             tables.AccountStatus  `json:"status"`
 	DasLockArgHex      string                `json:"das_lock_arg_hex"`
 	OwnerAlgorithmId   common.DasAlgorithmId `json:"owner_algorithm_id"`
-	OwnerDasType       common.ChainType      `json:"owner_das_type"`
 	OwnerAddress       string                `json:"owner_address"`
 	ManagerAlgorithmId common.DasAlgorithmId `json:"manager_algorithm_id"`
-	ManagerDasType     common.ChainType      `json:"manager_das_type"`
 	ManagerAddress     string                `json:"manager_address"`
 }
 
@@ -112,10 +110,8 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		Status:             accountInfo.Status,
 		DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
 		OwnerAlgorithmId:   accountInfo.OwnerAlgorithmId,
-		OwnerDasType:       accountInfo.OwnerChainType,
 		OwnerAddress:       core.FormatHexAddressToNormal(accountInfo.OwnerChainType, accountInfo.Owner),
 		ManagerAlgorithmId: accountInfo.ManagerAlgorithmId,
-		ManagerDasType:     accountInfo.ManagerChainType,
 		ManagerAddress:     core.FormatHexAddressToNormal(accountInfo.ManagerChainType, accountInfo.Manager),
 	}
 

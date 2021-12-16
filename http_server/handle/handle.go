@@ -25,8 +25,5 @@ type HttpHandle struct {
 
 func GetClientIp(ctx *gin.Context) string {
 	clientIP := fmt.Sprintf("%v", ctx.Request.Header.Get("X-Real-IP"))
-	if clientIP == "" || clientIP == "127.0.0.1" {
-		clientIP = ctx.Request.RemoteAddr
-	}
-	return clientIP
+	return fmt.Sprintf("(%s)(%s)", clientIP, ctx.Request.RemoteAddr)
 }

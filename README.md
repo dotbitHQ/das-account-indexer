@@ -158,10 +158,8 @@ curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_r
       "status": 1, // 0: normal 1: on sale
       "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
       "owner_algorithm_id": 5, // 3: eth personal sign 4: tron sign 5: eip-712
-      "owner_das_type": 1, // 1: evm chain 3: tron
       "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
       "manager_algorithm_id": 5,
-      "manager_das_type": 1,
       "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
     }
   }

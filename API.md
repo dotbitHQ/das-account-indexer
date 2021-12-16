@@ -1,146 +1,22 @@
 * [API List](#api-list)
-    * [Indexer Api](#indexer-api)
-        * [Get Server Info](#get-server-info)
-            * [Request](#request)
-            * [Response](#response)
-            * [Usage](#usage)
-        * [Get Account's Basic Info](#get-accounts-basic-info)
-            * [Request](#request-1)
-            * [Response](#response-1)
-            * [Usage](#usage-1)
-        * [Get Account Records Info](#get-account-records-info)
-            * [Request](#request-2)
-            * [Response](#response-2)
-            * [Usage](#usage-2)
-        * [Get Address Reverse Record Info](#get-address-reverse-record-info)
-            * [Request](#request-3)
-            * [Response](#response-3)
-            * [Usage](#usage-3)
-    * [Reverse Api](#reverse-api)
-        * [Get Server Info](#get-server-info)
-            * [Request](#request)
-            * [Response](#response)
-            * [Usage](#usage)
-        * [Get Address Reverse Record Info](#get-address-reverse-record-info)
-            * [Request](#request-3)
-            * [Response](#response-3)
-            * [Usage](#usage-3)
-* [<em>Deprecated API List</em>](#deprecated-api-list)
+    * [Get Account Records Info](#get-account-records-info)
+    * [Get Reverse Record Info](#get-reverse-record-info)
+    * [Get Account Basic Info](#get-account-basic-info)
     * [Get Server Info](#get-server-info)
-        * [Request](#request)
-        * [Response](#response)
-        * [Usage](#usage)
-    * [<em>Get Account's Basic Info And Records</em>](#get-accounts-basic-info-and-records)
-        * [<em>Request</em>](#request-4)
-        * [<em>Response</em>](#response-4)
-        * [<em>Usage</em>](#usage-4)
-    * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address)
-        * [<em>Request</em>](#request-5)
-        * [<em>Response</em>](#response-5)
-        * [<em>Usage</em>](#usage-5)
-* [Error Code](#error-code)
+* [<em>Deprecated API List</em>](#deprecated-api-list)
+    * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
+    * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
+* [Error](#error)
+    * [Error Example](#error-example)
+    * [Error Code](#error-code)
+
+
 
 ## API List
 
-### Indexer Api
+### Get Account Records Info
 
-#### Get Server Info
-
-##### Request
-
-* path: `/v1/server/info`
-* param: none
-
-##### Response
-
-```json
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "is_latest_block_number": true,
-    "current_block_number": 0
-  }
-}
-```
-
-##### Usage
-
-```shell
-curl -X POST http://127.0.0.1:8122/v1/server/info
-```
-
-or json rpc style:
-
-```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
-```
-
-#### Get Account's Basic Info
-
-##### Request
-
-* path: `/v1/account/info`
-* param:
-
-```json
-{
-  "account": "phone.bit"
-}
-```
-
-##### Response
-
-```json
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "out_point": {
-      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
-      "index": 0
-    },
-    "account_info": {
-      "account": "phone.bit",
-      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
-      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
-      "create_at_unix": 1626955542,
-      "expired_at_unix": 1658491542,
-      "status": 1,
-      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
-      "owner_algorithm_id": 5,
-      // 3: eth personal sign 4: tron sign 5: eip-712
-      "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
-      "manager_algorithm_id": 5,
-      "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
-    }
-  }
-}
-```
-
-```json
-{
-  "errno": 20007,
-  "errmsg": "account not exist",
-  "data": null
-}
-```
-
-##### Usage
-
-```shell
-curl -X POST http://127.0.0.1:8122/v1/account/info -d'{"account":"phone.bit"}'
-```
-
-or json rpc style:
-
-```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
-```
-
-#### Get Account Records Info
-
-##### Request
+**Request**
 
 * path: `/v1/account/records`
 * param:
@@ -151,9 +27,9 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_a
 }
 ```
 
-##### Response
+**Response**
 
-```json
+```javascript
 {
   "errno": 0,
   "errmsg": "",
@@ -178,15 +54,8 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_a
 }
 ```
 
-```json
-{
-  "errno": 20007,
-  "errmsg": "account not exist",
-  "data": null
-}
-```
 
-##### Usage
+**Usage**
 
 ```shell
 curl -X POST http://127.0.0.1:8122/v1/account/records -d'{"account":"phone.bit"}'
@@ -198,28 +67,25 @@ or json rpc style:
 curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
 ```
 
-#### Get Address Reverse Record Info
+### Get Reverse Record Info
 
-##### Request
-
+**Request**
+* host: `reverse-record.da.systems`
 * path: `/v1/reverse/record`
 * param:
 
-```json
+```javascript
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "",
-    // ETH-60 195-TRX 714-BNB 966-Matic
-    "chain_id": "",
-    // ETH-1 BSC-56 Polygon-137
-    "key": ""
-    // address
+    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
+    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+    "key": "" // address
   }
 }
 ```
 
-##### Response
+**Response**
 
 ```json
 {
@@ -231,33 +97,110 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_a
 }
 ```
 
-```json
-{
-  "errno": 10000,
-  "errmsg": "coin_type [601] and chain_id [1] is invalid",
-  "data": null
-}
-```
 
-##### Usage
+**Usage**
 
 ```shell
-curl -X POST http://127.0.0.1:8122/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0xc9f53b1d85356B60453F867610888D89a0B667Ad"}}'
+curl -X POST https://reverse-record.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0xc9f53b1d85356B60453F867610888D89a0B667Ad"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
+curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
 ```
 
-### Reverse Api
 
-### Deprecated API List
+### Get Account Basic Info
 
-#### Get Account's Basic Info And Records
+ **Request**
 
-##### _Request_
+* path: `/v1/account/info`
+* param:
+
+```json
+{
+  "account": "phone.bit"
+}
+```
+
+ **Response**
+
+```javascript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "out_point": {
+      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
+      "index": 0
+    },
+    "account_info": {
+      "account": "phone.bit",
+      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
+      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
+      "create_at_unix": 1626955542,
+      "expired_at_unix": 1658491542,
+      "status": 1,
+      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
+      "owner_algorithm_id": 5, // 3: eth personal sign, 4: tron sign, 5: eip-712
+      "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
+      "manager_algorithm_id": 5,
+      "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
+    }
+  }
+}
+```
+
+ **Usage**
+
+```shell
+curl -X POST http://127.0.0.1:8122/v1/account/info -d'{"account":"phone.bit"}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+```
+
+### Get Server Info
+
+**Request**
+
+* path: `/v1/server/info`
+* param: none
+
+**Response**
+
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "is_latest_block_number": true,
+    "current_block_number": 6088191
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST http://127.0.0.1:8122/v1/server/info
+```
+
+or json rpc style:
+
+```shell
+curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
+```
+
+## _Deprecated API List_
+
+### _Get Account Basic Info And Records_ `Deprecated`
+
+ _**Request**_
 
 * path: `/v1/search/account`
 * param:
@@ -268,9 +211,9 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_r
 }
 ```
 
-##### _Response_
+ _**Response**_
 
-```json
+```javascript
 {
   "errno": 0,
   "errmsg": "",
@@ -313,15 +256,7 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_r
 }
 ```
 
-```json
-{
-  "errno": 20007,
-  "errmsg": "account not exist",
-  "data": null
-}
-```
-
-##### _Usage_
+ _**Usage**_
 
 ```shell
 curl -X POST http://127.0.0.1:8121/v1/search/account -d'{"account":"phone.bit"}'
@@ -333,9 +268,9 @@ or json rpc style:
 curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_searchAccount","params": ["phone.bit"]}'
 ```
 
-#### _Get Related Accounts By Owner Address_ `Deprecated`
+### _Get Related Accounts By Owner Address_ `Deprecated`
 
-##### _Request_
+ _**Request**_
 
 * path: `/v1/address/account`
 * param:
@@ -346,9 +281,9 @@ curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_s
 }
 ```
 
-##### _Response_
+ _**Response**_
 
-```json
+```javascript
 {
   "errno": 0,
   "errmsg": "",
@@ -393,7 +328,7 @@ curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_s
 }
 ```
 
-##### _Usage_
+ _**Usage**_
 
 ```shell
 curl -X POST http://127.0.0.1:8121/v1/address/account -d'{"address":"0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"}'
@@ -405,16 +340,24 @@ or json rpc style:
 curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_getAddressAccount","params": ["0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"]}'
 ```
 
-## Error Code
-
+## Error
+### Error Example
+```json
+{
+  "errno": 20007,
+  "errmsg": "account not exist",
+  "data": null
+}
+```
+### Error Code
 ```go
 
 const (
-ApiCodeSuccess        Code = 0
-ApiCodeError500       Code = 500
-ApiCodeParamsInvalid  Code = 10000
-ApiCodeMethodNotExist Code = 10001
-ApiCodeDbError        Code = 10002
+ApiCodeSuccess              Code = 0
+ApiCodeError500             Code = 500
+ApiCodeParamsInvalid        Code = 10000
+ApiCodeMethodNotExist       Code = 10001
+ApiCodeDbError              Code = 10002
 
 ApiCodeAccountFormatInvalid Code = 20006
 ApiCodeAccountNotExist      Code = 20007

@@ -5,6 +5,7 @@ import (
 	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/scorpiotzh/toolib"
 	"net/http"
 )
 
@@ -27,7 +28,7 @@ func (h *HttpHandle) ServerInfo(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 
-	log.Info("ApiReq:", ctx.Request.RequestURI, funcName, clientIp)
+	log.Info("ApiReq:", toolib.JsonString(ctx.Request.URL), funcName, clientIp)
 
 	if err = h.doServerInfo(&apiResp); err != nil {
 		log.Error("doServerInfo err:", err.Error(), funcName)

@@ -107,7 +107,7 @@ curl -X POST https://reverse-record.da.systems/v1/reverse/record -d'{"type": "bl
 or json rpc style:
 
 ```shell
-curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"das_type":1,"address":"0xc9f53b1d85356B60453F867610888D89a0B667Ad"}]}'
+curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0xc9f53b1d85356B60453F867610888D89a0B667Ad"}}]}'
 ```
 
 

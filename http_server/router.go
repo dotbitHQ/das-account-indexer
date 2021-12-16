@@ -13,20 +13,34 @@ func (h *HttpServer) initRouter() {
 	shortDataTime, lockTime, shortExpireTime := time.Minute, time.Second*30, time.Second*5
 	cacheHandle := toolib.MiddlewareCacheByRedis(h.H.Red, false, shortDataTime, lockTime, shortExpireTime, respHandle)
 
+	// old api
 	h.engine.Use(toolib.MiddlewareCors())
-
 	h.engine.POST("", cacheHandle, h.H.Query)
-
 	v1 := h.engine.Group("v1")
 	{
-		v1.POST("/version", cacheHandle, h.H.Version)
+		v1.POST("/server/info", h.H.ServerInfo)
 		v1.POST("/search/account", cacheHandle, h.H.SearchAccount)
 		v1.POST("/address/account", cacheHandle, h.H.AddressAccount)
+	}
 
-		v1.POST("/indexer/info", h.H.IndexerInfo)
-		v1.POST("/account/info", cacheHandle, h.H.AccountInfo)
-		v1.POST("/account/records", cacheHandle, h.H.AccountRecords)
-		v1.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
+	// indexer api
+	h.engineIndexer.Use(toolib.MiddlewareCors())
+	h.engineIndexer.POST("", cacheHandle, h.H.QueryIndexer)
+	v1Indexer := h.engineIndexer.Group("v1")
+	{
+		v1Indexer.POST("/server/info", cacheHandle, h.H.ServerInfo)
+		v1Indexer.POST("/account/info", cacheHandle, h.H.AccountInfo)
+		v1Indexer.POST("/account/records", cacheHandle, h.H.AccountRecords)
+		v1Indexer.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
+	}
+
+	// reverse api
+	h.engineReverse.Use(toolib.MiddlewareCors())
+	h.engineReverse.POST("", cacheHandle, h.H.QueryReverse)
+	v1Reverse := h.engineReverse.Group("v1")
+	{
+		v1Reverse.POST("/server/info", cacheHandle, h.H.ServerInfo)
+		v1Reverse.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
 	}
 }
 

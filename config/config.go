@@ -42,6 +42,7 @@ type CfgServer struct {
 	Server struct {
 		Net                   common.DasNetType `json:"net" yaml:"net"`
 		HttpServerAddr        string            `json:"http_server_addr" yaml:"http_server_addr"`
+		HttpServerAddrIndexer string            `json:"http_server_addr_indexer" yaml:"http_server_addr_indexer"`
 		HttpServerAddrReverse string            `json:"http_server_addr_reverse" yaml:"http_server_addr_reverse"`
 	} `json:"server" yaml:"server"`
 	Chain struct {

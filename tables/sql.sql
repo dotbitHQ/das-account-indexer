@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `t_reverse_info`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='reverse records info';
 
-# DROP TABLES
-# DROP TABLE IF EXISTS `t_block_info`;
-# DROP TABLE IF EXISTS `t_account_info`;
-# DROP TABLE IF EXISTS `t_records_info`;
-# DROP TABLE IF EXISTS `t_reverse_info`;
+-- # DROP TABLES
+-- # DROP TABLE IF EXISTS `t_block_info`;
+-- # DROP TABLE IF EXISTS `t_account_info`;
+-- # DROP TABLE IF EXISTS `t_records_info`;
+-- # DROP TABLE IF EXISTS `t_reverse_info`;

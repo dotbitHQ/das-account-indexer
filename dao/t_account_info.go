@@ -33,7 +33,7 @@ func (d *DbDao) UpdateAccountInfo(account *tables.TableAccountInfo, records []ta
 	})
 }
 
-func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, records []tables.TableRecordsInfo) error {
+func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, records []tables.TableRecordsInfo, accountList []string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Clauses(clause.OnConflict{
 			DoUpdates: clause.AssignmentColumns([]string{
@@ -44,6 +44,12 @@ func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, record
 			}),
 		}).Create(&accounts).Error; err != nil {
 			return err
+		}
+
+		if len(accountList) > 0 {
+			if err := tx.Where(" account IN(?) ", accountList).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
 		}
 
 		if len(records) > 0 {

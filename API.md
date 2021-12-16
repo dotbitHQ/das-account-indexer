@@ -101,13 +101,13 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_a
 **Usage**
 
 ```shell
-curl -X POST https://reverse-record.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0xc9f53b1d85356B60453F867610888D89a0B667Ad"}}'
+curl -X POST https://reverse-record.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0xc9f53b1d85356B60453F867610888D89a0B667Ad"}}]}'
+curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
 ```
 
 

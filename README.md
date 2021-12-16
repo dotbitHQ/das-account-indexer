@@ -34,8 +34,9 @@ make default
 ```
 
 ## Usage
-* If you are come from [das_account_indexer](https://github.com/DeAccountSystems/das_account_indexer), you probably need do nothing, the new APIs are compatible with the old ones. More details see [deprecated-api-list](https://github.com/DeAccountSystems/das-account-indexer/API.md#deprecated-api-list), but we still suggest you replace with the corresponding new APIs
-* If you are a newcomer, just read [api-list](https://github.com/DeAccountSystems/das-account-indexer/API.md#api-list) 
+[Here](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md) is the main document about APIs
+* If you are come from [das_account_indexer](https://github.com/DeAccountSystems/das_account_indexer), you probably need do nothing, the new APIs are compatible with the old ones. More details see [deprecated-api-list](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md#deprecated-api-list), but we still suggest you replace with the corresponding new APIs
+* If you are a newcomer, just read [api-list](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md#api-list) 
 
 
 

@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `t_account_info`
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `uk_account_id` (`account_id`) USING BTREE,
     KEY `k_account` (`account`) USING BTREE,
+    KEY `k_next_account_id` (`next_account_id`) USING BTREE,
     KEY `k_oct_o` (`owner_chain_type`, `owner`) USING BTREE,
     KEY `k_mct_m` (`manager_chain_type`, `manager`) USING BTREE
 ) ENGINE = InnoDB

@@ -119,7 +119,8 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 		return nil
 	}
 
-	account, err := h.DbDao.FindAccountInfoByAccountName(reverse.Account)
+	accountId := common.GetAccountIdByAccount(reverse.Account)
+	account, err := h.DbDao.FindAccountInfoByAccountId(common.Bytes2Hex(accountId))
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.Address, reverse.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account err")

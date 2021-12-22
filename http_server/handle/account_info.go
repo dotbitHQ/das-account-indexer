@@ -89,7 +89,8 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		return nil
 	}
 
-	accountInfo, err := h.DbDao.FindAccountInfoByAccountName(req.Account)
+	accountId := common.GetAccountIdByAccount(req.Account)
+	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(common.Bytes2Hex(accountId))
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")

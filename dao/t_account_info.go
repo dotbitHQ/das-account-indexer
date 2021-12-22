@@ -61,8 +61,8 @@ func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, record
 	})
 }
 
-func (d *DbDao) FindAccountInfoByAccountName(accountName string) (accountInfo tables.TableAccountInfo, err error) {
-	err = d.db.Where(" account=? ", accountName).Find(&accountInfo).Error
+func (d *DbDao) FindAccountInfoByAccountId(accountId string) (accountInfo tables.TableAccountInfo, err error) {
+	err = d.db.Where(" account_id=? ", accountId).Find(&accountInfo).Error
 	return
 }
 

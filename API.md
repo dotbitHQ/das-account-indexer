@@ -16,7 +16,7 @@
 ### Get Server Info
 
 **Request**
-
+* host: `indexer-basic.da.systems`
 * path: `/v1/server/info`
 * param: none
 
@@ -48,7 +48,7 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 ### Get Reverse Record Info
 
 **Request**
-* host: `reverse-record.da.systems`
+* host: `indexer-basic.da.systems`
 * path: `/v1/reverse/record`
 * param:
 
@@ -92,6 +92,7 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 
 **Request**
 
+* host: `indexer-basic.da.systems`
 * path: `/v1/account/info`
 * param:
 
@@ -145,6 +146,7 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 
 **Request**
 
+* host: `http://127.0.0.1:8122`
 * path: `/v1/account/records`
 * param:
 

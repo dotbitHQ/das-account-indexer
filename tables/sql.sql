@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `t_account_info`
 CREATE TABLE IF NOT EXISTS `t_records_info`
 (
     `id`         bigint(20) unsigned                                            NOT NULL AUTO_INCREMENT COMMENT '',
+    `account_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT 'hash of account',
     `account`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT '',
     `key`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '',
     `type`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '',
@@ -68,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `t_records_info`
     `created_at` timestamp                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
     `updated_at` timestamp                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '',
     PRIMARY KEY (`id`) USING BTREE,
+    KEY `k_account_id` (`account_id`) USING BTREE,
     KEY `k_account` (`account`) USING BTREE,
     KEY `k_value` (`value`(768)) USING BTREE
 ) ENGINE = InnoDB

@@ -32,7 +32,7 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 	}
 	var accounts []tables.TableAccountInfo
 	var records []tables.TableRecordsInfo
-	var accountList []string
+	var accountIdList []string
 	for _, builder := range mapBuilder {
 		oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(req.Tx.Outputs[builder.Index].Lock.Args)
 		accounts = append(accounts, tables.TableAccountInfo{
@@ -53,22 +53,23 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 			ExpiredAt:          builder.ExpiredAt,
 		})
 		if _, ok := mapPreBuilder[builder.Account]; ok {
-			accountList = append(accountList, builder.Account)
+			accountIdList = append(accountIdList, builder.AccountId)
 			list := builder.RecordList()
 			for _, v := range list {
 				records = append(records, tables.TableRecordsInfo{
-					Account: builder.Account,
-					Key:     v.Key,
-					Type:    v.Type,
-					Label:   v.Label,
-					Value:   v.Value,
-					Ttl:     strconv.FormatUint(uint64(v.TTL), 10),
+					Account:   builder.Account,
+					AccountId: builder.AccountId,
+					Key:       v.Key,
+					Type:      v.Type,
+					Label:     v.Label,
+					Value:     v.Value,
+					Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
 				})
 			}
 		}
 	}
 
-	if err = b.DbDao.UpdateAccountInfoList(accounts, records, accountList); err != nil {
+	if err = b.DbDao.UpdateAccountInfoList(accounts, records, accountIdList); err != nil {
 		resp.Err = fmt.Errorf("UpdateAccountInfo err: %s", err.Error())
 		return
 	}

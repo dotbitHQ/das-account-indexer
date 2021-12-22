@@ -48,12 +48,13 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 	list := builder.RecordList()
 	for _, v := range list {
 		records = append(records, tables.TableRecordsInfo{
-			Account: builder.Account,
-			Key:     v.Key,
-			Type:    v.Type,
-			Label:   v.Label,
-			Value:   v.Value,
-			Ttl:     strconv.FormatUint(uint64(v.TTL), 10),
+			Account:   builder.Account,
+			AccountId: builder.AccountId,
+			Key:       v.Key,
+			Type:      v.Type,
+			Label:     v.Label,
+			Value:     v.Value,
+			Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
 		})
 	}
 

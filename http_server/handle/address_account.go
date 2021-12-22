@@ -77,7 +77,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")
 		return nil
 	}
-	var accounts []string
+	var accountIds []string
 	var mapAccountIndex = make(map[string]int)
 	for i, v := range list {
 		dasLockArgs := core.FormatOwnerManagerAddressToArgs(v.OwnerChainType, v.ManagerChainType, v.Owner, v.Manager)
@@ -101,13 +101,14 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 			},
 		}
 		resp = append(resp, tmp)
-		accounts = append(accounts, v.Account)
-		mapAccountIndex[v.Account] = i
+		accountId := common.Bytes2Hex(common.GetAccountIdByAccount(v.Account))
+		accountIds = append(accountIds, accountId)
+		mapAccountIndex[accountId] = i
 	}
 
 	// records
-	if len(accounts) > 0 {
-		records, err := h.DbDao.FindRecordsByAccounts(accounts)
+	if len(accountIds) > 0 {
+		records, err := h.DbDao.FindRecordsByAccountIds(accountIds)
 		if err != nil {
 			log.Error("FindRecordsByAccounts err:", err.Error(), req.Address)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find records info err")
@@ -115,7 +116,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 		}
 		for _, v := range records {
 			key := fmt.Sprintf("%s.%s", v.Type, v.Key)
-			if index, ok := mapAccountIndex[v.Account]; ok {
+			if index, ok := mapAccountIndex[v.AccountId]; ok {
 				resp[index].AccountData.Records = append(resp[index].AccountData.Records, DataRecord{
 					Key:   key,
 					Label: v.Label,

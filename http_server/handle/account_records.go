@@ -80,8 +80,8 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 		return nil
 	}
 
-	accountId := common.GetAccountIdByAccount(req.Account)
-	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(common.Bytes2Hex(accountId))
+	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
+	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
@@ -93,7 +93,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 
 	resp.Account = req.Account
 
-	list, err := h.DbDao.FindAccountRecords(req.Account)
+	list, err := h.DbDao.FindAccountRecordsByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountRecords err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find records info err")

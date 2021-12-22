@@ -119,8 +119,8 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 		return nil
 	}
 
-	accountId := common.GetAccountIdByAccount(reverse.Account)
-	account, err := h.DbDao.FindAccountInfoByAccountId(common.Bytes2Hex(accountId))
+	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(reverse.Account))
+	account, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.Address, reverse.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account err")
@@ -132,7 +132,7 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	} else if account.ManagerChainType == res.ChainType && strings.EqualFold(account.Manager, res.Address) {
 		resp.Account = account.Account
 	} else {
-		record, err := h.DbDao.FindRecordByAccountAddressValue(account.Account, res.Address)
+		record, err := h.DbDao.FindRecordByAccountIdAddressValue(account.AccountId, res.Address)
 		if err != nil {
 			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.Address, reverse.Account)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account record err")

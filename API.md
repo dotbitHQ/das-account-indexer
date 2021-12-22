@@ -1,8 +1,8 @@
 * [API List](#api-list)
-    * [Get Account Records Info](#get-account-records-info)
+    * [Get Server Info](#get-server-info)
     * [Get Reverse Record Info](#get-reverse-record-info)
     * [Get Account Basic Info](#get-account-basic-info)
-    * [Get Server Info](#get-server-info)
+    * [Get Account Records Info](#get-account-records-info)   
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -10,9 +10,136 @@
     * [Error Example](#error-example)
     * [Error Code](#error-code)
 
-
-
+  
 ## API List
+
+### Get Server Info
+
+**Request**
+
+* path: `/v1/server/info`
+* param: none
+
+**Response**
+
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "is_latest_block_number": true,
+    "current_block_number": 6088191
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-basic.da.systems/v1/server/info
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
+```
+
+### Get Reverse Record Info
+
+**Request**
+* host: `reverse-record.da.systems`
+* path: `/v1/reverse/record`
+* param:
+
+```javascript
+{
+  "type": "blockchain",
+  "key_info": {
+    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
+    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+    "key": "" // address
+  }
+}
+```
+
+**Response**
+
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "account": ""
+  }
+}
+```
+
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-basic.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
+```
+
+### Get Account Basic Info
+
+**Request**
+
+* path: `/v1/account/info`
+* param:
+
+```json
+{
+  "account": "phone.bit"
+}
+```
+
+**Response**
+
+```javascript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "out_point": {
+      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
+      "index": 0
+    },
+    "account_info": {
+      "account": "phone.bit",
+      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
+      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
+      "create_at_unix": 1626955542,
+      "expired_at_unix": 1658491542,
+      "status": 1,
+      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
+      "owner_algorithm_id": 5, // 3: eth personal sign, 4: tron sign, 5: eip-712
+      "owner_key": "0x59724739940777947c56c4f2f2c9211cd5130fef",
+      "manager_algorithm_id": 5,
+      "manager_key": "0x59724739940777947c56c4f2f2c9211cd5130fef"
+    }
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-basic.da.systems/v1/account/info -d'{"account":"phone.bit"}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+```
 
 ### Get Account Records Info
 
@@ -65,135 +192,6 @@ or json rpc style:
 
 ```shell
 curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
-```
-
-### Get Reverse Record Info
-
-**Request**
-* host: `reverse-record.da.systems`
-* path: `/v1/reverse/record`
-* param:
-
-```javascript
-{
-  "type": "blockchain",
-  "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
-    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
-    "key": "" // address
-  }
-}
-```
-
-**Response**
-
-```json
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "account": ""
-  }
-}
-```
-
-
-**Usage**
-
-```shell
-curl -X POST https://reverse-record.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
-```
-
-or json rpc style:
-
-```shell
-curl -X POST https://reverse-record.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
-```
-
-
-### Get Account Basic Info
-
- **Request**
-
-* path: `/v1/account/info`
-* param:
-
-```json
-{
-  "account": "phone.bit"
-}
-```
-
- **Response**
-
-```javascript
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "out_point": {
-      "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
-      "index": 0
-    },
-    "account_info": {
-      "account": "phone.bit",
-      "account_id_hex": "0x5f560ec1edc638d7dab7c7a1ca8c3b0f6ed1848b",
-      "next_account_id_hex": "0x5f5c20f6cd95388378771ca957ce665f084fe23b",
-      "create_at_unix": 1626955542,
-      "expired_at_unix": 1658491542,
-      "status": 1,
-      "das_lock_arg_hex": "0x0559724739940777947c56c4f2f2c9211cd5130fef0559724739940777947c56c4f2f2c9211cd5130fef",
-      "owner_algorithm_id": 5, // 3: eth personal sign, 4: tron sign, 5: eip-712
-      "owner_address": "0x59724739940777947c56c4f2f2c9211cd5130fef",
-      "manager_algorithm_id": 5,
-      "manager_address": "0x59724739940777947c56c4f2f2c9211cd5130fef"
-    }
-  }
-}
-```
-
- **Usage**
-
-```shell
-curl -X POST http://127.0.0.1:8122/v1/account/info -d'{"account":"phone.bit"}'
-```
-
-or json rpc style:
-
-```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
-```
-
-### Get Server Info
-
-**Request**
-
-* path: `/v1/server/info`
-* param: none
-
-**Response**
-
-```json
-{
-  "errno": 0,
-  "errmsg": "",
-  "data": {
-    "is_latest_block_number": true,
-    "current_block_number": 6088191
-  }
-}
-```
-
-**Usage**
-
-```shell
-curl -X POST http://127.0.0.1:8122/v1/server/info
-```
-
-or json rpc style:
-
-```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
 ```
 
 ## _Deprecated API List_

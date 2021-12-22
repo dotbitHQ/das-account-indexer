@@ -105,6 +105,8 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 	switch req.Method {
 	case code.MethodServerInfo:
 		h.JsonRpcServerInfo(req.Params, &apiResp)
+	case code.MethodAccountInfo:
+		h.JsonRpcAccountInfo(req.Params, &apiResp)
 	case code.MethodReverseRecord:
 		h.JsonRpcReverseRecord(req.Params, &apiResp)
 	default:

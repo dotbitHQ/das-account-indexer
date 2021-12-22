@@ -45,6 +45,7 @@ func (h *HttpServer) initRouter() {
 		{
 			v1Reverse.POST("/server/info", cacheHandle, h.H.ServerInfo)
 			v1Reverse.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
+			v1Reverse.POST("/account/info", cacheHandle, h.H.AccountInfo)
 		}
 	}
 

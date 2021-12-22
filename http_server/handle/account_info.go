@@ -32,9 +32,9 @@ type AccountInfo struct {
 	Status             tables.AccountStatus  `json:"status"`
 	DasLockArgHex      string                `json:"das_lock_arg_hex"`
 	OwnerAlgorithmId   common.DasAlgorithmId `json:"owner_algorithm_id"`
-	OwnerAddress       string                `json:"owner_address"`
+	OwnerKey           string                `json:"owner_key"`
 	ManagerAlgorithmId common.DasAlgorithmId `json:"manager_algorithm_id"`
-	ManagerAddress     string                `json:"manager_address"`
+	ManagerKey         string                `json:"manager_key"`
 }
 
 func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *code.ApiResp) {
@@ -110,9 +110,9 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		Status:             accountInfo.Status,
 		DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
 		OwnerAlgorithmId:   accountInfo.OwnerAlgorithmId,
-		OwnerAddress:       core.FormatHexAddressToNormal(accountInfo.OwnerChainType, accountInfo.Owner),
+		OwnerKey:           core.FormatHexAddressToNormal(accountInfo.OwnerChainType, accountInfo.Owner),
 		ManagerAlgorithmId: accountInfo.ManagerAlgorithmId,
-		ManagerAddress:     core.FormatHexAddressToNormal(accountInfo.ManagerChainType, accountInfo.Manager),
+		ManagerKey:         core.FormatHexAddressToNormal(accountInfo.ManagerChainType, accountInfo.Manager),
 	}
 
 	apiResp.ApiRespOK(resp)

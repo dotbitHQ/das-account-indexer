@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS `t_account_info`
     `created_at`           timestamp                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
     `updated_at`           timestamp                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '',
     PRIMARY KEY (`id`) USING BTREE,
-    UNIQUE KEY `uk_account` (`account`) USING BTREE,
-    KEY `k_account_id` (`account_id`) USING BTREE,
+    UNIQUE KEY `uk_account_id` (`account_id`) USING BTREE,
+    KEY `k_account` (`account`) USING BTREE,
     KEY `k_oct_o` (`owner_chain_type`, `owner`) USING BTREE,
     KEY `k_mct_m` (`manager_chain_type`, `manager`) USING BTREE
 ) ENGINE = InnoDB

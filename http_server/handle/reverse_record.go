@@ -85,7 +85,7 @@ func checkReqReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) *format
 		dasChainType = code.FormatChainIdToDasChainType(config.Cfg.Server.Net, req.KeyInfo.ChainId)
 	}
 	if dasChainType == -1 {
-		if req.KeyInfo.ChainId != "" && strings.HasPrefix(req.KeyInfo.Key, "0x") {
+		if strings.HasPrefix(req.KeyInfo.Key, "0x") {
 			dasChainType = common.ChainTypeEth
 		} else {
 			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("coin_type [%s] and chain_id [%s] is invalid", req.KeyInfo.CoinType, req.KeyInfo.ChainId))

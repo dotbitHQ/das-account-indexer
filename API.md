@@ -151,7 +151,7 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 * path: `/v1/account/list`
 * param:
 
-```json
+```javascript
 {
   "type": "blockchain",
   "key_info": {

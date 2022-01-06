@@ -14,6 +14,10 @@ import (
 )
 
 type ReqReverseRecord struct {
+	ReqKeyInfo
+}
+
+type ReqKeyInfo struct {
 	Type    string `json:"type"` // blockchain
 	KeyInfo struct {
 		CoinType code.CoinType `json:"coin_type"`
@@ -22,7 +26,7 @@ type ReqReverseRecord struct {
 	} `json:"key_info"`
 }
 
-type formatReqReverseRecord struct {
+type formatReqKeyInfo struct {
 	ChainType common.ChainType
 	Address   string
 }
@@ -74,8 +78,8 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func checkReqReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) *formatReqReverseRecord {
-	var res formatReqReverseRecord
+func checkReqKeyInfo(req *ReqKeyInfo, apiResp *code.ApiResp) *formatReqKeyInfo {
+	var res formatReqKeyInfo
 	if req.Type != "blockchain" {
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
 		return &res
@@ -103,7 +107,7 @@ func checkReqReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) *format
 
 func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) error {
 	var resp RespReverseRecord
-	res := checkReqReverseRecord(req, apiResp)
+	res := checkReqKeyInfo(&req.ReqKeyInfo, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil

@@ -70,3 +70,8 @@ func (d *DbDao) FindAccountListByAddress(chainType common.ChainType, address str
 	err = d.db.Where(" owner_chain_type=? AND owner=? ", chainType, address).Find(&list).Error
 	return
 }
+
+func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address string) (list []tables.TableAccountInfo, err error) {
+	err = d.db.Select("account").Where(" owner_chain_type=? AND owner=? ", chainType, address).Find(&list).Error
+	return
+}

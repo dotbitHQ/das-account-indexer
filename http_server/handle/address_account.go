@@ -134,6 +134,8 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 func formatAddress(address string) (common.ChainType, string) {
 	if strings.HasPrefix(address, common.TronBase58PreFix) {
 		return common.ChainTypeTron, core.FormatAddressToHex(common.ChainTypeTron, address)
+	} else if strings.HasPrefix(address, common.TronPreFix) {
+		return common.ChainTypeTron, address
 	} else if strings.HasPrefix(address, common.HexPreFix) {
 		return common.ChainTypeEth, address
 	} else {

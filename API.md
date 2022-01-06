@@ -182,13 +182,13 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 **Usage**
 
 ```shell
-curl -X POST https://indexer-basic.da.systems/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
+curl -X POST https://indexer-basic.da.systems/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
+curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}]}'
 ```
 
 ### Get Account Records Info

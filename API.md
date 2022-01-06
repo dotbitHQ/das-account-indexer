@@ -171,10 +171,9 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
   "data":{
     "account_list":[
       {
-        "account_info":{
-          "account":""
-        }
+        "account":""
       }
+      // ...
     ]
   }
 }

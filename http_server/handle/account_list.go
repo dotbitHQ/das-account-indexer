@@ -18,11 +18,6 @@ type RespAccountList struct {
 }
 
 type RespAddressAccount struct {
-	//OutPoint    *types.OutPoint `json:"out_point"`
-	AccountInfo DataAccountInfo `json:"account_info"`
-}
-
-type DataAccountInfo struct {
 	Account string `json:"account"`
 }
 
@@ -88,7 +83,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	}
 
 	for _, v := range list {
-		tmp := RespAddressAccount{AccountInfo: DataAccountInfo{Account: v.Account}}
+		tmp := RespAddressAccount{Account: v.Account}
 		resp.AccountList = append(resp.AccountList, tmp)
 	}
 

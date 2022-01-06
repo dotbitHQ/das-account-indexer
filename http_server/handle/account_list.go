@@ -9,16 +9,25 @@ import (
 	"net/http"
 )
 
-type ReqAddressAccountList struct {
+type ReqAccountList struct {
 	ReqKeyInfo
 }
 
-type RespAddressAccountList struct {
-	AccountList []string `json:"account_list"`
+type RespAccountList struct {
+	AccountList []RespAddressAccount `json:"account_list"`
 }
 
-func (h *HttpHandle) JsonRpcAddressAccountList(p json.RawMessage, apiResp *code.ApiResp) {
-	var req []ReqAddressAccountList
+type RespAddressAccount struct {
+	//OutPoint    *types.OutPoint `json:"out_point"`
+	AccountInfo DataAccountInfo `json:"account_info"`
+}
+
+type DataAccountInfo struct {
+	Account string `json:"account"`
+}
+
+func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *code.ApiResp) {
+	var req []ReqAccountList
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
@@ -31,15 +40,15 @@ func (h *HttpHandle) JsonRpcAddressAccountList(p json.RawMessage, apiResp *code.
 		return
 	}
 
-	if err = h.doAddressAccountList(&req[0], apiResp); err != nil {
-		log.Error("doAddressAccountList err:", err.Error())
+	if err = h.doAccountList(&req[0], apiResp); err != nil {
+		log.Error("doAccountList err:", err.Error())
 	}
 }
 
-func (h *HttpHandle) AddressAccountList(ctx *gin.Context) {
+func (h *HttpHandle) AccountList(ctx *gin.Context) {
 	var (
-		funcName = "AddressAccountList"
-		req      ReqAddressAccountList
+		funcName = "AccountList"
+		req      ReqAccountList
 		apiResp  code.ApiResp
 		err      error
 	)
@@ -52,16 +61,16 @@ func (h *HttpHandle) AddressAccountList(ctx *gin.Context) {
 	}
 	log.Info("ApiReq:", funcName, toolib.JsonString(req))
 
-	if err = h.doAddressAccountList(&req, &apiResp); err != nil {
-		log.Error("doAddressAccountList err:", err.Error(), funcName)
+	if err = h.doAccountList(&req, &apiResp); err != nil {
+		log.Error("doAccountList err:", err.Error(), funcName)
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAddressAccountList(req *ReqAddressAccountList, apiResp *code.ApiResp) error {
-	var resp RespAddressAccountList
-	resp.AccountList = make([]string, 0)
+func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) error {
+	var resp RespAccountList
+	resp.AccountList = make([]RespAddressAccount, 0)
 
 	res := checkReqKeyInfo(&req.ReqKeyInfo, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
@@ -69,7 +78,7 @@ func (h *HttpHandle) doAddressAccountList(req *ReqAddressAccountList, apiResp *c
 		return nil
 	}
 
-	log.Info("doAddressAccountList:", res.ChainType, res.Address)
+	log.Info("doAccountList:", res.ChainType, res.Address)
 
 	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.Address)
 	if err != nil {
@@ -79,7 +88,8 @@ func (h *HttpHandle) doAddressAccountList(req *ReqAddressAccountList, apiResp *c
 	}
 
 	for _, v := range list {
-		resp.AccountList = append(resp.AccountList, v.Account)
+		tmp := RespAddressAccount{AccountInfo: DataAccountInfo{Account: v.Account}}
+		resp.AccountList = append(resp.AccountList, tmp)
 	}
 
 	apiResp.ApiRespOK(resp)

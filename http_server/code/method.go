@@ -10,6 +10,7 @@ const (
 	MethodAddressAccount JsonRpcMethod = "das_getAddressAccount"
 
 	MethodAccountInfo    JsonRpcMethod = "das_accountInfo"
+	MethodAccountList    JsonRpcMethod = "das_accountList"
 	MethodAccountRecords JsonRpcMethod = "das_accountRecords"
 	MethodReverseRecord  JsonRpcMethod = "das_reverseRecord"
 )

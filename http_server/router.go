@@ -32,9 +32,10 @@ func (h *HttpServer) initRouter() {
 		{
 			v1Indexer.POST("/server/info", cacheHandle, h.H.ServerInfo)
 			v1Indexer.POST("/account/info", cacheHandle, h.H.AccountInfo)
+			v1Indexer.POST("/account/list", cacheHandle, h.H.AccountList)
 			v1Indexer.POST("/account/records", cacheHandle, h.H.AccountRecords)
 			v1Indexer.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
-			v1Indexer.POST("/address/account", cacheHandle, h.H.AddressAccountList)
+
 		}
 	}
 
@@ -47,7 +48,7 @@ func (h *HttpServer) initRouter() {
 			v1Reverse.POST("/server/info", cacheHandle, h.H.ServerInfo)
 			v1Reverse.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
 			v1Reverse.POST("/account/info", cacheHandle, h.H.AccountInfo)
-			v1Reverse.POST("/address/account", cacheHandle, h.H.AddressAccountList)
+			v1Reverse.POST("/account/list", cacheHandle, h.H.AccountList)
 		}
 	}
 

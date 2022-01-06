@@ -2,6 +2,7 @@
     * [Get Server Info](#get-server-info)
     * [Get Reverse Record Info](#get-reverse-record-info)
     * [Get Account Basic Info](#get-account-basic-info)
+    * [Get Account List](#get-account-list)  
     * [Get Account Records Info](#get-account-records-info)   
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
@@ -140,6 +141,55 @@ or json rpc style:
 
 ```shell
 curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+```
+
+### Get Account List
+
+**Request**
+
+* host: `indexer-basic.da.systems`
+* path: `/v1/account/list`
+* param:
+
+```json
+{
+  "type": "blockchain",
+  "key_info": {
+    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
+    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+    "key": "" // address
+  }
+}
+```
+
+**Response**
+
+```javascript
+{
+  "errno":0,
+  "errmsg":"",
+  "data":{
+    "account_list":[
+      {
+        "account_info":{
+          "account":""
+        }
+      }
+    ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-basic.da.systems/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
 ```
 
 ### Get Account Records Info

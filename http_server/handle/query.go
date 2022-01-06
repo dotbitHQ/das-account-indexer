@@ -69,6 +69,8 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		h.JsonRpcServerInfo(req.Params, &apiResp)
 	case code.MethodAccountInfo:
 		h.JsonRpcAccountInfo(req.Params, &apiResp)
+	case code.MethodAccountList:
+		h.JsonRpcAccountList(req.Params, &apiResp)
 	case code.MethodAccountRecords:
 		h.JsonRpcAccountRecords(req.Params, &apiResp)
 	case code.MethodReverseRecord:
@@ -107,6 +109,8 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 		h.JsonRpcServerInfo(req.Params, &apiResp)
 	case code.MethodAccountInfo:
 		h.JsonRpcAccountInfo(req.Params, &apiResp)
+	case code.MethodAccountList:
+		h.JsonRpcAccountList(req.Params, &apiResp)
 	case code.MethodReverseRecord:
 		h.JsonRpcReverseRecord(req.Params, &apiResp)
 	default:

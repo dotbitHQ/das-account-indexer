@@ -1,6 +1,6 @@
 # github.com/Andrew-M-C/go.emoji v0.0.0-20211011074904-61cf526972e1
 github.com/Andrew-M-C/go.emoji/official
-# github.com/DeAccountSystems/das-lib v0.0.0-20211214073305-9c63875053ec
+# github.com/DeAccountSystems/das-lib v0.0.0-20220105140009-d423fec84f2f
 ## explicit
 github.com/DeAccountSystems/das-lib/common
 github.com/DeAccountSystems/das-lib/core
@@ -185,7 +185,7 @@ github.com/minio/blake2b-simd
 github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
-# github.com/nervosnetwork/ckb-sdk-go v0.43.2
+# github.com/nervosnetwork/ckb-sdk-go v0.101.3
 ## explicit
 github.com/nervosnetwork/ckb-sdk-go/address
 github.com/nervosnetwork/ckb-sdk-go/collector

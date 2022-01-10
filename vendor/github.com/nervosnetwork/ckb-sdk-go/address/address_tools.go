@@ -26,6 +26,14 @@ type AddressGenerateResult struct {
 	PrivateKey string
 }
 
+func GenerateAddress(mode Mode) (*AddressGenerateResult, error) {
+	return GenerateBech32mFullAddress(mode)
+}
+
+// Deprecated: Short address format deprecated because it is limited (only support secp256k1_blake160,
+// secp256k1_multisig, anyone_can_pay) and a flaw has been found in its encoding method bech32,
+// which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
 func GenerateShortAddress(mode Mode) (*AddressGenerateResult, error) {
 
 	key, err := secp256k1.RandomNew()
@@ -44,7 +52,7 @@ func GenerateShortAddress(mode Mode) (*AddressGenerateResult, error) {
 		Args:     common.FromHex(hex.EncodeToString(pubKey)),
 	}
 
-	address, err := Generate(mode, script)
+	address, err := ConvertScriptToShortAddress(mode, script)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +62,67 @@ func GenerateShortAddress(mode Mode) (*AddressGenerateResult, error) {
 		LockArgs:   hexutil.Encode(pubKey),
 		PrivateKey: hexutil.Encode(key.Bytes()),
 	}, err
+}
 
+// Deprecated: Old full address format is deprecated because a flaw has been found in its encoding method
+// bech32, which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
+func GenerateFullAddress(mode Mode) (*AddressGenerateResult, error) {
+	key, err := secp256k1.RandomNew()
+	if err != nil {
+		return nil, err
+	}
+
+	pubKey, err := blake2b.Blake160(key.PubKey())
+	if err != nil {
+		return nil, err
+	}
+
+	script := &types.Script{
+		CodeHash: types.HexToHash(transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH),
+		HashType: types.HashTypeType,
+		Args:     common.FromHex(hex.EncodeToString(pubKey)),
+	}
+
+	address, err := ConvertScriptToFullAddress(FullTypeFormat, mode, script)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AddressGenerateResult{
+		Address:    address,
+		LockArgs:   hexutil.Encode(pubKey),
+		PrivateKey: hexutil.Encode(key.Bytes()),
+	}, err
+}
+
+func GenerateBech32mFullAddress(mode Mode) (*AddressGenerateResult, error) {
+	key, err := secp256k1.RandomNew()
+	if err != nil {
+		return nil, err
+	}
+
+	pubKey, err := blake2b.Blake160(key.PubKey())
+	if err != nil {
+		return nil, err
+	}
+
+	script := &types.Script{
+		CodeHash: types.HexToHash(transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH),
+		HashType: types.HashTypeType,
+		Args:     common.FromHex(hex.EncodeToString(pubKey)),
+	}
+
+	address, err := ConvertScriptToBech32mFullAddress(mode, script)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AddressGenerateResult{
+		Address:    address,
+		LockArgs:   hexutil.Encode(pubKey),
+		PrivateKey: hexutil.Encode(key.Bytes()),
+	}, err
 }
 
 func GenerateAcpAddress(secp256k1Address string) (string, error) {
@@ -69,7 +137,7 @@ func GenerateAcpAddress(secp256k1Address string) (string, error) {
 		Args:     common.FromHex(hex.EncodeToString(addressScript.Script.Args)),
 	}
 
-	return Generate(addressScript.Mode, script)
+	return ConvertScriptToAddress(addressScript.Mode, script)
 }
 
 func GenerateChequeAddress(senderAddress, receiverAddress string) (string, error) {
@@ -108,8 +176,16 @@ func GenerateChequeAddress(senderAddress, receiverAddress string) (string, error
 		Args:     common.FromHex(pubKey),
 	}
 
-	return Generate(senderScript.Mode, chequeLock)
+	return ConvertScriptToAddress(senderScript.Mode, chequeLock)
 
+}
+
+func getHashType(hashType types.ScriptHashType) string {
+	if hashType == types.HashTypeType {
+		return "01"
+	} else {
+		return "00"
+	}
 }
 
 func getAcpCodeHash(mode Mode) string {

@@ -9,6 +9,7 @@ import (
 
 type OfferCellBuilder struct {
 	Index         uint32
+	Version       uint32
 	OfferCellData *molecule.OfferCellData
 	DataEntityOpt *molecule.DataEntityOpt
 	Account       string
@@ -35,6 +36,12 @@ func OfferCellDataBuilderMapFromTx(tx *types.Transaction, dataType common.DataTy
 				return false, fmt.Errorf("get index err")
 			}
 			resp.Index = index
+
+			version, err := molecule.Bytes2GoU32(dataEntity.Version().RawData())
+			if err != nil {
+				return false, fmt.Errorf("get version err: %s", err.Error())
+			}
+			resp.Version = version
 
 			offerCellData, err := molecule.OfferCellDataFromSlice(dataEntity.Entity().RawData(), false)
 			if err != nil {
@@ -95,7 +102,7 @@ func (o *OfferCellBuilder) getOldDataEntityOpt(p *OfferCellParam) *molecule.Data
 
 	oldOfferCellDataBytes := molecule.GoBytes2MoleculeBytes(o.OfferCellData.AsSlice())
 	oldDataEntity = molecule.NewDataEntityBuilder().Entity(oldOfferCellDataBytes).
-		Version(DataEntityVersion2).
+		Version(DataEntityVersion1).
 		Index(molecule.GoU32ToMoleculeU32(p.OldIndex)).
 		Build()
 	oldDataEntityOpt := molecule.NewDataEntityOptBuilder().Set(oldDataEntity).Build()

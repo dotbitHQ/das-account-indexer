@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/DeAccountSystems/das-lib/core"
+	"github.com/DeAccountSystems/das-lib/witness"
 	"github.com/nervosnetwork/ckb-sdk-go/crypto/blake2b"
 	"github.com/nervosnetwork/ckb-sdk-go/transaction"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
@@ -111,9 +112,12 @@ func (d *DasTxBuilder) generateDigestByGroup(group []int, skipGroups []int) (Sig
 		return signData, fmt.Errorf("getInputCell err: %s", err.Error())
 	}
 
-	algorithmId, _, _, _, _, _ := core.FormatDasLockToHexAddress(item.Cell.Output.Lock.Args)
+	ownerAlgorithmId, managerAlgorithmId, _, _, _, _ := core.FormatDasLockToHexAddress(item.Cell.Output.Lock.Args)
 	signData.SignMsg = digest
-	signData.SignType = algorithmId
+	signData.SignType = ownerAlgorithmId
+	if actionBuilder, err := witness.ActionDataBuilderFromTx(d.Transaction); err == nil && actionBuilder.Action == common.DasActionEditRecords {
+		signData.SignType = managerAlgorithmId
+	}
 
 	// skip useless signature
 	if len(skipGroups) != 0 {

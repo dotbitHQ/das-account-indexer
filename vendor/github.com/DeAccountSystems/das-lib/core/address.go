@@ -2,12 +2,14 @@ package core
 
 import (
 	"encoding/hex"
+	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/nervosnetwork/ckb-sdk-go/address"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"strings"
 )
 
+// Deprecated: format normal ckb lock to address will delete in future
 func FormatNormalCkbLockToAddress(net common.DasNetType, args []byte) (addr string, err error) {
 	lockScript := common.GetNormalLockScript(common.Bytes2Hex(args))
 	netMode := address.Mainnet
@@ -18,7 +20,7 @@ func FormatNormalCkbLockToAddress(net common.DasNetType, args []byte) (addr stri
 		netMode = address.Testnet
 	}
 
-	addr, err = address.Generate(netMode, lockScript)
+	addr, err = common.ConvertScriptToAddress(netMode, lockScript)
 	return
 }
 
@@ -90,9 +92,11 @@ func (d *DasCore) FormatAddressToDasLockScript(chainType common.ChainType, addr 
 		} else {
 			args = common.DasLockEthPreFix + strings.TrimPrefix(addr, common.HexPreFix)
 		}
-	case common.ChainTypeBtc:
 	case common.ChainTypeTron:
 		args = common.DasLockTronPreFix + strings.TrimPrefix(addr, common.TronPreFix)
+	default:
+		e = fmt.Errorf("unknow chain type [%d]", chainType)
+		return
 	}
 	args = common.HexPreFix + args + args
 

@@ -23,5 +23,5 @@ func GenerateAddressByArgs(net common.DasNetType, args string) (string, error) {
 	if net == common.DasNetTypeMainNet {
 		netMode = address.Mainnet
 	}
-	return address.Generate(netMode, serverLock)
+	return common.ConvertScriptToAddress(netMode, serverLock)
 }

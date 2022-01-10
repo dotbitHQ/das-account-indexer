@@ -54,7 +54,8 @@ func (d *DasTxBuilder) addInputsForTx(inputs []*types.CellInput) error {
 				}
 				cellDepList = append(cellDepList, dasContract.ToCellDep())
 			}
-		} else if item.Cell.Output.Lock != nil &&
+		}
+		if item.Cell.Output.Lock != nil &&
 			item.Cell.Output.Lock.CodeHash.Hex() == transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH &&
 			d.equalArgs(common.Bytes2Hex(item.Cell.Output.Lock.Args), d.serverArgs) {
 			d.ServerSignGroup = append(d.ServerSignGroup, startIndex+i)

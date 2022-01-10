@@ -10,6 +10,8 @@ const charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 
 var gen = []int{0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3}
 
+const BECH32M_CONST = 0x2bc830a3
+
 func Decode(bech string) (string, []byte, error) {
 	for i := 0; i < len(bech); i++ {
 		if bech[i] < 33 || bech[i] > 126 {
@@ -38,15 +40,36 @@ func Decode(bech string) (string, []byte, error) {
 		return "", nil, errors.New(fmt.Sprintf("failed converting data to bytes: %v", err))
 	}
 
-	if !bech32VerifyChecksum(hrp, decoded) {
-		moreInfo := ""
-		checksum := bech[len(bech)-6:]
-		expected, err := toChars(bech32Checksum(hrp,
-			decoded[:len(decoded)-6]))
-		if err == nil {
-			moreInfo = fmt.Sprintf("Expected %v, got %v.", expected, checksum)
+	ints := make([]int, len(decoded))
+	for i := 0; i < len(decoded); i++ {
+		ints[i] = int(decoded[i])
+	}
+
+	polymod := append(bech32HrpExpand(hrp), ints...)
+	i := bech32Polymod(polymod)
+
+	if i == 1 {
+		if !bech32VerifyChecksum(hrp, decoded) {
+			moreInfo := ""
+			checksum := bech[len(bech)-6:]
+			expected, err := toChars(bech32Checksum(hrp,
+				decoded[:len(decoded)-6]))
+			if err == nil {
+				moreInfo = fmt.Sprintf("Expected %v, got %v.", expected, checksum)
+			}
+			return "", nil, errors.New("checksum failed. " + moreInfo)
 		}
-		return "", nil, errors.New("checksum failed. " + moreInfo)
+	} else {
+		if !bech32VerifyChecksumWithBech32m(hrp, decoded) {
+			moreInfo := ""
+			checksum := bech[len(bech)-6:]
+			expected, err := toChars(bech32Checksum(hrp,
+				decoded[:len(decoded)-6]))
+			if err == nil {
+				moreInfo = fmt.Sprintf("Expected %v, got %v.", expected, checksum)
+			}
+			return "", nil, errors.New("checksum failed. " + moreInfo)
+		}
 	}
 
 	return hrp, decoded[:len(decoded)-6], nil
@@ -184,4 +207,107 @@ func bech32VerifyChecksum(hrp string, data []byte) bool {
 	}
 	concat := append(bech32HrpExpand(hrp), integers...)
 	return bech32Polymod(concat) == 1
+}
+
+func DecodeWithBech32m(bech string) (string, []byte, error) {
+	for i := 0; i < len(bech); i++ {
+		if bech[i] < 33 || bech[i] > 126 {
+			return "", nil, fmt.Errorf("invalid character: '%c'", bech[i])
+		}
+	}
+
+	lower := strings.ToLower(bech)
+	upper := strings.ToUpper(bech)
+	if bech != lower && bech != upper {
+		return "", nil, errors.New("string not all lowercase or all uppercase")
+	}
+
+	bech = lower
+
+	one := strings.LastIndexByte(bech, '1')
+	if one < 1 || one+7 > len(bech) {
+		return "", nil, fmt.Errorf("invalid index of 1")
+	}
+
+	hrp := bech[:one]
+	data := bech[one+1:]
+
+	decoded, err := toBytes(data)
+	if err != nil {
+		return "", nil, errors.New(fmt.Sprintf("failed converting data to bytes: %v", err))
+	}
+
+	if !bech32VerifyChecksumWithBech32m(hrp, decoded) {
+		moreInfo := ""
+		checksum := bech[len(bech)-6:]
+		expected, err := toChars(bech32ChecksumWithBech32m(hrp,
+			decoded[:len(decoded)-6]))
+		if err == nil {
+			moreInfo = fmt.Sprintf("Expected %v, got %v.", expected, checksum)
+		}
+		return "", nil, errors.New("checksum failed. " + moreInfo)
+	}
+
+	return hrp, decoded[:len(decoded)-6], nil
+}
+
+func EncodeWithBech32m(hrp string, data []byte) (string, error) {
+	checksum := bech32ChecksumWithBech32m(hrp, data)
+	combined := append(data, checksum...)
+
+	dataChars, err := toChars(combined)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("unable to convert data bytes to chars: %v", err))
+	}
+	return hrp + "1" + dataChars, nil
+}
+
+func bech32ChecksumWithBech32m(hrp string, data []byte) []byte {
+	integers := make([]int, len(data))
+	for i, b := range data {
+		integers[i] = int(b)
+	}
+	values := append(bech32HrpExpandWithBech32m(hrp), integers...)
+	values = append(values, []int{0, 0, 0, 0, 0, 0}...)
+	polymod := bech32PolymodWithBech32m(values) ^ BECH32M_CONST
+	var res []byte
+	for i := 0; i < 6; i++ {
+		res = append(res, byte((polymod>>uint(5*(5-i)))&31))
+	}
+	return res
+}
+
+func bech32PolymodWithBech32m(values []int) int {
+	chk := 1
+	for _, v := range values {
+		b := chk >> 25
+		chk = (chk&0x1ffffff)<<5 ^ v
+		for i := 0; i < 5; i++ {
+			if (b>>uint(i))&1 == 1 {
+				chk ^= gen[i]
+			}
+		}
+	}
+	return chk
+}
+
+func bech32HrpExpandWithBech32m(hrp string) []int {
+	v := make([]int, 0, len(hrp)*2+1)
+	for i := 0; i < len(hrp); i++ {
+		v = append(v, int(hrp[i]>>5))
+	}
+	v = append(v, 0)
+	for i := 0; i < len(hrp); i++ {
+		v = append(v, int(hrp[i]&31))
+	}
+	return v
+}
+
+func bech32VerifyChecksumWithBech32m(hrp string, data []byte) bool {
+	integers := make([]int, len(data))
+	for i, b := range data {
+		integers[i] = int(b)
+	}
+	concat := append(bech32HrpExpandWithBech32m(hrp), integers...)
+	return bech32PolymodWithBech32m(concat) == BECH32M_CONST
 }

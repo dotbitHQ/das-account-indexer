@@ -21,6 +21,7 @@ type ConfigCellDataBuilder struct {
 	ConfigCellApply             *molecule.ConfigCellApply
 	ConfigCellRelease           *molecule.ConfigCellRelease
 	ConfigCellRecordKeys        []string
+	ConfigCellEmojis            []string
 }
 
 func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *types.Transaction, configCellTypeArgs common.ConfigCellTypeArgs) error {
@@ -69,11 +70,11 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 		}
 		builder.ConfigCellApply = ConfigCellApply
 	case common.ConfigCellTypeArgsRelease:
-		ConfigCellApply, err := molecule.ConfigCellReleaseFromSlice(configCellDataBys, false)
+		ConfigCellRelease, err := molecule.ConfigCellReleaseFromSlice(configCellDataBys, false)
 		if err != nil {
 			return fmt.Errorf("ConfigCellProfitRateFromSlice err: %s", err.Error())
 		}
-		builder.ConfigCellRelease = ConfigCellApply
+		builder.ConfigCellRelease = ConfigCellRelease
 	case common.ConfigCellTypeArgsSecondaryMarket:
 		ConfigCellSecondaryMarket, err := molecule.ConfigCellSecondaryMarketFromSlice(configCellDataBys, false)
 		if err != nil {
@@ -115,7 +116,22 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 		if err != nil {
 			return fmt.Errorf("key name space len err: %s", err.Error())
 		}
-		builder.ConfigCellRecordKeys = strings.Split(string(configCellDataBys[4:dataLength-4]), string([]byte{0x00}))
+		builder.ConfigCellRecordKeys = strings.Split(string(configCellDataBys[4:dataLength]), string([]byte{0x00}))
+	case common.ConfigCellTypeArgsCharSetEmoji:
+		dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
+		if err != nil {
+			return fmt.Errorf("key name space len err: %s", err.Error())
+		}
+		builder.ConfigCellEmojis = strings.Split(string(configCellDataBys[4:dataLength]), string([]byte{0x00}))
+	case common.ConfigCellTypeArgsUnavailable:
+		fmt.Println(string(configCellDataBys))
+	//dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
+	//if err != nil {
+	//	return fmt.Errorf("key name space len err: %s", err.Error())
+	//}
+	//fmt.Println(string(configCellDataBys[4:dataLength]))
+	case common.ConfigCellTypeArgsPreservedAccount00:
+		fmt.Println(string(configCellDataBys))
 	}
 	return nil
 }
@@ -129,6 +145,13 @@ func ConfigCellDataBuilderByTypeArgs(tx *types.Transaction, configCellTypeArgs c
 	}
 
 	return &resp, nil
+}
+
+func (c *ConfigCellDataBuilder) PriceInvitedDiscount() (uint32, error) {
+	if c.ConfigCellPrice != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellPrice.Discount().InvitedDiscount().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellPrice is nil")
 }
 
 func (c *ConfigCellDataBuilder) RecordBasicCapacity() (uint64, error) {
@@ -155,6 +178,48 @@ func (c *ConfigCellDataBuilder) RecordCommonFee() (uint64, error) {
 func (c *ConfigCellDataBuilder) BasicCapacity() (uint64, error) {
 	if c.ConfigCellAccount != nil {
 		return molecule.Bytes2GoU64(c.ConfigCellAccount.BasicCapacity().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) TransferAccountThrottle() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.TransferAccountThrottle().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) EditRecordsThrottle() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.EditRecordsThrottle().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) RecordMinTtl() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.RecordMinTtl().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) ExpirationGracePeriod() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.ExpirationGracePeriod().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) EditManagerThrottle() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.EditManagerThrottle().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) MaxLength() (uint32, error) {
+	if c.ConfigCellAccount != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellAccount.MaxLength().RawData())
 	}
 	return 0, fmt.Errorf("ConfigCellAccount is nil")
 }
@@ -192,6 +257,18 @@ func (c *ConfigCellDataBuilder) AccountPrice(length uint8) (uint64, uint64, erro
 		}
 	}
 	return 0, 0, fmt.Errorf("not exist price of length[%d]", length)
+}
+
+func (c *ConfigCellDataBuilder) PriceConfig(length uint8) *molecule.PriceConfig {
+	if length > 5 {
+		length = 5
+	}
+	if c.PriceConfigMap != nil {
+		if price, ok := c.PriceConfigMap[length]; ok {
+			return price
+		}
+	}
+	return nil
 }
 
 func (c *ConfigCellDataBuilder) SaleCellBasicCapacity() (uint64, error) {
@@ -253,6 +330,13 @@ func (c *ConfigCellDataBuilder) OfferMessageBytesLimit() (uint32, error) {
 func (c *ConfigCellDataBuilder) IncomeBasicCapacity() (uint64, error) {
 	if c.ConfigCellIncome != nil {
 		return molecule.Bytes2GoU64(c.ConfigCellIncome.BasicCapacity().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellIncome is nil")
+}
+
+func (c *ConfigCellDataBuilder) IncomeMinTransferCapacity() (uint64, error) {
+	if c.ConfigCellIncome != nil {
+		return molecule.Bytes2GoU64(c.ConfigCellIncome.MinTransferCapacity().RawData())
 	}
 	return 0, fmt.Errorf("ConfigCellIncome is nil")
 }

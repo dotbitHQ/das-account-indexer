@@ -129,19 +129,58 @@ type PreAccountCellParam struct {
 	NewIndex uint32
 	Status   uint8
 	Action   string
+
+	CreatedAt       int64
+	InvitedDiscount uint32
+	Quote           uint64
+	InviterScript   *types.Script
+	ChannelScript   *types.Script
+	InviterId       []byte
+	OwnerLockArgs   []byte
+	RefundLock      *types.Script
+	Price           molecule.PriceConfig
+	AccountChars    molecule.AccountChars
 }
 
 func (p *PreAccountCellDataBuilder) getOldDataEntityOpt(param *PreAccountCellParam) *molecule.DataEntityOpt {
 	var oldDataEntity molecule.DataEntity
 	oldAccountCellDataBytes := molecule.GoBytes2MoleculeBytes(p.PreAccountCellData.AsSlice())
 	oldDataEntity = molecule.NewDataEntityBuilder().Entity(oldAccountCellDataBytes).
-		Version(DataEntityVersion2).Index(molecule.GoU32ToMoleculeU32(param.OldIndex)).Build()
+		Version(DataEntityVersion1).Index(molecule.GoU32ToMoleculeU32(param.OldIndex)).Build()
 	oldDataEntityOpt := molecule.NewDataEntityOptBuilder().Set(oldDataEntity).Build()
 	return &oldDataEntityOpt
 }
 func (p *PreAccountCellDataBuilder) GenWitness(param *PreAccountCellParam) ([]byte, []byte, error) {
 
 	switch param.Action {
+	case common.DasActionPreRegister:
+		createdAt := molecule.NewTimestampBuilder().Set(molecule.GoTimeUnixToMoleculeBytes(param.CreatedAt)).Build()
+		invitedDiscount := molecule.GoU32ToMoleculeU32(param.InvitedDiscount)
+		quote := molecule.GoU64ToMoleculeU64(param.Quote)
+		iScript := molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.InviterScript)).Build()
+		cScript := molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.ChannelScript)).Build()
+		inviterId := molecule.GoBytes2MoleculeBytes(param.InviterId)
+		ownerLockArgs := molecule.GoBytes2MoleculeBytes(param.OwnerLockArgs)
+		refundLock := molecule.CkbScript2MoleculeScript(param.RefundLock)
+
+		preAccountCellData := molecule.NewPreAccountCellDataBuilder().
+			Account(param.AccountChars).
+			RefundLock(refundLock).
+			OwnerLockArgs(ownerLockArgs).
+			InviterId(inviterId).
+			InviterLock(iScript).
+			ChannelLock(cScript).
+			Price(param.Price).
+			Quote(quote).
+			InvitedDiscount(invitedDiscount).
+			CreatedAt(createdAt).Build()
+		newDataBytes := molecule.GoBytes2MoleculeBytes(preAccountCellData.AsSlice())
+		newDataEntity := molecule.NewDataEntityBuilder().Entity(newDataBytes).
+			Version(DataEntityVersion1).Index(molecule.GoU32ToMoleculeU32(param.NewIndex)).Build()
+		newDataEntityOpt := molecule.NewDataEntityOptBuilder().Set(newDataEntity).Build()
+		tmp := molecule.NewDataBuilder().New(newDataEntityOpt).Build()
+		witness := GenDasDataWitness(common.ActionDataTypePreAccountCell, &tmp)
+		return witness, common.Blake2b(preAccountCellData.AsSlice()), nil
 	case common.DasActionPropose:
 		oldDataEntityOpt := p.getOldDataEntityOpt(param)
 		tmp := molecule.NewDataBuilder().Dep(*oldDataEntityOpt).Build()

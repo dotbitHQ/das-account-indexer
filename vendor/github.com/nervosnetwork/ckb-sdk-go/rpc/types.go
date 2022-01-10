@@ -26,7 +26,7 @@ type header struct {
 	ProposalsHash    types.Hash     `json:"proposals_hash"`
 	Timestamp        hexutil.Uint64 `json:"timestamp"`
 	TransactionsRoot types.Hash     `json:"transactions_root"`
-	UnclesHash       types.Hash     `json:"uncles_hash"`
+	ExtraHash        types.Hash     `json:"extra_hash"`
 	Version          hexutil.Uint   `json:"version"`
 }
 
@@ -340,7 +340,7 @@ func toHeader(head header) *types.Header {
 		ProposalsHash:    head.ProposalsHash,
 		Timestamp:        uint64(head.Timestamp),
 		TransactionsRoot: head.TransactionsRoot,
-		UnclesHash:       head.UnclesHash,
+		ExtraHash:        head.ExtraHash,
 		Version:          uint(head.Version),
 	}
 }

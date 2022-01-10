@@ -43,3 +43,49 @@ const (
 	ConfigCellTypeArgsCharSetHanS  ConfigCellTypeArgs = "0xa3860100"
 	ConfigCellTypeArgsCharSetHanT  ConfigCellTypeArgs = "0xa4860100"
 )
+
+func GetConfigCellTypeArgsPreservedAccountByIndex(index uint32) ConfigCellTypeArgs {
+	switch index {
+	case 0:
+		return ConfigCellTypeArgsPreservedAccount00
+	case 1:
+		return ConfigCellTypeArgsPreservedAccount01
+	case 2:
+		return ConfigCellTypeArgsPreservedAccount02
+	case 3:
+		return ConfigCellTypeArgsPreservedAccount03
+	case 4:
+		return ConfigCellTypeArgsPreservedAccount04
+	case 5:
+		return ConfigCellTypeArgsPreservedAccount05
+	case 6:
+		return ConfigCellTypeArgsPreservedAccount06
+	case 7:
+		return ConfigCellTypeArgsPreservedAccount07
+	case 8:
+		return ConfigCellTypeArgsPreservedAccount08
+	case 9:
+		return ConfigCellTypeArgsPreservedAccount09
+	case 10:
+		return ConfigCellTypeArgsPreservedAccount10
+	case 11:
+		return ConfigCellTypeArgsPreservedAccount11
+	case 12:
+		return ConfigCellTypeArgsPreservedAccount12
+	case 13:
+		return ConfigCellTypeArgsPreservedAccount13
+	case 14:
+		return ConfigCellTypeArgsPreservedAccount14
+	case 15:
+		return ConfigCellTypeArgsPreservedAccount15
+	case 16:
+		return ConfigCellTypeArgsPreservedAccount16
+	case 17:
+		return ConfigCellTypeArgsPreservedAccount17
+	case 18:
+		return ConfigCellTypeArgsPreservedAccount18
+	case 19:
+		return ConfigCellTypeArgsPreservedAccount19
+	}
+	return ""
+}

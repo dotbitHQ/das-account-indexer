@@ -22,6 +22,8 @@ const (
 	AccountStatusNormal    uint8 = 0
 	AccountStatusOnSale    uint8 = 1
 	AccountStatusOnAuction uint8 = 2
+
+	OneYearSec = int64(3600 * 24 * 365)
 )
 
 func Has0xPrefix(str string) bool {

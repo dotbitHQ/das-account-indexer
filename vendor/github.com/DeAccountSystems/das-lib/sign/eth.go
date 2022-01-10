@@ -6,6 +6,7 @@ import (
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/signer/core"
+	"strings"
 )
 
 func EthSignature(data []byte, hexPrivateKey string) ([]byte, error) {
@@ -38,15 +39,16 @@ func VerifyEthSignature(sign []byte, rawByte []byte, address string) (bool, erro
 
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 	//fmt.Println("recovered:", recoveredAddr.Hex(), "addr:", address)
-	return recoveredAddr.Hex() == address, nil
+	return strings.EqualFold(recoveredAddr.Hex(), address), nil
 }
 
 func PersonalSignature(data []byte, hexPrivateKey string) ([]byte, error) {
-	if len(data) == 0 {
+	l := len(data)
+	if l == 0 {
 		return nil, errors.New("invalid raw data")
 	}
 
-	data = append([]byte(common.EthMessageHeader), data...)
+	data = append([]byte(fmt.Sprintf(common.EthMessageHeader, l)), data...)
 	key, err := crypto.HexToECDSA(hexPrivateKey)
 	if err != nil {
 		return nil, err
@@ -56,14 +58,15 @@ func PersonalSignature(data []byte, hexPrivateKey string) ([]byte, error) {
 	return crypto.Sign(tmpHash, key)
 }
 func VerifyPersonalSignature(sign []byte, rawByte []byte, address string) (bool, error) {
-	if len(sign) != 65 { // sign check
+	l := len(rawByte)
+	if len(sign) != 65 || l == 0 { // sign check
 		return false, fmt.Errorf("invalid param")
 	}
 
 	if sign[64] >= 27 {
 		sign[64] -= 27
 	}
-	rawByte = append([]byte(common.EthMessageHeader), rawByte...)
+	rawByte = append([]byte(fmt.Sprintf(common.EthMessageHeader, l)), rawByte...)
 	hash := crypto.Keccak256(rawByte)
 
 	pub, err := crypto.Ecrecover(hash[:], sign)
@@ -74,13 +77,9 @@ func VerifyPersonalSignature(sign []byte, rawByte []byte, address string) (bool,
 	if err != nil {
 		return false, err
 	}
-
-	if err != nil {
-		return false, err
-	}
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 	//fmt.Println("recovered:", recoveredAddr.Hex(), "addr:", address)
-	return recoveredAddr.Hex() == address, nil
+	return strings.EqualFold(recoveredAddr.Hex(), address), nil
 }
 
 func EIP712Signature(typedData core.TypedData, hexPrivateKey string) ([]byte, []byte, error) {
@@ -144,5 +143,5 @@ func VerifyEIP712Signature(typedData core.TypedData, sign []byte, address string
 	}
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 	//fmt.Println("recovered:", recoveredAddr.Hex(), "addr:", address)
-	return recoveredAddr.Hex() == address, nil
+	return strings.EqualFold(recoveredAddr.Hex(), address), nil
 }

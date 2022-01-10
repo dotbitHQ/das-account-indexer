@@ -667,7 +667,7 @@ func (cli *client) PingPeers(ctx context.Context) error {
 func (cli *client) SendTransaction(ctx context.Context, tx *types.Transaction) (*types.Hash, error) {
 	var result types.Hash
 
-	err := cli.c.CallContext(ctx, &result, "send_transaction", fromTransaction(tx))
+	err := cli.c.CallContext(ctx, &result, "send_transaction", fromTransaction(tx), "passthrough")
 	if err != nil {
 		return nil, err
 	}

@@ -3,17 +3,19 @@ package sign
 import (
 	"crypto/ecdsa"
 	"errors"
+	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func TronSignature(signType bool, data []byte, hexPrivateKey string) ([]byte, error) {
-	if len(data) == 0 {
+	l := len(data)
+	if l == 0 {
 		return nil, errors.New("invalid raw data")
 	}
 
 	if signType {
-		data = append([]byte(common.TronMessageHeader), data...)
+		data = append([]byte(fmt.Sprintf(common.TronMessageHeader, l)), data...)
 	}
 
 	tmpHash := crypto.Keccak256(data)
@@ -31,7 +33,8 @@ func TronSignature(signType bool, data []byte, hexPrivateKey string) ([]byte, er
 }
 
 func TronVerifySignature(signType bool, sign []byte, rawByte []byte, base58Addr string) bool {
-	if len(sign) != 65 { // sign check
+	l := len(rawByte)
+	if len(sign) != 65 || l == 0 { // sign check
 		return false
 	}
 
@@ -40,7 +43,7 @@ func TronVerifySignature(signType bool, sign []byte, rawByte []byte, base58Addr 
 	}
 
 	if signType {
-		rawByte = append([]byte(common.TronMessageHeader), rawByte...)
+		rawByte = append([]byte(fmt.Sprintf(common.TronMessageHeader, l)), rawByte...)
 	}
 
 	pubKey, err := GetSignedPubKey(rawByte, sign)

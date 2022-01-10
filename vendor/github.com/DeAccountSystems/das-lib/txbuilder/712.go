@@ -112,7 +112,7 @@ func (d *DasTxBuilder) getMMJsonCellInfo(cellList []*types.CellInfo, dataType co
 				if err != nil {
 					return nil, fmt.Errorf("AccountSaleCellDataBuilderFromTx err: %s", err.Error())
 				}
-				d.salePrice, _ = builder.Price()
+				d.salePrice = builder.Price
 			case common.DasContractNameAccountCellType:
 				builder, err := witness.AccountCellDataBuilderFromTx(d.Transaction, dataType)
 				if err != nil {
@@ -197,7 +197,7 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 		}
 		dasMessage = fmt.Sprintf("CHANGE THE OFFER ON %s FROM %s CKB TO %s CKB", builder.Account, common.Capacity2Str(builderOld.Price), common.Capacity2Str(builder.Price))
 	case common.DasActionCancelOffer:
-		dasMessage = fmt.Sprintf("CANCEL %d OFFERS", d.offers)
+		dasMessage = fmt.Sprintf("CANCEL %d OFFER(S)", d.offers)
 	case common.DasActionAcceptOffer:
 		builder, err := witness.OfferCellDataBuilderFromTx(d.Transaction, common.DataTypeOld)
 		if err != nil {
@@ -242,7 +242,7 @@ func (d *DasTxBuilder) getWithdrawDasMessage() (string, error) {
 			_, _, oCTTmp, _, oATmp, _ := core.FormatDasLockToNormalAddress(v.Lock.Args)
 			chainStrTmp, receiverAddr = oCTTmp.String(), oATmp
 		} else {
-			addr, _ := address.Generate(mod, v.Lock)
+			addr, _ := common.ConvertScriptToAddress(mod, v.Lock)
 			chainStrTmp, receiverAddr = "CKB", addr
 		}
 

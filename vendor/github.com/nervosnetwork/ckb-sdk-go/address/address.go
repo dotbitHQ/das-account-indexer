@@ -2,9 +2,10 @@ package address
 
 import (
 	"encoding/hex"
+	"strings"
+
 	"github.com/nervosnetwork/ckb-sdk-go/utils"
 	"github.com/pkg/errors"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -23,6 +24,7 @@ const (
 	TypeFull  Type = "Full"
 	TypeShort Type = "Short"
 
+	TYPE_FULL_WITH_BECH32M    = "00"
 	ShortFormat               = "01"
 	FullDataFormat            = "02"
 	FullTypeFormat            = "04"
@@ -39,7 +41,15 @@ type ParsedAddress struct {
 	Script *types.Script
 }
 
-func Generate(mode Mode, script *types.Script) (string, error) {
+func ConvertScriptToAddress(mode Mode, script *types.Script) (string, error) {
+	return ConvertScriptToBech32mFullAddress(mode, script)
+}
+
+// Deprecated: Short address format deprecated because it is limited (only support secp256k1_blake160,
+// secp256k1_multisig, anyone_can_pay) and a flaw has been found in its encoding method bech32,
+// which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
+func ConvertScriptToShortAddress(mode Mode, script *types.Script) (string, error) {
 	if script.HashType == types.HashTypeType && isShortPayloadSupportedArgsLen(len(script.Args)) {
 		if transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH == script.CodeHash.String() {
 			// generate_short_payload_singleSig_address
@@ -66,13 +76,7 @@ func Generate(mode Mode, script *types.Script) (string, error) {
 			return bech32.Encode((string)(mode), data)
 		}
 	}
-
-	hashType := FullTypeFormat
-	if script.HashType == types.HashTypeData {
-		hashType = FullDataFormat
-	}
-
-	return GenerateFullPayloadAddress(hashType, mode, script)
+	return "", errors.New("The given script can not be converted into short address. Unsupported")
 }
 
 func isShortPayloadSupportedArgsLen(argLen int) bool {
@@ -82,13 +86,76 @@ func isShortPayloadSupportedArgsLen(argLen int) bool {
 	return false
 }
 
-func GenerateFullPayloadAddress(hashType string, mode Mode, script *types.Script) (string, error) {
+// Deprecated: Old full address format is deprecated because a flaw has been found in its encoding method
+// bech32, which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
+func ConvertScriptToFullAddress(hashType string, mode Mode, script *types.Script) (string, error) {
 	payload := hashType + hex.EncodeToString(script.CodeHash.Bytes()) + hex.EncodeToString(script.Args)
 	data, err := bech32.ConvertBits(common.FromHex(payload), 8, 5, true)
 	if err != nil {
 		return "", err
 	}
 	return bech32.Encode((string)(mode), data)
+}
+
+func ConvertScriptToBech32mFullAddress(mode Mode, script *types.Script) (string, error) {
+	hashType, err := types.SerializeHashType(script.HashType)
+	if err != nil {
+		return "", err
+	}
+
+	// Payload: type(00) | code hash | hash type | args
+	payload := TYPE_FULL_WITH_BECH32M
+	payload += script.CodeHash.Hex()[2:]
+	payload += hashType
+
+	payload += common.Bytes2Hex(script.Args)
+
+	dataPart, err := bech32.ConvertBits(common.FromHex(payload), 8, 5, true)
+	if err != nil {
+		return "", err
+	}
+	return bech32.EncodeWithBech32m(string(mode), dataPart)
+}
+
+func ConvertToBech32mFullAddress(address string) (string, error) {
+	parsedAddress, err := Parse(address)
+	if err != nil {
+		return "", err
+	}
+	return ConvertScriptToBech32mFullAddress(parsedAddress.Mode, parsedAddress.Script)
+}
+
+// Deprecated: Short address format deprecated because it is limited (only support secp256k1_blake160,
+// secp256k1_multisig, anyone_can_pay) and a flaw has been found in its encoding method bech32,
+// which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
+func ConvertToShortAddress(address string) (string, error) {
+	parsedAddress, err := Parse(address)
+	if err != nil {
+		return "", err
+	}
+	return ConvertScriptToShortAddress(parsedAddress.Mode, parsedAddress.Script)
+}
+
+// Deprecated: Old full address format is deprecated because a flaw has been found in its encoding method
+// bech32, which could enable attackers to generate valid but unexpected addresses.
+// For more please check https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0021-ckb-address-format/0021-ckb-address-format.md
+func ConvertToBech32FullAddress(address string) (string, error) {
+	parsedAddress, err := Parse(address)
+	if err != nil {
+		return "", err
+	}
+	return ConvertScriptToFullAddress(FullTypeFormat, parsedAddress.Mode, parsedAddress.Script)
+}
+
+func ConvertPublicToAddress(mode Mode, publicKey string) (string, error) {
+	script := &types.Script{
+		CodeHash: types.HexToHash(transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH),
+		HashType: types.HashTypeType,
+		Args:     common.FromHex(publicKey),
+	}
+	return ConvertScriptToBech32mFullAddress(mode, script)
 }
 
 func Parse(address string) (*ParsedAddress, error) {
@@ -143,6 +210,20 @@ func Parse(address string) (*ParsedAddress, error) {
 			HashType: types.HashTypeType,
 			Args:     common.Hex2Bytes(payload[66:]),
 		}
+	} else if strings.HasPrefix(payload, "00") {
+		addressType = TypeFull
+		script = types.Script{
+			CodeHash: types.HexToHash(payload[2:66]),
+			Args:     common.Hex2Bytes(payload[68:]),
+		}
+
+		hashType, err := types.DeserializeHashType(payload[66:68])
+		if err != nil {
+			return nil, err
+		}
+
+		script.HashType = hashType
+
 	} else {
 		return nil, errors.New("address type error:" + payload[:2])
 	}

@@ -2,6 +2,8 @@ package common
 
 import (
 	"fmt"
+	"github.com/nervosnetwork/ckb-sdk-go/address"
+	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/tron-us/go-common/crypto"
 )
 
@@ -23,8 +25,8 @@ const (
 )
 
 const (
-	TronMessageHeader = "\x19TRON Signed Message:\n32"
-	EthMessageHeader  = "\x19Ethereum Signed Message:\n32"
+	TronMessageHeader = "\x19TRON Signed Message:\n%d"
+	EthMessageHeader  = "\x19Ethereum Signed Message:\n%d"
 )
 
 const (
@@ -69,4 +71,16 @@ func TronBase58ToHex(address string) (string, error) {
 		return "", fmt.Errorf("Decode58Check:%v", err)
 	}
 	return *addr, nil
+}
+
+func ConvertScriptToAddress(mode address.Mode, script *types.Script) (string, error) {
+	if script.HashType == types.HashTypeType && len(script.Args) >= 20 && len(script.Args) <= 22 {
+		return address.ConvertScriptToShortAddress(mode, script)
+	}
+
+	hashType := address.FullTypeFormat
+	if script.HashType == types.HashTypeData {
+		hashType = address.FullDataFormat
+	}
+	return address.ConvertScriptToFullAddress(hashType, mode, script)
 }

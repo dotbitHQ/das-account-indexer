@@ -3,7 +3,7 @@ package common
 type SoScriptType string
 
 const (
-	SoScriptTypeMixin    SoScriptType = "Mixin"
+	SoScriptTypeEd25519  SoScriptType = "Ed25519"
 	SoScriptTypeEth      SoScriptType = "Eth"
 	SoScriptTypeTron     SoScriptType = "Tron"
 	SoScriptTypeCkb      SoScriptType = "Ckb"

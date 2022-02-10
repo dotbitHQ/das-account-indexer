@@ -56,7 +56,7 @@ func formatAddressToHalfArgs(chainType common.ChainType, addr string) (args []by
 		args = append(args, common.DasAlgorithmIdTron.Bytes()...)
 		args = append(args, common.Hex2Bytes(strings.TrimPrefix(addrHex, common.TronPreFix))...)
 	case common.ChainTypeMixin:
-		args = append(args, common.DasAlgorithmIdMixin.Bytes()...)
+		args = append(args, common.DasAlgorithmIdEd25519.Bytes()...)
 		args = append(args, common.Hex2Bytes(addrHex)...)
 	}
 	return
@@ -135,7 +135,7 @@ func FormatDasLockToOwnerAndManager(args []byte) (owner, manager []byte) {
 	switch oID {
 	case common.DasAlgorithmIdCkb, common.DasAlgorithmIdEth, common.DasAlgorithmIdEth712, common.DasAlgorithmIdTron:
 		splitLen = common.DasLockArgsLen / 2
-	case common.DasAlgorithmIdMixin:
+	case common.DasAlgorithmIdEd25519:
 		splitLen = common.DasLockArgsLenMax / 2
 	default:
 		return
@@ -157,7 +157,7 @@ func formatHalfArgsToHexAddress(args []byte) (aId common.DasAlgorithmId, chainTy
 	case common.DasAlgorithmIdTron:
 		chainType = common.ChainTypeTron
 		addr = common.TronPreFix + hex.EncodeToString(args[1:])
-	case common.DasAlgorithmIdMixin:
+	case common.DasAlgorithmIdEd25519:
 		chainType = common.ChainTypeMixin
 		addr = common.HexPreFix + hex.EncodeToString(args[1:])
 	}

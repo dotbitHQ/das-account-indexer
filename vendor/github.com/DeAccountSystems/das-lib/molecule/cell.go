@@ -244,7 +244,7 @@ func (s *ConfigCellMain) AsSlice() []byte {
 }
 
 func ConfigCellMainDefault() ConfigCellMain {
-	return *ConfigCellMainFromSliceUnchecked([]byte{73, 2, 0, 0, 16, 0, 0, 0, 17, 0, 0, 0, 125, 1, 0, 0, 0, 108, 1, 0, 0, 44, 0, 0, 0, 76, 0, 0, 0, 108, 0, 0, 0, 140, 0, 0, 0, 172, 0, 0, 0, 204, 0, 0, 0, 236, 0, 0, 0, 12, 1, 0, 0, 44, 1, 0, 0, 76, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 0, 0, 0, 24, 0, 0, 0, 60, 0, 0, 0, 96, 0, 0, 0, 132, 0, 0, 0, 168, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+	return *ConfigCellMainFromSliceUnchecked([]byte{113, 2, 0, 0, 16, 0, 0, 0, 17, 0, 0, 0, 125, 1, 0, 0, 0, 108, 1, 0, 0, 44, 0, 0, 0, 76, 0, 0, 0, 108, 0, 0, 0, 140, 0, 0, 0, 172, 0, 0, 0, 204, 0, 0, 0, 236, 0, 0, 0, 12, 1, 0, 0, 44, 1, 0, 0, 76, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 244, 0, 0, 0, 28, 0, 0, 0, 64, 0, 0, 0, 100, 0, 0, 0, 136, 0, 0, 0, 172, 0, 0, 0, 208, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 }
 
 func ConfigCellMainFromSlice(slice []byte, compatible bool) (*ConfigCellMain, error) {
@@ -712,13 +712,14 @@ type DasLockOutPointTableBuilder struct {
 	ckb_anyone_can_pay OutPoint
 	eth                OutPoint
 	tron               OutPoint
+	ed25519            OutPoint
 }
 
 func (s *DasLockOutPointTableBuilder) Build() DasLockOutPointTable {
 	b := new(bytes.Buffer)
 
-	totalSize := HeaderSizeUint * (5 + 1)
-	offsets := make([]uint32, 0, 5)
+	totalSize := HeaderSizeUint * (6 + 1)
+	offsets := make([]uint32, 0, 6)
 
 	offsets = append(offsets, totalSize)
 	totalSize += uint32(len(s.ckb_signall.AsSlice()))
@@ -730,6 +731,8 @@ func (s *DasLockOutPointTableBuilder) Build() DasLockOutPointTable {
 	totalSize += uint32(len(s.eth.AsSlice()))
 	offsets = append(offsets, totalSize)
 	totalSize += uint32(len(s.tron.AsSlice()))
+	offsets = append(offsets, totalSize)
+	totalSize += uint32(len(s.ed25519.AsSlice()))
 
 	b.Write(packNumber(Number(totalSize)))
 
@@ -742,6 +745,7 @@ func (s *DasLockOutPointTableBuilder) Build() DasLockOutPointTable {
 	b.Write(s.ckb_anyone_can_pay.AsSlice())
 	b.Write(s.eth.AsSlice())
 	b.Write(s.tron.AsSlice())
+	b.Write(s.ed25519.AsSlice())
 	return DasLockOutPointTable{inner: b.Bytes()}
 }
 
@@ -770,8 +774,13 @@ func (s *DasLockOutPointTableBuilder) Tron(v OutPoint) *DasLockOutPointTableBuil
 	return s
 }
 
+func (s *DasLockOutPointTableBuilder) Ed25519(v OutPoint) *DasLockOutPointTableBuilder {
+	s.ed25519 = v
+	return s
+}
+
 func NewDasLockOutPointTableBuilder() *DasLockOutPointTableBuilder {
-	return &DasLockOutPointTableBuilder{ckb_signall: OutPointDefault(), ckb_multisign: OutPointDefault(), ckb_anyone_can_pay: OutPointDefault(), eth: OutPointDefault(), tron: OutPointDefault()}
+	return &DasLockOutPointTableBuilder{ckb_signall: OutPointDefault(), ckb_multisign: OutPointDefault(), ckb_anyone_can_pay: OutPointDefault(), eth: OutPointDefault(), tron: OutPointDefault(), ed25519: OutPointDefault()}
 }
 
 type DasLockOutPointTable struct {
@@ -786,7 +795,7 @@ func (s *DasLockOutPointTable) AsSlice() []byte {
 }
 
 func DasLockOutPointTableDefault() DasLockOutPointTable {
-	return *DasLockOutPointTableFromSliceUnchecked([]byte{204, 0, 0, 0, 24, 0, 0, 0, 60, 0, 0, 0, 96, 0, 0, 0, 132, 0, 0, 0, 168, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+	return *DasLockOutPointTableFromSliceUnchecked([]byte{244, 0, 0, 0, 28, 0, 0, 0, 64, 0, 0, 0, 100, 0, 0, 0, 136, 0, 0, 0, 172, 0, 0, 0, 208, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 }
 
 func DasLockOutPointTableFromSlice(slice []byte, compatible bool) (*DasLockOutPointTable, error) {
@@ -802,7 +811,7 @@ func DasLockOutPointTableFromSlice(slice []byte, compatible bool) (*DasLockOutPo
 		return nil, errors.New(errMsg)
 	}
 
-	if uint32(sliceLen) == HeaderSizeUint && 5 == 0 {
+	if uint32(sliceLen) == HeaderSizeUint && 6 == 0 {
 		return &DasLockOutPointTable{inner: slice}, nil
 	}
 
@@ -823,9 +832,9 @@ func DasLockOutPointTableFromSlice(slice []byte, compatible bool) (*DasLockOutPo
 	}
 
 	fieldCount := uint32(offsetFirst)/HeaderSizeUint - 1
-	if fieldCount < 5 {
+	if fieldCount < 6 {
 		return nil, errors.New("FieldCountNotMatch")
-	} else if !compatible && fieldCount > 5 {
+	} else if !compatible && fieldCount > 6 {
 		return nil, errors.New("FieldCountNotMatch")
 	}
 
@@ -869,6 +878,11 @@ func DasLockOutPointTableFromSlice(slice []byte, compatible bool) (*DasLockOutPo
 		return nil, err
 	}
 
+	_, err = OutPointFromSlice(slice[offsets[5]:offsets[6]], compatible)
+	if err != nil {
+		return nil, err
+	}
+
 	return &DasLockOutPointTable{inner: slice}, nil
 }
 
@@ -890,11 +904,11 @@ func (s *DasLockOutPointTable) IsEmpty() bool {
 	return s.Len() == 0
 }
 func (s *DasLockOutPointTable) CountExtraFields() uint {
-	return s.FieldCount() - 5
+	return s.FieldCount() - 6
 }
 
 func (s *DasLockOutPointTable) HasExtraFields() bool {
-	return 5 != s.FieldCount()
+	return 6 != s.FieldCount()
 }
 
 func (s *DasLockOutPointTable) CkbSignall() *OutPoint {
@@ -922,10 +936,16 @@ func (s *DasLockOutPointTable) Eth() *OutPoint {
 }
 
 func (s *DasLockOutPointTable) Tron() *OutPoint {
-	var ret *OutPoint
 	start := unpackNumber(s.inner[20:])
+	end := unpackNumber(s.inner[24:])
+	return OutPointFromSliceUnchecked(s.inner[start:end])
+}
+
+func (s *DasLockOutPointTable) Ed25519() *OutPoint {
+	var ret *OutPoint
+	start := unpackNumber(s.inner[24:])
 	if s.HasExtraFields() {
-		end := unpackNumber(s.inner[24:])
+		end := unpackNumber(s.inner[28:])
 		ret = OutPointFromSliceUnchecked(s.inner[start:end])
 	} else {
 		ret = OutPointFromSliceUnchecked(s.inner[start:])
@@ -934,7 +954,7 @@ func (s *DasLockOutPointTable) Tron() *OutPoint {
 }
 
 func (s *DasLockOutPointTable) AsBuilder() DasLockOutPointTableBuilder {
-	ret := NewDasLockOutPointTableBuilder().CkbSignall(*s.CkbSignall()).CkbMultisign(*s.CkbMultisign()).CkbAnyoneCanPay(*s.CkbAnyoneCanPay()).Eth(*s.Eth()).Tron(*s.Tron())
+	ret := NewDasLockOutPointTableBuilder().CkbSignall(*s.CkbSignall()).CkbMultisign(*s.CkbMultisign()).CkbAnyoneCanPay(*s.CkbAnyoneCanPay()).Eth(*s.Eth()).Tron(*s.Tron()).Ed25519(*s.Ed25519())
 	return *ret
 }
 

@@ -107,6 +107,7 @@ func (d *DasCore) AsyncDasConfigCell() error {
 					if _, ok2 := DasConfigCellByTxHashMap.Load(item.OutPoint.TxHash.Hex()); ok2 {
 						DasConfigCellByTxHashMap.Delete(item.OutPoint.TxHash.Hex())
 					}
+					item.BlockNumber = v.BlockNumber
 					item.OutPoint.TxHash = v.OutPoint.TxHash
 					item.OutPoint.Index = v.OutPoint.Index
 

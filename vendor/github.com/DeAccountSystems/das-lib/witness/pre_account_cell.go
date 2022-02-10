@@ -157,8 +157,17 @@ func (p *PreAccountCellDataBuilder) GenWitness(param *PreAccountCellParam) ([]by
 		createdAt := molecule.NewTimestampBuilder().Set(molecule.GoTimeUnixToMoleculeBytes(param.CreatedAt)).Build()
 		invitedDiscount := molecule.GoU32ToMoleculeU32(param.InvitedDiscount)
 		quote := molecule.GoU64ToMoleculeU64(param.Quote)
-		iScript := molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.InviterScript)).Build()
-		cScript := molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.ChannelScript)).Build()
+		var iScript, cScript molecule.ScriptOpt
+		if param.InviterScript != nil {
+			iScript = molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.InviterScript)).Build()
+		} else {
+			iScript = *molecule.ScriptOptFromSliceUnchecked([]byte{})
+		}
+		if param.ChannelScript != nil {
+			cScript = molecule.NewScriptOptBuilder().Set(molecule.CkbScript2MoleculeScript(param.ChannelScript)).Build()
+		} else {
+			cScript = *molecule.ScriptOptFromSliceUnchecked([]byte{})
+		}
 		inviterId := molecule.GoBytes2MoleculeBytes(param.InviterId)
 		ownerLockArgs := molecule.GoBytes2MoleculeBytes(param.OwnerLockArgs)
 		refundLock := molecule.CkbScript2MoleculeScript(param.RefundLock)

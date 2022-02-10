@@ -3,7 +3,7 @@ module das-account-indexer
 go 1.15
 
 require (
-	github.com/DeAccountSystems/das-lib v0.0.0-20220105140009-d423fec84f2f
+	github.com/DeAccountSystems/das-lib v0.0.0-20220208094827-07a789a62889
 	github.com/elazarl/goproxy v0.0.0-20211114080932-d06c3be7c11b // indirect
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-gonic/gin v1.7.7

@@ -301,7 +301,7 @@ func (a *AccountCellDataBuilder) GenWitness(p *AccountCellParam) ([]byte, []byte
 
 			tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).New(newDataEntityOpt).Build()
 			witness := GenDasDataWitness(common.ActionDataTypeAccountCell, &tmp)
-			return witness, nil, nil
+			return witness, common.Blake2b(newAccountSaleCellData.AsSlice()), nil
 		} else if p.SubAction == "new" {
 			accountId, err := molecule.AccountIdFromSlice(common.Hex2Bytes(p.AccountId), false)
 			if err != nil {

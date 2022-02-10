@@ -14,6 +14,7 @@ var (
 
 type IncomeCellDataBuilder struct {
 	Index          uint32
+	Version        uint32
 	IncomeCellData *molecule.IncomeCellData
 	DataEntityOpt  *molecule.DataEntityOpt
 }
@@ -46,6 +47,11 @@ func IncomeCellDataBuilderListFromTx(tx *types.Transaction, dataType common.Data
 				return false, fmt.Errorf("getDataEntityOpt err: %s", err.Error())
 			}
 			resp.DataEntityOpt = dataEntityOpt
+			version, err := molecule.Bytes2GoU32(dataEntity.Version().RawData())
+			if err != nil {
+				return false, fmt.Errorf("get version err: %s", err.Error())
+			}
+			resp.Version = version
 			index, err := molecule.Bytes2GoU32(dataEntity.Index().RawData())
 			if err != nil {
 				return false, fmt.Errorf("get index err: %s", err.Error())

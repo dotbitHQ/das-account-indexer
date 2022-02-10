@@ -15,6 +15,7 @@ const (
 	DasAlgorithmIdEth    DasAlgorithmId = 3
 	DasAlgorithmIdTron   DasAlgorithmId = 4
 	DasAlgorithmIdEth712 DasAlgorithmId = 5
+	DasAlgorithmIdMixin  DasAlgorithmId = 6
 )
 
 func (d DasAlgorithmId) Bytes() []byte {
@@ -29,6 +30,8 @@ func (d DasAlgorithmId) ToSoScriptType() SoScriptType {
 		return SoScriptTypeEth
 	case DasAlgorithmIdTron:
 		return SoScriptTypeTron
+	case DasAlgorithmIdMixin:
+		return SoScriptTypeMixin
 	default:
 		return SoScriptTypeCkb
 	}

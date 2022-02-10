@@ -121,7 +121,8 @@ func (d *DasTxBuilder) checkTxWitnesses() error {
 	if lenW < lenI {
 		return fmt.Errorf("len witness[%d]<len inputs[%d]", lenW, lenI)
 	} else if lenW > lenI {
-		_, err := witness.ActionDataBuilderFromTx(d.Transaction)
+		_, err := witness.ActionDataBuilderFromWitness(d.Transaction.Witnesses[lenI])
+		//_, err := witness.ActionDataBuilderFromTx(d.Transaction)
 		if err != nil {
 			return fmt.Errorf("ActionDataBuilderFromTx err: %s", err.Error())
 		}

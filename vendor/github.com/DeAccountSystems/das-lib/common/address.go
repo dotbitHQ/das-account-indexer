@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"github.com/nervosnetwork/ckb-sdk-go/address"
+	"github.com/nervosnetwork/ckb-sdk-go/transaction"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/tron-us/go-common/crypto"
 )
@@ -10,10 +11,11 @@ import (
 type ChainType int
 
 const (
-	ChainTypeCkb  ChainType = 0
-	ChainTypeEth  ChainType = 1
-	ChainTypeBtc  ChainType = 2
-	ChainTypeTron ChainType = 3
+	ChainTypeCkb   ChainType = 0
+	ChainTypeEth   ChainType = 1
+	ChainTypeBtc   ChainType = 2
+	ChainTypeTron  ChainType = 3
+	ChainTypeMixin ChainType = 4
 
 	HexPreFix           = "0x"
 	TronPreFix          = "41"
@@ -22,6 +24,7 @@ const (
 	DasLockEthPreFix    = "03"
 	DasLockTronPreFix   = "04"
 	DasLockEth712PreFix = "05"
+	DasLockMixinPreFix  = "06"
 )
 
 const (
@@ -30,10 +33,11 @@ const (
 )
 
 const (
-	DasAccountSuffix = ".bit"
-	DasLockArgsLen   = 42
-	DasAccountIdLen  = 20
-	HashBytesLen     = 32
+	DasAccountSuffix  = ".bit"
+	DasLockArgsLen    = 42
+	DasLockArgsLenMax = 66
+	DasAccountIdLen   = 20
+	HashBytesLen      = 32
 
 	ExpireTimeLen    = 8
 	NextAccountIdLen = 20
@@ -53,6 +57,8 @@ func (c ChainType) String() string {
 		return "ETH"
 	case ChainTypeTron:
 		return "TRON"
+	case ChainTypeMixin:
+		return "MIXIN"
 	}
 	return ""
 }
@@ -74,13 +80,19 @@ func TronBase58ToHex(address string) (string, error) {
 }
 
 func ConvertScriptToAddress(mode address.Mode, script *types.Script) (string, error) {
-	if script.HashType == types.HashTypeType && len(script.Args) >= 20 && len(script.Args) <= 22 {
+	if transaction.SECP256K1_BLAKE160_SIGHASH_ALL_TYPE_HASH == script.CodeHash.String() ||
+		transaction.SECP256K1_BLAKE160_MULTISIG_ALL_TYPE_HASH == script.CodeHash.String() {
 		return address.ConvertScriptToShortAddress(mode, script)
 	}
+	return address.ConvertScriptToAddress(mode, script)
 
-	hashType := address.FullTypeFormat
-	if script.HashType == types.HashTypeData {
-		hashType = address.FullDataFormat
-	}
-	return address.ConvertScriptToFullAddress(hashType, mode, script)
+	//if script.HashType == types.HashTypeType && len(script.Args) >= 20 && len(script.Args) <= 22 {
+	//	return address.ConvertScriptToShortAddress(mode, script)
+	//}
+	//
+	//hashType := address.FullTypeFormat
+	//if script.HashType == types.HashTypeData {
+	//	hashType = address.FullDataFormat
+	//}
+	//return address.ConvertScriptToFullAddress(hashType, mode, script)
 }

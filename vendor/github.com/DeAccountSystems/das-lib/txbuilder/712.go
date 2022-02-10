@@ -152,8 +152,11 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 	case common.DasActionEditRecords:
 		dasMessage = fmt.Sprintf("EDIT RECORDS OF ACCOUNT %s", d.account)
 	case common.DasActionTransferAccount:
-		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.accountDasLockArgs)
-		//dasMessage = fmt.Sprintf("TRANSFER THE ACCOUNT %s TO %s:%s", d.account, oCT.String(), oA)
+		builder, err := witness.AccountCellDataBuilderFromTx(d.Transaction, common.DataTypeNew)
+		if err != nil {
+			return nil, "", fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		}
+		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[builder.Index].Lock.Args)
 		dasMessage = fmt.Sprintf("TRANSFER THE ACCOUNT %s TO %s", d.account, oA)
 	case common.DasActionTransfer, common.DasActionWithdrawFromWallet:
 		dasMessage, err = d.getWithdrawDasMessage()
@@ -170,15 +173,12 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 		dasMessage = fmt.Sprintf("BUY %s WITH %s CKB", d.account, common.Capacity2Str(d.salePrice))
 	case common.DasActionDeclareReverseRecord:
 		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		//dasMessage = fmt.Sprintf("DECLARE A REVERSE RECORD FROM %s:%s TO %s", oCT.String(), oA, d.account)
 		dasMessage = fmt.Sprintf("DECLARE A REVERSE RECORD FROM %s TO %s", oA, d.account)
 	case common.DasActionRedeclareReverseRecord:
 		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		//dasMessage = fmt.Sprintf("REDECLARE A REVERSE RECORD FROM %s:%s TO %s", oCT.String(), oA, d.account)
 		dasMessage = fmt.Sprintf("REDECLARE A REVERSE RECORD FROM %s TO %s", oA, d.account)
 	case common.DasActionRetractReverseRecord:
 		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		//dasMessage = fmt.Sprintf("RETRACT REVERSE RECORDS ON %s:%s", oCT.String(), oA)
 		dasMessage = fmt.Sprintf("RETRACT REVERSE RECORDS ON %s", oA)
 	case common.DasActionMakeOffer:
 		builder, err := witness.OfferCellDataBuilderFromTx(d.Transaction, common.DataTypeNew)

@@ -54,3 +54,7 @@ func (d *DasCore) GetDasLock() *types.Script {
 		return common.GetNormalLockScript("0xefbf497f752ff7a655a8ec6f3c8f3feaaed6e410")
 	}
 }
+
+func SetLogLevel(level int) {
+	log = mylog.NewLogger("das-core", level)
+}

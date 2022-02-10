@@ -9,19 +9,22 @@ import (
 )
 
 type ConfigCellDataBuilder struct {
-	ConfigCellAccount           *molecule.ConfigCellAccount
-	ConfigCellPrice             *molecule.ConfigCellPrice
-	PriceConfigMap              map[uint8]*molecule.PriceConfig
-	ConfigCellSecondaryMarket   *molecule.ConfigCellSecondaryMarket
-	ConfigCellIncome            *molecule.ConfigCellIncome
-	ConfigCellProfitRate        *molecule.ConfigCellProfitRate
-	ConfigCellMain              *molecule.ConfigCellMain
-	ConfigCellReverseResolution *molecule.ConfigCellReverseResolution
-	ConfigCellProposal          *molecule.ConfigCellProposal
-	ConfigCellApply             *molecule.ConfigCellApply
-	ConfigCellRelease           *molecule.ConfigCellRelease
-	ConfigCellRecordKeys        []string
-	ConfigCellEmojis            []string
+	ConfigCellAccount               *molecule.ConfigCellAccount
+	ConfigCellPrice                 *molecule.ConfigCellPrice
+	PriceConfigMap                  map[uint8]*molecule.PriceConfig
+	PriceMaxLength                  uint8
+	ConfigCellSecondaryMarket       *molecule.ConfigCellSecondaryMarket
+	ConfigCellIncome                *molecule.ConfigCellIncome
+	ConfigCellProfitRate            *molecule.ConfigCellProfitRate
+	ConfigCellMain                  *molecule.ConfigCellMain
+	ConfigCellReverseResolution     *molecule.ConfigCellReverseResolution
+	ConfigCellProposal              *molecule.ConfigCellProposal
+	ConfigCellApply                 *molecule.ConfigCellApply
+	ConfigCellRelease               *molecule.ConfigCellRelease
+	ConfigCellRecordKeys            []string
+	ConfigCellEmojis                []string
+	ConfigCellUnavailableAccountMap map[string]struct{}
+	ConfigCellPreservedAccountMap   map[string]struct{}
 }
 
 func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *types.Transaction, configCellTypeArgs common.ConfigCellTypeArgs) error {
@@ -60,6 +63,9 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 			length, err := molecule.Bytes2GoU8(price.Length().RawData())
 			if err != nil {
 				return fmt.Errorf("price.Length() err: %s", err.Error())
+			}
+			if builder.PriceMaxLength < length {
+				builder.PriceMaxLength = length
 			}
 			builder.PriceConfigMap[length] = price
 		}
@@ -120,18 +126,55 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 	case common.ConfigCellTypeArgsCharSetEmoji:
 		dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
 		if err != nil {
-			return fmt.Errorf("key name space len err: %s", err.Error())
+			return fmt.Errorf("char set emoji err: %s", err.Error())
 		}
 		builder.ConfigCellEmojis = strings.Split(string(configCellDataBys[4:dataLength]), string([]byte{0x00}))
 	case common.ConfigCellTypeArgsUnavailable:
-		fmt.Println(string(configCellDataBys))
-	//dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
-	//if err != nil {
-	//	return fmt.Errorf("key name space len err: %s", err.Error())
-	//}
-	//fmt.Println(string(configCellDataBys[4:dataLength]))
-	case common.ConfigCellTypeArgsPreservedAccount00:
-		fmt.Println(string(configCellDataBys))
+		if builder.ConfigCellUnavailableAccountMap == nil {
+			builder.ConfigCellUnavailableAccountMap = make(map[string]struct{})
+		}
+		dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
+		if err != nil {
+			return fmt.Errorf("unavailable account err: %s", err.Error())
+		}
+		for i := 20; i <= len(configCellDataBys[4:dataLength]); i += 20 {
+			tmp := common.Bytes2Hex(configCellDataBys[4:dataLength][i-20 : i])
+			if _, ok := builder.ConfigCellUnavailableAccountMap[tmp]; ok {
+				fmt.Println(tmp, "ok")
+			}
+			builder.ConfigCellUnavailableAccountMap[tmp] = struct{}{}
+		}
+	case common.ConfigCellTypeArgsPreservedAccount00,
+		common.ConfigCellTypeArgsPreservedAccount01,
+		common.ConfigCellTypeArgsPreservedAccount02,
+		common.ConfigCellTypeArgsPreservedAccount03,
+		common.ConfigCellTypeArgsPreservedAccount04,
+		common.ConfigCellTypeArgsPreservedAccount05,
+		common.ConfigCellTypeArgsPreservedAccount06,
+		common.ConfigCellTypeArgsPreservedAccount07,
+		common.ConfigCellTypeArgsPreservedAccount08,
+		common.ConfigCellTypeArgsPreservedAccount09,
+		common.ConfigCellTypeArgsPreservedAccount10,
+		common.ConfigCellTypeArgsPreservedAccount11,
+		common.ConfigCellTypeArgsPreservedAccount12,
+		common.ConfigCellTypeArgsPreservedAccount13,
+		common.ConfigCellTypeArgsPreservedAccount14,
+		common.ConfigCellTypeArgsPreservedAccount15,
+		common.ConfigCellTypeArgsPreservedAccount16,
+		common.ConfigCellTypeArgsPreservedAccount17,
+		common.ConfigCellTypeArgsPreservedAccount18,
+		common.ConfigCellTypeArgsPreservedAccount19:
+		if builder.ConfigCellPreservedAccountMap == nil {
+			builder.ConfigCellPreservedAccountMap = make(map[string]struct{})
+		}
+		dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
+		if err != nil {
+			return fmt.Errorf("preserved account err: %s", err.Error())
+		}
+		for i := 20; i <= len(configCellDataBys[4:dataLength]); i += 20 {
+			tmp := common.Bytes2Hex(configCellDataBys[4:dataLength][i-20 : i])
+			builder.ConfigCellPreservedAccountMap[tmp] = struct{}{}
+		}
 	}
 	return nil
 }
@@ -260,8 +303,8 @@ func (c *ConfigCellDataBuilder) AccountPrice(length uint8) (uint64, uint64, erro
 }
 
 func (c *ConfigCellDataBuilder) PriceConfig(length uint8) *molecule.PriceConfig {
-	if length > 5 {
-		length = 5
+	if length > c.PriceMaxLength {
+		length = c.PriceMaxLength
 	}
 	if c.PriceConfigMap != nil {
 		if price, ok := c.PriceConfigMap[length]; ok {

@@ -157,6 +157,11 @@ func (d *DasTxBuilder) getInputCell(o *types.OutPoint) (*types.CellWithStatus, e
 		return cell, nil
 	} else {
 		log.Warn("GetLiveCell:", key, cell.Status)
-		return nil, fmt.Errorf("cell [%s] not live", key)
+		if !d.notCheckInputs {
+			return nil, fmt.Errorf("cell [%s] not live", key)
+		} else {
+			d.MapInputsCell[key] = cell
+			return cell, nil
+		}
 	}
 }

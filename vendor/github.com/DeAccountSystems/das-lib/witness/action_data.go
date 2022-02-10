@@ -79,6 +79,46 @@ func ActionDataBuilderFromTx(tx *types.Transaction) (*ActionDataBuilder, error) 
 	return &resp, nil
 }
 
+func ActionDataBuilderFromWitness(wit []byte) (*ActionDataBuilder, error) {
+	if len(wit) <= common.WitnessDasTableTypeEndIndex+1 {
+		return nil, fmt.Errorf("action data len is invalid")
+	} else if string(wit[0:common.WitnessDasCharLen]) != common.WitnessDas {
+		return nil, fmt.Errorf("not a das data")
+	}
+	actionDataType := common.Bytes2Hex(wit[common.WitnessDasCharLen:common.WitnessDasTableTypeEndIndex])
+	dataBys := wit[common.WitnessDasTableTypeEndIndex:]
+	if actionDataType != common.ActionDataTypeActionData {
+		return nil, fmt.Errorf("not a action data")
+	}
+	actionData, err := molecule.ActionDataFromSlice(dataBys, false)
+	if err != nil {
+		return nil, fmt.Errorf("ActionDataFromSlice err: %s", err.Error())
+	}
+	var resp ActionDataBuilder
+	resp.ActionData = actionData
+	resp.Action = string(actionData.Action().RawData())
+	if resp.Action == common.DasActionBuyAccount {
+		raw := actionData.Params().RawData()
+
+		lenRaw := len(raw)
+		inviterLockBytesLen, err := molecule.Bytes2GoU32(raw[:4])
+		if err != nil {
+			return nil, fmt.Errorf("Bytes2GoU32 err: %s", err.Error())
+		}
+		inviterLockRaw := raw[:inviterLockBytesLen]
+		channelLockRaw := raw[inviterLockBytesLen : lenRaw-1]
+
+		resp.Params = append(resp.Params, inviterLockRaw)
+		resp.Params = append(resp.Params, channelLockRaw)
+		resp.Params = append(resp.Params, raw[lenRaw-1:lenRaw])
+		resp.ParamsStr = common.GetMaxHashLenParams(common.Bytes2Hex(inviterLockRaw)) + "," + common.GetMaxHashLenParams(common.Bytes2Hex(channelLockRaw)) + "," + common.Bytes2Hex(raw[lenRaw-1:lenRaw])
+	} else {
+		resp.Params = append(resp.Params, actionData.Params().RawData())
+		resp.ParamsStr = common.Bytes2Hex(actionData.Params().RawData())
+	}
+	return &resp, nil
+}
+
 func GenActionDataWitness(action common.DasAction, params []byte) ([]byte, error) {
 	if action == "" {
 		return nil, fmt.Errorf("action is nil")
@@ -88,6 +128,8 @@ func GenActionDataWitness(action common.DasAction, params []byte) ([]byte, error
 	}
 	if action == common.DasActionEditRecords {
 		params = append(params, common.Hex2Bytes(common.ParamManager)...)
+	} else if action == common.DasActionRenewAccount {
+		params = []byte{}
 	} else {
 		params = append(params, common.Hex2Bytes(common.ParamOwner)...)
 	}

@@ -28,8 +28,9 @@ const (
 )
 
 const (
-	TronMessageHeader = "\x19TRON Signed Message:\n%d"
-	EthMessageHeader  = "\x19Ethereum Signed Message:\n%d"
+	TronMessageHeader    = "\x19TRON Signed Message:\n%d"
+	EthMessageHeader     = "\x19Ethereum Signed Message:\n%d"
+	Ed25519MessageHeader = "\x18Ed25519 Signed Message:\n%d"
 )
 
 const (

@@ -1,6 +1,6 @@
  * [Prerequisites](#prerequisites)
  * [Install](#install)
- * [Usage](#usage)
+ * [API Usage](#usage)
  * [Others](#others)
     
 

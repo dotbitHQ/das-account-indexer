@@ -75,3 +75,8 @@ func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address
 	err = d.db.Select("account").Where(" owner_chain_type=? AND owner=? ", chainType, address).Find(&list).Error
 	return
 }
+
+func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
+	return d.db.Select("block_number", "outpoint", "enable_sub_account", "renew_sub_account_price").
+		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
+}

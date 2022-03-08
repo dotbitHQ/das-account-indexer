@@ -32,6 +32,12 @@ const (
 	DasActionEditOffer   DasAction = "edit_offer"
 	DasActionCancelOffer DasAction = "cancel_offer"
 	DasActionAcceptOffer DasAction = "accept_offer"
+
+	DasActionEnableSubAccount  DasAction = "enable_sub_account"
+	DasActionCreateSubAccount  DasAction = "create_sub_account"
+	DasActionEditSubAccount    DasAction = "edit_sub_account"
+	DasActionRenewSubAccount   DasAction = "renew_sub_account"
+	DasActionRecycleSubAccount DasAction = "recycle_sub_account"
 )
 
 const (

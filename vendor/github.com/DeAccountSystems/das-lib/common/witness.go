@@ -11,6 +11,7 @@ const (
 	ActionDataTypePreAccountCell     ActionDataType = "0x05000000" // pre account cell
 	ActionDataTypeIncomeCell         ActionDataType = "0x06000000" // income cell
 	ActionDataTypeOfferCell          ActionDataType = "0x07000000" // offer cell
+	ActionDataTypeSubAccount         ActionDataType = "0x08000000" // sub account
 )
 
 const (
@@ -27,4 +28,12 @@ const (
 	DataTypeDep          DataType = 2
 	GoDataEntityVersion1 uint32   = 1
 	GoDataEntityVersion2 uint32   = 2
+	GoDataEntityVersion3 uint32   = 3
+)
+
+const (
+	EditKeyOwner     = "owner"
+	EditKeyManager   = "manager"
+	EditKeyExpiredAt = "expired_at"
+	EditKeyRecords   = "records"
 )

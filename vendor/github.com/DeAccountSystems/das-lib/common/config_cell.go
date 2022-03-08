@@ -15,6 +15,7 @@ const (
 	ConfigCellTypeArgsUnavailable     ConfigCellTypeArgs = "0x6e000000"
 	ConfigCellTypeArgsSecondaryMarket ConfigCellTypeArgs = "0x6f000000"
 	ConfigCellTypeArgsReverseRecord   ConfigCellTypeArgs = "0x70000000"
+	ConfigCellTypeArgsSubAccount      ConfigCellTypeArgs = "0x71000000"
 
 	ConfigCellTypeArgsPreservedAccount00 ConfigCellTypeArgs = "0x10270000"
 	ConfigCellTypeArgsPreservedAccount01 ConfigCellTypeArgs = "0x11270000"

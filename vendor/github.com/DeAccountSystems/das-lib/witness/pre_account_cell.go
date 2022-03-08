@@ -154,7 +154,7 @@ func (p *PreAccountCellDataBuilder) GenWitness(param *PreAccountCellParam) ([]by
 
 	switch param.Action {
 	case common.DasActionPreRegister:
-		createdAt := molecule.NewTimestampBuilder().Set(molecule.GoTimeUnixToMoleculeBytes(param.CreatedAt)).Build()
+		createdAt := molecule.NewUint64Builder().Set(molecule.GoTimeUnixToMoleculeBytes(param.CreatedAt)).Build()
 		invitedDiscount := molecule.GoU32ToMoleculeU32(param.InvitedDiscount)
 		quote := molecule.GoU64ToMoleculeU64(param.Quote)
 		var iScript, cScript molecule.ScriptOpt

@@ -87,6 +87,13 @@ func OutputDataToAccountId(data []byte) ([]byte, error) {
 	return data[HashBytesLen : HashBytesLen+DasAccountIdLen], nil
 }
 
+func OutputDataToSMTRoot(data []byte) ([]byte, error) {
+	if size := len(data); size < HashBytesLen {
+		return nil, fmt.Errorf("len not enough: %d", size)
+	}
+	return data[0:HashBytesLen], nil
+}
+
 func AccountCharsToAccount(accountChars *molecule.AccountChars) string {
 	index := uint(0)
 	var accountRawBytes []byte

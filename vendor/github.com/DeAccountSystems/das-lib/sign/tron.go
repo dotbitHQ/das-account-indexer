@@ -15,6 +15,7 @@ func TronSignature(signType bool, data []byte, hexPrivateKey string) ([]byte, er
 	}
 
 	if signType {
+		l = 32 // fix tron sign
 		data = append([]byte(fmt.Sprintf(common.TronMessageHeader, l)), data...)
 	}
 

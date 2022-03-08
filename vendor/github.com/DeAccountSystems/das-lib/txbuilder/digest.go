@@ -118,6 +118,9 @@ func (d *DasTxBuilder) generateDigestByGroup(group []int, skipGroups []int) (Sig
 	if actionBuilder, err := witness.ActionDataBuilderFromTx(d.Transaction); err == nil && actionBuilder.Action == common.DasActionEditRecords {
 		signData.SignType = managerAlgorithmId
 	}
+	if signData.SignType == common.DasAlgorithmIdTron {
+		signData.SignMsg += "04" // fix tron sign
+	}
 
 	// skip useless signature
 	if len(skipGroups) != 0 {

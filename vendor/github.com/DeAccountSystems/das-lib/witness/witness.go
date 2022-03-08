@@ -13,6 +13,10 @@ var (
 	log                   = mylog.NewLogger("witness", mylog.LevelDebug)
 	ErrDataEntityOptIsNil = errors.New("DataEntityOpt is nil")
 	ErrNotExistWitness    = errors.New("the witness wanted not exist")
+
+	DataEntityVersion1 = molecule.GoU32ToMoleculeU32(common.GoDataEntityVersion1)
+	DataEntityVersion2 = molecule.GoU32ToMoleculeU32(common.GoDataEntityVersion2)
+	DataEntityVersion3 = molecule.GoU32ToMoleculeU32(common.GoDataEntityVersion3)
 )
 
 func GetWitnessDataFromTx(tx *types.Transaction, handle FuncParseWitness) error {
@@ -66,5 +70,11 @@ func getDataEntityOpt(dataBys []byte, dataType common.DataType) (*molecule.DataE
 func GenDasDataWitness(action common.ActionDataType, data *molecule.Data) []byte {
 	tmp := append([]byte(common.WitnessDas), common.Hex2Bytes(action)...)
 	tmp = append(tmp, data.AsSlice()...)
+	return tmp
+}
+
+func GenDasSubAccountWitness(action common.ActionDataType, data []byte) []byte {
+	tmp := append([]byte(common.WitnessDas), common.Hex2Bytes(action)...)
+	tmp = append(tmp, data...)
 	return tmp
 }

@@ -21,6 +21,7 @@ type ConfigCellDataBuilder struct {
 	ConfigCellProposal              *molecule.ConfigCellProposal
 	ConfigCellApply                 *molecule.ConfigCellApply
 	ConfigCellRelease               *molecule.ConfigCellRelease
+	ConfigCellSubAccount            *molecule.ConfigCellSubAccount
 	ConfigCellRecordKeys            []string
 	ConfigCellEmojis                []string
 	ConfigCellUnavailableAccountMap map[string]struct{}
@@ -111,6 +112,12 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 			return fmt.Errorf("ConfigCellReverseResolutionFromSlice err: %s", err.Error())
 		}
 		builder.ConfigCellReverseResolution = ConfigCellReverseResolution
+	case common.ConfigCellTypeArgsSubAccount:
+		ConfigCellSubAccount, err := molecule.ConfigCellSubAccountFromSlice(configCellDataBys, false)
+		if err != nil {
+			return fmt.Errorf("ConfigCellSubAccountFromSlice err: %s", err.Error())
+		}
+		builder.ConfigCellSubAccount = ConfigCellSubAccount
 	case common.ConfigCellTypeArgsProposal:
 		ConfigCellProposal, err := molecule.ConfigCellProposalFromSlice(configCellDataBys, false)
 		if err != nil {
@@ -221,6 +228,23 @@ func (c *ConfigCellDataBuilder) RecordCommonFee() (uint64, error) {
 func (c *ConfigCellDataBuilder) BasicCapacity() (uint64, error) {
 	if c.ConfigCellAccount != nil {
 		return molecule.Bytes2GoU64(c.ConfigCellAccount.BasicCapacity().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) BasicCapacityFromOwnerDasAlgorithmId(args string) (uint64, error) {
+	if args == "" {
+		return 0, fmt.Errorf("args is nil")
+	}
+	argsByte := common.Hex2Bytes(args)
+	algorithmId := common.DasAlgorithmId(argsByte[0])
+	switch algorithmId {
+	case common.DasAlgorithmIdEd25519:
+		return 230 * common.OneCkb, nil
+	default:
+		if c.ConfigCellAccount != nil {
+			return molecule.Bytes2GoU64(c.ConfigCellAccount.BasicCapacity().RawData())
+		}
 	}
 	return 0, fmt.Errorf("ConfigCellAccount is nil")
 }

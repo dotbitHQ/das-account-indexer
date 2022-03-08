@@ -110,7 +110,7 @@ func (d *DasCore) FormatAddressToDasLockScript(chainType common.ChainType, addr 
 	case common.ChainTypeTron:
 		args = common.DasLockTronPreFix + strings.TrimPrefix(addr, common.TronPreFix)
 	case common.ChainTypeMixin:
-		args = common.DasLockMixinPreFix + strings.TrimPrefix(addr, common.HexPreFix)
+		args = common.DasLockEd25519PreFix + strings.TrimPrefix(addr, common.HexPreFix)
 	default:
 		e = fmt.Errorf("unknow chain type [%d]", chainType)
 		return

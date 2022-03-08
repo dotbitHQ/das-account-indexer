@@ -60,6 +60,8 @@ func ParserWitnessData(witnessByte []byte) interface{} {
 		return ParserConfigCellSecondaryMarket(witnessByte)
 	case common.ConfigCellTypeArgsReverseRecord:
 		return ParserConfigCellReverseRecord(witnessByte)
+	case common.ConfigCellTypeArgsSubAccount:
+		return ParserConfigCellSubAccount(witnessByte)
 
 	case common.ConfigCellTypeArgsPreservedAccount00:
 		return ParserConfigCellUnavailable(witnessByte, "ConfigCellPreservedAccount00")
@@ -211,9 +213,9 @@ func ParserAccountCell(witnessByte []byte) interface{} {
 		index, _ := molecule.Bytes2GoU32(dataEntity.Index().RawData())
 		var accountCell map[string]interface{}
 		switch version {
-		case common.GoDataEntityVersion1:
-			accountCell = parserAccountCellV1(dataEntity)
 		case common.GoDataEntityVersion2:
+			accountCell = parserAccountCellV2(dataEntity)
+		case common.GoDataEntityVersion3:
 			accountCell = parserAccountCell(dataEntity)
 		}
 		if accountCell == nil {
@@ -234,18 +236,20 @@ func ParserAccountCell(witnessByte []byte) interface{} {
 	}
 }
 
-func parserAccountCellV1(dataEntity *molecule.DataEntity) map[string]interface{} {
-	accountCellV1, _ := molecule.AccountCellDataV1FromSlice(dataEntity.Entity().RawData(), false)
-	if accountCellV1 == nil {
+func parserAccountCellV2(dataEntity *molecule.DataEntity) map[string]interface{} {
+	accountCellV2, _ := molecule.AccountCellDataV2FromSlice(dataEntity.Entity().RawData(), false)
+	if accountCellV2 == nil {
 		return nil
 	}
 
-	registeredAt, _ := molecule.Bytes2GoU64(accountCellV1.RegisteredAt().RawData())
-	updatedAt, _ := molecule.Bytes2GoU64(accountCellV1.UpdatedAt().RawData())
-	status, _ := molecule.Bytes2GoU64(accountCellV1.Status().RawData())
+	registeredAt, _ := molecule.Bytes2GoU64(accountCellV2.RegisteredAt().RawData())
+	lastTransferAccountAt, _ := molecule.Bytes2GoU64(accountCellV2.LastTransferAccountAt().RawData())
+	lastEditManagerAt, _ := molecule.Bytes2GoU64(accountCellV2.LastEditManagerAt().RawData())
+	lastEditRecordsAt, _ := molecule.Bytes2GoU64(accountCellV2.LastEditRecordsAt().RawData())
+	status, _ := molecule.Bytes2GoU64(accountCellV2.Status().RawData())
 	var recordsMaps []map[string]interface{}
-	for i := uint(0); i < accountCellV1.Records().Len(); i++ {
-		record := accountCellV1.Records().Get(i)
+	for i := uint(0); i < accountCellV2.Records().Len(); i++ {
+		record := accountCellV2.Records().Get(i)
 		ttl, _ := molecule.Bytes2GoU32(record.RecordTtl().RawData())
 		recordsMaps = append(recordsMaps, map[string]interface{}{
 			"key":   string(record.RecordKey().RawData()),
@@ -257,14 +261,16 @@ func parserAccountCellV1(dataEntity *molecule.DataEntity) map[string]interface{}
 	}
 
 	return map[string]interface{}{
-		"witness_hash": common.Bytes2Hex(common.Blake2b(accountCellV1.AsSlice())),
+		"witness_hash": common.Bytes2Hex(common.Blake2b(accountCellV2.AsSlice())),
 		"entity": map[string]interface{}{
-			"id":            common.Bytes2Hex(accountCellV1.Id().RawData()),
-			"account":       common.AccountCharsToAccount(accountCellV1.Account()),
-			"registered_at": ConvertTimestamp(int64(registeredAt)),
-			"updated_at":    ConvertTimestamp(int64(updatedAt)),
-			"status":        status,
-			"records":       recordsMaps,
+			"id":                       common.Bytes2Hex(accountCellV2.Id().RawData()),
+			"account":                  common.AccountCharsToAccount(accountCellV2.Account()),
+			"registered_at":            ConvertTimestamp(int64(registeredAt)),
+			"last_transfer_account_at": ConvertTimestamp(int64(lastTransferAccountAt)),
+			"last_edit_manager_at":     ConvertTimestamp(int64(lastEditManagerAt)),
+			"last_edit_records_at":     ConvertTimestamp(int64(lastEditRecordsAt)),
+			"status":                   status,
+			"records":                  recordsMaps,
 		},
 	}
 }
@@ -279,7 +285,9 @@ func parserAccountCell(dataEntity *molecule.DataEntity) map[string]interface{} {
 	lastTransferAccountAt, _ := molecule.Bytes2GoU64(accountCell.LastTransferAccountAt().RawData())
 	lastEditManagerAt, _ := molecule.Bytes2GoU64(accountCell.LastEditManagerAt().RawData())
 	lastEditRecordsAt, _ := molecule.Bytes2GoU64(accountCell.LastEditRecordsAt().RawData())
-	status, _ := molecule.Bytes2GoU64(accountCell.Status().RawData())
+	status, _ := molecule.Bytes2GoU8(accountCell.Status().RawData())
+	enableSubAccount, _ := molecule.Bytes2GoU8(accountCell.EnableSubAccount().RawData())
+	renewSubAccountPrice, _ := molecule.Bytes2GoU64(accountCell.RenewSubAccountPrice().RawData())
 	var recordsMaps []map[string]interface{}
 	for i := uint(0); i < accountCell.Records().Len(); i++ {
 		record := accountCell.Records().Get(i)
@@ -303,6 +311,8 @@ func parserAccountCell(dataEntity *molecule.DataEntity) map[string]interface{} {
 			"last_edit_manager_at":     ConvertTimestamp(int64(lastEditManagerAt)),
 			"last_edit_records_at":     ConvertTimestamp(int64(lastEditRecordsAt)),
 			"status":                   status,
+			"enable_sub_account":       enableSubAccount,
+			"renew_sub_account_price":  ConvertCapacity(renewSubAccountPrice),
 			"records":                  recordsMaps,
 		},
 	}
@@ -632,7 +642,7 @@ func ParserOfferCell(witnessByte []byte) interface{} {
 			"witness_hash": common.Bytes2Hex(common.Blake2b(offerCell.AsSlice())),
 			"entity": map[string]interface{}{
 				"account":      string(offerCell.Account().RawData()),
-				"price":        price,
+				"price":        ConvertCapacity(price),
 				"message":      string(offerCell.Message().RawData()),
 				"inviter_lock": parserScript(offerCell.InviterLock()),
 				"channel_lock": parserScript(offerCell.ChannelLock()),
@@ -1008,6 +1018,40 @@ func ParserConfigCellReverseRecord(witnessByte []byte) interface{} {
 			"common_fee":                   ConvertCapacity(commonFee),
 			"record_prepared_fee_capacity": ConvertCapacity(recordPreparedFeeCapacity),
 			"record_basic_capacity":        ConvertCapacity(recordBasicCapacity),
+		},
+	}
+}
+
+func ParserConfigCellSubAccount(witnessByte []byte) interface{} {
+	configCellSubAccount, _ := molecule.ConfigCellSubAccountFromSlice(witnessByte[common.WitnessDasTableTypeEndIndex:], false)
+	if configCellSubAccount == nil {
+		return parserDefaultWitness(witnessByte)
+	}
+
+	basicCapacity, _ := molecule.Bytes2GoU64(configCellSubAccount.BasicCapacity().RawData())
+	preparedFeeCapacity, _ := molecule.Bytes2GoU64(configCellSubAccount.PreparedFeeCapacity().RawData())
+	newSubAccountPrice, _ := molecule.Bytes2GoU64(configCellSubAccount.NewSubAccountPrice().RawData())
+	renewSubAccountPrice, _ := molecule.Bytes2GoU64(configCellSubAccount.RenewSubAccountPrice().RawData())
+	commonFee, _ := molecule.Bytes2GoU64(configCellSubAccount.CommonFee().RawData())
+	createFee, _ := molecule.Bytes2GoU64(configCellSubAccount.CreateFee().RawData())
+	editFee, _ := molecule.Bytes2GoU64(configCellSubAccount.EditFee().RawData())
+	renewFee, _ := molecule.Bytes2GoU64(configCellSubAccount.RenewFee().RawData())
+	recycleFee, _ := molecule.Bytes2GoU64(configCellSubAccount.RecycleFee().RawData())
+
+	return map[string]interface{}{
+		"witness":      common.Bytes2Hex(witnessByte),
+		"witness_hash": common.Bytes2Hex(common.Blake2b(configCellSubAccount.AsSlice())),
+		"name":         "ConfigCellReverseRecord",
+		"data": map[string]interface{}{
+			"basic_capacity":          ConvertCapacity(basicCapacity),
+			"prepared_fee_capacity":   ConvertCapacity(preparedFeeCapacity),
+			"new_sub_account_price":   ConvertCapacity(newSubAccountPrice),
+			"renew_sub_account_price": ConvertCapacity(renewSubAccountPrice),
+			"common_fee":              ConvertCapacity(commonFee),
+			"create_fee":              ConvertCapacity(createFee),
+			"edit_fee":                ConvertCapacity(editFee),
+			"renew_fee":               ConvertCapacity(renewFee),
+			"recycle_fee":             ConvertCapacity(recycleFee),
 		},
 	}
 }

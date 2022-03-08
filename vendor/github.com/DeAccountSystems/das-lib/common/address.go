@@ -17,14 +17,14 @@ const (
 	ChainTypeTron  ChainType = 3
 	ChainTypeMixin ChainType = 4
 
-	HexPreFix           = "0x"
-	TronPreFix          = "41"
-	TronBase58PreFix    = "T"
-	DasLockCkbPreFix    = "00"
-	DasLockEthPreFix    = "03"
-	DasLockTronPreFix   = "04"
-	DasLockEth712PreFix = "05"
-	DasLockMixinPreFix  = "06"
+	HexPreFix            = "0x"
+	TronPreFix           = "41"
+	TronBase58PreFix     = "T"
+	DasLockCkbPreFix     = "00"
+	DasLockEthPreFix     = "03"
+	DasLockTronPreFix    = "04"
+	DasLockEth712PreFix  = "05"
+	DasLockEd25519PreFix = "06"
 )
 
 const (

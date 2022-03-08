@@ -33,10 +33,12 @@ make default
 # it will take about 3 hours to synchronize to the latest data(Dec 15, 2021)
 ```
 
-## Usage
-[Here](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md) is the main document about APIs
+## API Usage
+[Here](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md) are the APIs details.
+
+* If you are a newcomer, just read [API List](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md) 
 * If you are come from [das_account_indexer](https://github.com/DeAccountSystems/das_account_indexer), you probably need do nothing, the new APIs are compatible with the old ones. More details see [deprecated-api-list](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md#deprecated-api-list), but we still suggest you replace with the corresponding new APIs
-* If you are a newcomer, just read [api-list](https://github.com/DeAccountSystems/das-account-indexer/blob/main/API.md#api-list) 
+
 
 
 

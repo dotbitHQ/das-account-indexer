@@ -77,6 +77,88 @@ func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address
 }
 
 func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
-	return d.db.Select("block_number", "outpoint", "enable_sub_account", "renew_sub_account_price").
+	return d.db.Select("block_number", "block_timestamp", "outpoint", "enable_sub_account", "renew_sub_account_price").
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
+}
+
+func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo) error {
+	if len(accountInfos) > 0 {
+		return d.db.Clauses(clause.OnConflict{
+			DoUpdates: clause.AssignmentColumns([]string{
+				"block_number", "block_timestamp", "outpoint",
+				"owner_chain_type", "owner", "owner_algorithm_id",
+				"manager_chain_type", "manager", "manager_algorithm_id",
+				"registered_at", "expired_at", "status",
+				"enable_sub_account", "renew_sub_account_price", "nonce",
+			}),
+		}).Create(&accountInfos).Error
+	}
+
+	return nil
+}
+
+func (d *DbDao) EditOwnerSubAccount(accountInfo tables.TableAccountInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Select("block_number", "block_timestamp", "outpoint",
+			"owner_chain_type", "owner", "owner_algorithm_id", "nonce").
+			Where("account_id = ?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id = ?", accountInfo.AccountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (d *DbDao) EditManagerSubAccount(accountInfo tables.TableAccountInfo) error {
+	return d.db.Select("block_number", "block_timestamp", "outpoint",
+		"manager_chain_type", "manager", "manager_algorithm_id", "nonce").
+		Where("account_id = ?", accountInfo.AccountId).
+		Updates(accountInfo).Error
+}
+
+func (d *DbDao) EditRecordsSubAccount(accountInfo tables.TableAccountInfo, recordsInfos []tables.TableRecordsInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Select("block_number", "block_timestamp", "outpoint", "nonce").
+			Where("account_id = ?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id = ?", accountInfo.AccountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+
+		if len(recordsInfos) > 0 {
+			if err := tx.Create(&recordsInfos).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (d *DbDao) RenewSubAccount(accountInfo tables.TableAccountInfo) error {
+	return d.db.Select("block_number", "block_timestamp", "outpoint", "expired_at", "nonce").
+		Where("account_id = ?", accountInfo.AccountId).
+		Updates(accountInfo).Error
+}
+
+func (d *DbDao) RecycleSubAccount(accountId string) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("account_id = ?", accountId).Delete(&tables.TableAccountInfo{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id = ?", accountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

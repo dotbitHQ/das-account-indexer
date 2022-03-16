@@ -1,4 +1,5 @@
 server:
+  is_update: false
   net: 2 # 1-mainnet 2-testnet
   http_server_addr: ":8121"
   http_server_addr_indexer: ":8122"

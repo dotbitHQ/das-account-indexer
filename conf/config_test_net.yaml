@@ -33,3 +33,4 @@ das_lib:
     "balance-cell-type": "0x27560fe2daa6150b771621300d1d4ea127832b7b326f2d70eed63f5333b4a8a9"
     "das-lock": "0xeedd10c7d8fee85c119daf2077fea9cf76b9a92ddca546f1f8e0031682e65aee"
     "reverse-record-cell-type": "0x334d7841eb156b8aa5abd7b09277e91e782d840140905496bb5bff0ea6ce9d75"
+    "sub-account-cell-type": "0x63ca3e26cc69809f06735c6d9139ec2d84f2a277f13509a54060d6ee19423b5b"

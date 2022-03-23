@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/Andrew-M-C/go.emoji/official"
-	"github.com/DeAccountSystems/das-lib/molecule"
 	"github.com/nervosnetwork/ckb-sdk-go/crypto/blake2b"
 	"github.com/nervosnetwork/ckb-sdk-go/transaction"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
@@ -92,21 +91,6 @@ func OutputDataToSMTRoot(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("len not enough: %d", size)
 	}
 	return data[0:HashBytesLen], nil
-}
-
-func AccountCharsToAccount(accountChars *molecule.AccountChars) string {
-	index := uint(0)
-	var accountRawBytes []byte
-	accountCharsSize := accountChars.ItemCount()
-	for ; index < accountCharsSize; index++ {
-		char := accountChars.Get(index)
-		accountRawBytes = append(accountRawBytes, char.Bytes().RawData()...)
-	}
-	accountStr := string(accountRawBytes)
-	if accountStr != "" && !strings.HasSuffix(accountStr, DasAccountSuffix) {
-		accountStr = accountStr + DasAccountSuffix
-	}
-	return accountStr
 }
 
 func GetAccountLength(account string) uint8 {

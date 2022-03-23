@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/DeAccountSystems/das-lib/molecule"
+	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/shopspring/decimal"
 	"strings"
 	"time"
@@ -35,6 +36,8 @@ func ParserWitnessData(witnessByte []byte) interface{} {
 		return ParserIncomeCell(witnessByte)
 	case common.ActionDataTypeOfferCell:
 		return ParserOfferCell(witnessByte)
+	case common.ActionDataTypeSubAccount:
+		return ParserSubAccount(witnessByte)
 
 	case common.ConfigCellTypeArgsAccount:
 		return ParserConfigCellAccount(witnessByte)
@@ -159,6 +162,18 @@ func parserScript(script *molecule.Script) map[string]interface{} {
 		"code_hash": common.Bytes2Hex(script.CodeHash().RawData()),
 		"hash_type": common.Bytes2Hex(script.HashType().AsSlice()),
 		"args":      common.Bytes2Hex(script.Args().RawData()),
+	}
+}
+
+func parserTypesScript(script *types.Script) map[string]interface{} {
+	if script == nil {
+		return nil
+	}
+
+	return map[string]interface{}{
+		"code_hash": script.CodeHash,
+		"hash_type": script.HashType,
+		"args":      common.Bytes2Hex(script.Args),
 	}
 }
 
@@ -654,6 +669,56 @@ func ParserOfferCell(witnessByte []byte) interface{} {
 		"witness": common.Bytes2Hex(witnessByte),
 		"name":    "OfferCell",
 		"data":    offerCells,
+	}
+}
+
+func ParserSubAccount(witnessByte []byte) interface{} {
+	builder, _ := SubAccountBuilderFromBytes(witnessByte)
+	if builder == nil {
+		return parserDefaultWitness(witnessByte)
+	}
+
+	var editValue interface{}
+	switch string(builder.EditKey) {
+	case common.EditKeyOwner, common.EditKeyManager:
+		lock := builder.ConvertEditValueToLock()
+		editValue = parserScript(lock)
+	case common.EditKeyRecords:
+		records := builder.ConvertEditValueToRecords()
+		editValue = ConvertToSubAccountRecords(records)
+	case common.EditKeyExpiredAt:
+		expiredAt := builder.ConvertEditValueToExpiredAt()
+		editValue, _ = molecule.Bytes2GoU64(expiredAt.RawData())
+	}
+	subAccount := map[string]interface{}{
+		"signature":    common.Bytes2Hex(builder.Signature),
+		"prev_root":    common.Bytes2Hex(builder.PrevRoot),
+		"current_root": common.Bytes2Hex(builder.CurrentRoot),
+		"proof":        common.Bytes2Hex(builder.Proof),
+		"version":      builder.Version,
+		"sub_account": map[string]interface{}{
+			"lock":                 parserTypesScript(builder.SubAccount.Lock),
+			"account_id":           builder.SubAccount.AccountId,
+			"account_char_set":     builder.SubAccount.AccountCharSet,
+			"suffix":               builder.SubAccount.Suffix,
+			"registered_at":        builder.SubAccount.RegisteredAt,
+			"expired_at":           builder.SubAccount.ExpiredAt,
+			"status":               builder.SubAccount.Status,
+			"records":              builder.SubAccount.Records,
+			"nonce":                builder.SubAccount.Nonce,
+			"EnableSubAccount":     builder.SubAccount.EnableSubAccount,
+			"RenewSubAccountPrice": builder.SubAccount.RenewSubAccountPrice,
+		},
+		"edit_key":     string(builder.EditKey),
+		"edit_value":   editValue,
+		"account":      builder.Account,
+		"witness_hash": common.Bytes2Hex(common.Blake2b(builder.MoleculeSubAccount.AsSlice())),
+	}
+
+	return map[string]interface{}{
+		"witness": common.Bytes2Hex(witnessByte),
+		"name":    "SubAccount",
+		"data":    subAccount,
 	}
 }
 

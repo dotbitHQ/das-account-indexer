@@ -73,7 +73,7 @@ func GenDasDataWitness(action common.ActionDataType, data *molecule.Data) []byte
 	return tmp
 }
 
-func GenDasSubAccountWitness(action common.ActionDataType, data []byte) []byte {
+func GenDasDataWitnessWithByte(action common.ActionDataType, data []byte) []byte {
 	tmp := append([]byte(common.WitnessDas), common.Hex2Bytes(action)...)
 	tmp = append(tmp, data...)
 	return tmp

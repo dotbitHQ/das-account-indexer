@@ -61,9 +61,9 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		return
 	}
 
-	subAccountMap, err := witness.SubAccountDataBuilderMapFromTx(req.Tx)
+	subAccountMap, err := witness.SubAccountBuilderMapFromTx(req.Tx)
 	if err != nil {
-		resp.Err = fmt.Errorf("SubAccountDataBuilderMapFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("SubAccountBuilderMapFromTx err: %s", err.Error())
 		return
 	}
 
@@ -112,9 +112,9 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 
 	log.Info("ActionEditSubAccount:", req.BlockNumber, req.TxHash)
 
-	builder, err := witness.SubAccountDataBuilderFromTx(req.Tx)
+	builder, err := witness.SubAccountBuilderFromTx(req.Tx)
 	if err != nil {
-		resp.Err = fmt.Errorf("SubAccountDataBuilderFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("SubAccountBuilderFromTx err: %s", err.Error())
 		return
 	}
 
@@ -126,7 +126,11 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 		Nonce:          builder.SubAccount.Nonce,
 	}
 
-	subAccount := builder.ConvertToSubAccount()
+	subAccount, err := builder.ConvertToEditValue()
+	if err != nil {
+		resp.Err = fmt.Errorf("ConvertToEditValue err: %s", err.Error())
+		return
+	}
 	switch string(builder.EditKey) {
 	case common.EditKeyOwner:
 		oID, _, oCT, _, oA, _ := core.FormatDasLockToHexAddress(subAccount.Lock.Args)
@@ -180,9 +184,9 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 
 	log.Info("ActionRenewSubAccount:", req.BlockNumber, req.TxHash)
 
-	builder, err := witness.SubAccountDataBuilderFromTx(req.Tx)
+	builder, err := witness.SubAccountBuilderFromTx(req.Tx)
 	if err != nil {
-		resp.Err = fmt.Errorf("SubAccountDataBuilderFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("SubAccountBuilderFromTx err: %s", err.Error())
 		return
 	}
 
@@ -194,7 +198,11 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 		Nonce:          builder.SubAccount.Nonce,
 	}
 
-	subAccount := builder.ConvertToSubAccount()
+	subAccount, err := builder.ConvertToEditValue()
+	if err != nil {
+		resp.Err = fmt.Errorf("ConvertToEditValue err: %s", err.Error())
+		return
+	}
 	switch string(builder.EditKey) {
 	case common.EditKeyExpiredAt:
 		accountInfo.ExpiredAt = subAccount.ExpiredAt
@@ -219,9 +227,9 @@ func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (re
 
 	log.Info("ActionRecycleSubAccount:", req.BlockNumber, req.TxHash)
 
-	builder, err := witness.SubAccountDataBuilderFromTx(req.Tx)
+	builder, err := witness.SubAccountBuilderFromTx(req.Tx)
 	if err != nil {
-		resp.Err = fmt.Errorf("SubAccountDataBuilderFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("SubAccountBuilderFromTx err: %s", err.Error())
 		return
 	}
 

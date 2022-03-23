@@ -117,6 +117,12 @@ func (d *DasCore) AsyncDasConfigCell() error {
 			}
 		}
 	}
+
+	builder, err := d.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsCharSetEmoji)
+	if err != nil {
+		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
+	}
+	common.InitEmoji(builder.ConfigCellEmojis)
 	return nil
 }
 

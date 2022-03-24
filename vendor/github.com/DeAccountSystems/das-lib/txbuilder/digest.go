@@ -115,8 +115,18 @@ func (d *DasTxBuilder) generateDigestByGroup(group []int, skipGroups []int) (Sig
 	ownerAlgorithmId, managerAlgorithmId, _, _, _, _ := core.FormatDasLockToHexAddress(item.Cell.Output.Lock.Args)
 	signData.SignMsg = digest
 	signData.SignType = ownerAlgorithmId
-	if actionBuilder, err := witness.ActionDataBuilderFromTx(d.Transaction); err == nil && actionBuilder.Action == common.DasActionEditRecords {
+
+	actionBuilder, err := witness.ActionDataBuilderFromTx(d.Transaction)
+	if err != nil {
+		return signData, fmt.Errorf("witness.ActionDataBuilderFromTx err: %s", err.Error())
+	}
+	switch actionBuilder.Action {
+	case common.DasActionEditRecords:
 		signData.SignType = managerAlgorithmId
+	case common.DasActionEnableSubAccount, common.DasActionCreateSubAccount:
+		if signData.SignType == common.DasAlgorithmIdEth712 {
+			signData.SignType = common.DasAlgorithmIdEth
+		}
 	}
 	if signData.SignType == common.DasAlgorithmIdTron {
 		signData.SignMsg += "04" // fix tron sign

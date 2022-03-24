@@ -30,7 +30,7 @@ func (b *BlockParser) ActionEnableSubAccount(req *FuncTransactionHandleReq) (res
 	accountInfo := tables.TableAccountInfo{
 		BlockNumber:          req.BlockNumber,
 		BlockTimestamp:       req.BlockTimestamp,
-		Outpoint:             common.OutPoint2String(req.TxHash, 1),
+		Outpoint:             common.OutPoint2String(req.TxHash, 0),
 		AccountId:            builder.AccountId,
 		EnableSubAccount:     tables.AccountEnableStatusOn,
 		RenewSubAccountPrice: builder.RenewSubAccountPrice,
@@ -74,7 +74,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		accountInfos = append(accountInfos, tables.TableAccountInfo{
 			BlockNumber:          req.BlockNumber,
 			BlockTimestamp:       req.BlockTimestamp,
-			Outpoint:             common.OutPoint2String(req.TxHash, 1),
+			Outpoint:             common.OutPoint2String(req.TxHash, 0),
 			AccountId:            v.SubAccount.AccountId,
 			ParentAccountId:      builder.AccountId,
 			Account:              v.Account,

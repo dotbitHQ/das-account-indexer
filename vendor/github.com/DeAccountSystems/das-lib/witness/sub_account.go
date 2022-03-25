@@ -6,6 +6,7 @@ import (
 	"github.com/DeAccountSystems/das-lib/molecule"
 	"github.com/nervosnetwork/ckb-sdk-go/crypto/blake2b"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
+	"strings"
 )
 
 const (
@@ -172,7 +173,8 @@ func SubAccountBuilderFromBytes(dataBys []byte) (*SubAccountBuilder, error) {
 
 		resp.SubAccount = &tmp
 		resp.MoleculeSubAccount = subAccount
-		resp.Account = common.AccountCharsToAccount(subAccount.Account())
+		account := strings.TrimRight(common.AccountCharsToAccount(subAccount.Account()), common.DasAccountSuffix)
+		resp.Account = account + tmp.Suffix
 		return &resp, nil
 	default:
 		return nil, fmt.Errorf("sub account version: %d", resp.Version)

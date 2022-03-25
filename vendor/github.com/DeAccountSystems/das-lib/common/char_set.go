@@ -14,7 +14,7 @@ const (
 	AccountCharTypeEn     AccountCharType = 2
 )
 
-var CharSetTypeEmoji = ""
+var CharSetTypeEmojiMap = make(map[string]struct{})
 
 const (
 	CharSetTypeNumber = "0123456789"
@@ -50,7 +50,7 @@ func AccountToAccountChars(account string) ([]AccountCharSet, error) {
 	for _, v := range account {
 		char := string(v)
 		var charSetName AccountCharType
-		if strings.Contains(CharSetTypeEmoji, char) {
+		if _, ok := CharSetTypeEmojiMap[char]; ok {
 			charSetName = AccountCharTypeEmoji
 		} else if strings.Contains(CharSetTypeNumber, char) {
 			charSetName = AccountCharTypeNumber
@@ -69,7 +69,7 @@ func AccountToAccountChars(account string) ([]AccountCharSet, error) {
 
 func InitEmoji(emojis []string) {
 	for _, v := range emojis {
-		CharSetTypeEmoji = fmt.Sprintf("%v%v", CharSetTypeEmoji, v)
+		CharSetTypeEmojiMap[v] = struct{}{}
 	}
 	//fmt.Println(CharSetTypeEmoji)
 }

@@ -119,6 +119,21 @@ func ActionDataBuilderFromWitness(wit []byte) (*ActionDataBuilder, error) {
 	return &resp, nil
 }
 
+func GenActionDataWitnessV2(action common.DasAction, params []byte, signer string) ([]byte, error) {
+	if action == "" {
+		return nil, fmt.Errorf("action is nil")
+	}
+	params = append(params, common.Hex2Bytes(signer)...)
+
+	actionBytes := molecule.GoString2MoleculeBytes(action)
+	paramsBytes := molecule.GoBytes2MoleculeBytes(params)
+	actionData := molecule.NewActionDataBuilder().Action(actionBytes).Params(paramsBytes).Build()
+
+	tmp := append([]byte(common.WitnessDas), common.Hex2Bytes(common.ActionDataTypeActionData)...)
+	tmp = append(tmp, actionData.AsSlice()...)
+	return tmp, nil
+}
+
 func GenActionDataWitness(action common.DasAction, params []byte) ([]byte, error) {
 	if action == "" {
 		return nil, fmt.Errorf("action is nil")

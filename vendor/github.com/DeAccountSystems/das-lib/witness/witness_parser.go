@@ -712,7 +712,7 @@ func ParserSubAccount(witnessByte []byte) interface{} {
 		"edit_key":     string(builder.EditKey),
 		"edit_value":   editValue,
 		"account":      builder.Account,
-		"witness_hash": common.Bytes2Hex(common.Blake2b(builder.MoleculeSubAccount.AsSlice())),
+		"witness_hash": common.Bytes2Hex(common.Blake2b(builder.SubAccount.ToH256())),
 	}
 
 	return map[string]interface{}{

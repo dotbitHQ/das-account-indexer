@@ -14,17 +14,16 @@ const (
 )
 
 type SubAccountBuilder struct {
-	Signature          []byte
-	SignRole           []byte
-	PrevRoot           []byte
-	CurrentRoot        []byte
-	Proof              []byte
-	Version            uint32
-	SubAccount         *SubAccount
-	EditKey            []byte
-	EditValue          []byte
-	MoleculeSubAccount *molecule.SubAccount
-	Account            string
+	Signature   []byte
+	SignRole    []byte
+	PrevRoot    []byte
+	CurrentRoot []byte
+	Proof       []byte
+	Version     uint32
+	SubAccount  *SubAccount
+	EditKey     []byte
+	EditValue   []byte
+	Account     string
 }
 
 type SubAccountParam struct {
@@ -172,9 +171,7 @@ func SubAccountBuilderFromBytes(dataBys []byte) (*SubAccountBuilder, error) {
 		tmp.RenewSubAccountPrice, _ = molecule.Bytes2GoU64(subAccount.RenewSubAccountPrice().RawData())
 
 		resp.SubAccount = &tmp
-		resp.MoleculeSubAccount = subAccount
-		account := strings.TrimRight(common.AccountCharsToAccount(subAccount.Account()), common.DasAccountSuffix)
-		resp.Account = account + tmp.Suffix
+		resp.Account = strings.TrimRight(common.AccountCharsToAccount(subAccount.Account()), common.DasAccountSuffix) + tmp.Suffix
 		return &resp, nil
 	default:
 		return nil, fmt.Errorf("sub account version: %d", resp.Version)

@@ -81,20 +81,28 @@ func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
 }
 
-func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo) error {
-	if len(accountInfos) > 0 {
-		return d.db.Clauses(clause.OnConflict{
-			DoUpdates: clause.AssignmentColumns([]string{
-				"block_number", "block_timestamp", "outpoint",
-				"owner_chain_type", "owner", "owner_algorithm_id",
-				"manager_chain_type", "manager", "manager_algorithm_id",
-				"registered_at", "expired_at", "status",
-				"enable_sub_account", "renew_sub_account_price", "nonce",
-			}),
-		}).Create(&accountInfos).Error
-	}
+func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo, accountInfo tables.TableAccountInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if len(accountInfos) > 0 {
+			return tx.Clauses(clause.OnConflict{
+				DoUpdates: clause.AssignmentColumns([]string{
+					"block_number", "block_timestamp", "outpoint",
+					"owner_chain_type", "owner", "owner_algorithm_id",
+					"manager_chain_type", "manager", "manager_algorithm_id",
+					"registered_at", "expired_at", "status",
+					"enable_sub_account", "renew_sub_account_price", "nonce",
+				}),
+			}).Create(&accountInfos).Error
+		}
 
-	return nil
+		if err := tx.Select("block_number", "block_timestamp", "outpoint").
+			Where("account_id = ?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (d *DbDao) EditOwnerSubAccount(accountInfo tables.TableAccountInfo) error {

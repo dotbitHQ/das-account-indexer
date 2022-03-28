@@ -92,8 +92,13 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 			ExpiredAt:            v.SubAccount.ExpiredAt,
 		})
 	}
-
-	if err = b.DbDao.CreateSubAccount(accountInfos); err != nil {
+	accountInfo := tables.TableAccountInfo{
+		BlockNumber:    req.BlockNumber,
+		BlockTimestamp: req.BlockTimestamp,
+		Outpoint:       common.OutPoint2String(req.TxHash, 0),
+		AccountId:      builder.AccountId,
+	}
+	if err = b.DbDao.CreateSubAccount(accountInfos, accountInfo); err != nil {
 		resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
 		return
 	}

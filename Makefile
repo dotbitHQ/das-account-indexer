@@ -4,6 +4,7 @@ BINARY_NAME=das_account_indexer_server
 
 # update
 update:
+	export GOPRIVATE="github.com/dotbitHQ"
 	go mod tidy
 	go mod vendor
 

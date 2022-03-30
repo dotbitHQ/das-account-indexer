@@ -470,3 +470,10 @@ func (c *ConfigCellDataBuilder) Status() (uint8, error) {
 	}
 	return 0, fmt.Errorf("ConfigCellMain is nil")
 }
+
+func (c *ConfigCellDataBuilder) LuckyNumber() (uint32, error) {
+	if c.ConfigCellRelease != nil {
+		return molecule.Bytes2GoU32(c.ConfigCellRelease.LuckyNumber().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellRelease is nil")
+}

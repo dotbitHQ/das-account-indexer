@@ -71,5 +71,5 @@ func InitEmoji(emojis []string) {
 	for _, v := range emojis {
 		CharSetTypeEmojiMap[v] = struct{}{}
 	}
-	//fmt.Println(CharSetTypeEmoji)
+	//fmt.Println(CharSetTypeEmojiMap)
 }

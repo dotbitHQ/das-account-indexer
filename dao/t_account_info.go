@@ -151,19 +151,22 @@ func (d *DbDao) EditRecordsSubAccount(accountInfo tables.TableAccountInfo, recor
 	})
 }
 
-func (d *DbDao) RenewSubAccount(accountInfo tables.TableAccountInfo) error {
-	return d.db.Select("block_number", "block_timestamp", "outpoint", "expired_at", "nonce").
-		Where("account_id = ?", accountInfo.AccountId).
-		Updates(accountInfo).Error
+func (d *DbDao) RenewSubAccount(accountInfos []tables.TableAccountInfo) error {
+	return d.db.Clauses(clause.OnConflict{
+		DoUpdates: clause.AssignmentColumns([]string{
+			"block_number", "block_timestamp", "outpoint",
+			"expired_at", "nonce",
+		}),
+	}).Create(&accountInfos).Error
 }
 
-func (d *DbDao) RecycleSubAccount(accountId string) error {
+func (d *DbDao) RecycleSubAccount(accountId []string) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("account_id = ?", accountId).Delete(&tables.TableAccountInfo{}).Error; err != nil {
+		if err := tx.Where("account_id IN(?)", accountId).Delete(&tables.TableAccountInfo{}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where("account_id = ?", accountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+		if err := tx.Where("account_id IN(?)", accountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
 			return err
 		}
 

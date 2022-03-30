@@ -3255,7 +3255,7 @@ func (s *ConfigCellIncome) AsBuilder() ConfigCellIncomeBuilder {
 }
 
 type ConfigCellReleaseBuilder struct {
-	release_rules ReleaseRules
+	lucky_number Uint32
 }
 
 func (s *ConfigCellReleaseBuilder) Build() ConfigCellRelease {
@@ -3265,7 +3265,7 @@ func (s *ConfigCellReleaseBuilder) Build() ConfigCellRelease {
 	offsets := make([]uint32, 0, 1)
 
 	offsets = append(offsets, totalSize)
-	totalSize += uint32(len(s.release_rules.AsSlice()))
+	totalSize += uint32(len(s.lucky_number.AsSlice()))
 
 	b.Write(packNumber(Number(totalSize)))
 
@@ -3273,17 +3273,17 @@ func (s *ConfigCellReleaseBuilder) Build() ConfigCellRelease {
 		b.Write(packNumber(Number(offsets[i])))
 	}
 
-	b.Write(s.release_rules.AsSlice())
+	b.Write(s.lucky_number.AsSlice())
 	return ConfigCellRelease{inner: b.Bytes()}
 }
 
-func (s *ConfigCellReleaseBuilder) ReleaseRules(v ReleaseRules) *ConfigCellReleaseBuilder {
-	s.release_rules = v
+func (s *ConfigCellReleaseBuilder) LuckyNumber(v Uint32) *ConfigCellReleaseBuilder {
+	s.lucky_number = v
 	return s
 }
 
 func NewConfigCellReleaseBuilder() *ConfigCellReleaseBuilder {
-	return &ConfigCellReleaseBuilder{release_rules: ReleaseRulesDefault()}
+	return &ConfigCellReleaseBuilder{lucky_number: Uint32Default()}
 }
 
 type ConfigCellRelease struct {
@@ -3298,7 +3298,7 @@ func (s *ConfigCellRelease) AsSlice() []byte {
 }
 
 func ConfigCellReleaseDefault() ConfigCellRelease {
-	return *ConfigCellReleaseFromSliceUnchecked([]byte{12, 0, 0, 0, 8, 0, 0, 0, 4, 0, 0, 0})
+	return *ConfigCellReleaseFromSliceUnchecked([]byte{12, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0})
 }
 
 func ConfigCellReleaseFromSlice(slice []byte, compatible bool) (*ConfigCellRelease, error) {
@@ -3356,7 +3356,7 @@ func ConfigCellReleaseFromSlice(slice []byte, compatible bool) (*ConfigCellRelea
 
 	var err error
 
-	_, err = ReleaseRulesFromSlice(slice[offsets[0]:offsets[1]], compatible)
+	_, err = Uint32FromSlice(slice[offsets[0]:offsets[1]], compatible)
 	if err != nil {
 		return nil, err
 	}
@@ -3389,402 +3389,20 @@ func (s *ConfigCellRelease) HasExtraFields() bool {
 	return 1 != s.FieldCount()
 }
 
-func (s *ConfigCellRelease) ReleaseRules() *ReleaseRules {
-	var ret *ReleaseRules
+func (s *ConfigCellRelease) LuckyNumber() *Uint32 {
+	var ret *Uint32
 	start := unpackNumber(s.inner[4:])
 	if s.HasExtraFields() {
 		end := unpackNumber(s.inner[8:])
-		ret = ReleaseRulesFromSliceUnchecked(s.inner[start:end])
+		ret = Uint32FromSliceUnchecked(s.inner[start:end])
 	} else {
-		ret = ReleaseRulesFromSliceUnchecked(s.inner[start:])
+		ret = Uint32FromSliceUnchecked(s.inner[start:])
 	}
 	return ret
 }
 
 func (s *ConfigCellRelease) AsBuilder() ConfigCellReleaseBuilder {
-	ret := NewConfigCellReleaseBuilder().ReleaseRules(*s.ReleaseRules())
-	return *ret
-}
-
-type ReleaseRulesBuilder struct {
-	inner []ReleaseRule
-}
-
-func (s *ReleaseRulesBuilder) Build() ReleaseRules {
-	itemCount := len(s.inner)
-
-	b := new(bytes.Buffer)
-
-	// Empty dyn vector, just return size's bytes
-	if itemCount == 0 {
-		b.Write(packNumber(Number(HeaderSizeUint)))
-		return ReleaseRules{inner: b.Bytes()}
-	}
-
-	// Calculate first offset then loop for rest items offsets
-	totalSize := HeaderSizeUint * uint32(itemCount+1)
-	offsets := make([]uint32, 0, itemCount)
-	offsets = append(offsets, totalSize)
-	for i := 1; i < itemCount; i++ {
-		totalSize += uint32(len(s.inner[i-1].AsSlice()))
-		offsets = append(offsets, offsets[i-1]+uint32(len(s.inner[i-1].AsSlice())))
-	}
-	totalSize += uint32(len(s.inner[itemCount-1].AsSlice()))
-
-	b.Write(packNumber(Number(totalSize)))
-
-	for i := 0; i < itemCount; i++ {
-		b.Write(packNumber(Number(offsets[i])))
-	}
-
-	for i := 0; i < itemCount; i++ {
-		b.Write(s.inner[i].AsSlice())
-	}
-
-	return ReleaseRules{inner: b.Bytes()}
-}
-
-func (s *ReleaseRulesBuilder) Set(v []ReleaseRule) *ReleaseRulesBuilder {
-	s.inner = v
-	return s
-}
-func (s *ReleaseRulesBuilder) Push(v ReleaseRule) *ReleaseRulesBuilder {
-	s.inner = append(s.inner, v)
-	return s
-}
-func (s *ReleaseRulesBuilder) Extend(iter []ReleaseRule) *ReleaseRulesBuilder {
-	for i := 0; i < len(iter); i++ {
-		s.inner = append(s.inner, iter[i])
-	}
-	return s
-}
-func (s *ReleaseRulesBuilder) Replace(index uint, v ReleaseRule) *ReleaseRule {
-	if uint(len(s.inner)) > index {
-		a := s.inner[index]
-		s.inner[index] = v
-		return &a
-	}
-	return nil
-}
-
-func NewReleaseRulesBuilder() *ReleaseRulesBuilder {
-	return &ReleaseRulesBuilder{[]ReleaseRule{}}
-}
-
-type ReleaseRules struct {
-	inner []byte
-}
-
-func ReleaseRulesFromSliceUnchecked(slice []byte) *ReleaseRules {
-	return &ReleaseRules{inner: slice}
-}
-func (s *ReleaseRules) AsSlice() []byte {
-	return s.inner
-}
-
-func ReleaseRulesDefault() ReleaseRules {
-	return *ReleaseRulesFromSliceUnchecked([]byte{4, 0, 0, 0})
-}
-
-func ReleaseRulesFromSlice(slice []byte, compatible bool) (*ReleaseRules, error) {
-	sliceLen := len(slice)
-
-	if uint32(sliceLen) < HeaderSizeUint {
-		errMsg := strings.Join([]string{"HeaderIsBroken", "ReleaseRules", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(HeaderSizeUint))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	totalSize := unpackNumber(slice)
-	if Number(sliceLen) != totalSize {
-		errMsg := strings.Join([]string{"TotalSizeNotMatch", "ReleaseRules", strconv.Itoa(int(sliceLen)), "!=", strconv.Itoa(int(totalSize))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	if uint32(sliceLen) == HeaderSizeUint {
-		return &ReleaseRules{inner: slice}, nil
-	}
-
-	if uint32(sliceLen) < HeaderSizeUint*2 {
-		errMsg := strings.Join([]string{"TotalSizeNotMatch", "ReleaseRules", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(HeaderSizeUint * 2))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	offsetFirst := unpackNumber(slice[HeaderSizeUint:])
-	if uint32(offsetFirst)%HeaderSizeUint != 0 || uint32(offsetFirst) < HeaderSizeUint*2 {
-		errMsg := strings.Join([]string{"OffsetsNotMatch", "ReleaseRules", strconv.Itoa(int(offsetFirst % 4)), "!= 0", strconv.Itoa(int(offsetFirst)), "<", strconv.Itoa(int(HeaderSizeUint * 2))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	if sliceLen < int(offsetFirst) {
-		errMsg := strings.Join([]string{"HeaderIsBroken", "ReleaseRules", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(offsetFirst))}, " ")
-		return nil, errors.New(errMsg)
-	}
-	itemCount := uint32(offsetFirst)/HeaderSizeUint - 1
-
-	offsets := make([]uint32, itemCount)
-
-	for i := 0; i < int(itemCount); i++ {
-		offsets[i] = uint32(unpackNumber(slice[HeaderSizeUint:][int(HeaderSizeUint)*i:]))
-	}
-
-	offsets = append(offsets, uint32(totalSize))
-
-	for i := 0; i < len(offsets); i++ {
-		if i&1 != 0 && offsets[i-1] > offsets[i] {
-			errMsg := strings.Join([]string{"OffsetsNotMatch", "ReleaseRules"}, " ")
-			return nil, errors.New(errMsg)
-		}
-	}
-
-	for i := 0; i < len(offsets); i++ {
-		if i&1 != 0 {
-			start := offsets[i-1]
-			end := offsets[i]
-			_, err := ReleaseRuleFromSlice(slice[start:end], compatible)
-
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	return &ReleaseRules{inner: slice}, nil
-}
-
-func (s *ReleaseRules) TotalSize() uint {
-	return uint(unpackNumber(s.inner))
-}
-func (s *ReleaseRules) ItemCount() uint {
-	var number uint = 0
-	if uint32(s.TotalSize()) == HeaderSizeUint {
-		return number
-	}
-	number = uint(unpackNumber(s.inner[HeaderSizeUint:]))/4 - 1
-	return number
-}
-func (s *ReleaseRules) Len() uint {
-	return s.ItemCount()
-}
-func (s *ReleaseRules) IsEmpty() bool {
-	return s.Len() == 0
-}
-
-// if *ReleaseRule is nil, index is out of bounds
-func (s *ReleaseRules) Get(index uint) *ReleaseRule {
-	var b *ReleaseRule
-	if index < s.Len() {
-		start_index := uint(HeaderSizeUint) * (1 + index)
-		start := unpackNumber(s.inner[start_index:])
-
-		if index == s.Len()-1 {
-			b = ReleaseRuleFromSliceUnchecked(s.inner[start:])
-		} else {
-			end_index := start_index + uint(HeaderSizeUint)
-			end := unpackNumber(s.inner[end_index:])
-			b = ReleaseRuleFromSliceUnchecked(s.inner[start:end])
-		}
-	}
-	return b
-}
-
-func (s *ReleaseRules) AsBuilder() ReleaseRulesBuilder {
-	size := s.ItemCount()
-	t := NewReleaseRulesBuilder()
-	for i := uint(0); i < size; i++ {
-		t.Push(*s.Get(i))
-	}
-	return *t
-}
-
-type ReleaseRuleBuilder struct {
-	length        Uint32
-	release_start Uint64
-	release_end   Uint64
-}
-
-func (s *ReleaseRuleBuilder) Build() ReleaseRule {
-	b := new(bytes.Buffer)
-
-	totalSize := HeaderSizeUint * (3 + 1)
-	offsets := make([]uint32, 0, 3)
-
-	offsets = append(offsets, totalSize)
-	totalSize += uint32(len(s.length.AsSlice()))
-	offsets = append(offsets, totalSize)
-	totalSize += uint32(len(s.release_start.AsSlice()))
-	offsets = append(offsets, totalSize)
-	totalSize += uint32(len(s.release_end.AsSlice()))
-
-	b.Write(packNumber(Number(totalSize)))
-
-	for i := 0; i < len(offsets); i++ {
-		b.Write(packNumber(Number(offsets[i])))
-	}
-
-	b.Write(s.length.AsSlice())
-	b.Write(s.release_start.AsSlice())
-	b.Write(s.release_end.AsSlice())
-	return ReleaseRule{inner: b.Bytes()}
-}
-
-func (s *ReleaseRuleBuilder) Length(v Uint32) *ReleaseRuleBuilder {
-	s.length = v
-	return s
-}
-
-func (s *ReleaseRuleBuilder) ReleaseStart(v Uint64) *ReleaseRuleBuilder {
-	s.release_start = v
-	return s
-}
-
-func (s *ReleaseRuleBuilder) ReleaseEnd(v Uint64) *ReleaseRuleBuilder {
-	s.release_end = v
-	return s
-}
-
-func NewReleaseRuleBuilder() *ReleaseRuleBuilder {
-	return &ReleaseRuleBuilder{length: Uint32Default(), release_start: Uint64Default(), release_end: Uint64Default()}
-}
-
-type ReleaseRule struct {
-	inner []byte
-}
-
-func ReleaseRuleFromSliceUnchecked(slice []byte) *ReleaseRule {
-	return &ReleaseRule{inner: slice}
-}
-func (s *ReleaseRule) AsSlice() []byte {
-	return s.inner
-}
-
-func ReleaseRuleDefault() ReleaseRule {
-	return *ReleaseRuleFromSliceUnchecked([]byte{36, 0, 0, 0, 16, 0, 0, 0, 20, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-}
-
-func ReleaseRuleFromSlice(slice []byte, compatible bool) (*ReleaseRule, error) {
-	sliceLen := len(slice)
-	if uint32(sliceLen) < HeaderSizeUint {
-		errMsg := strings.Join([]string{"HeaderIsBroken", "ReleaseRule", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(HeaderSizeUint))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	totalSize := unpackNumber(slice)
-	if Number(sliceLen) != totalSize {
-		errMsg := strings.Join([]string{"TotalSizeNotMatch", "ReleaseRule", strconv.Itoa(int(sliceLen)), "!=", strconv.Itoa(int(totalSize))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	if uint32(sliceLen) == HeaderSizeUint && 3 == 0 {
-		return &ReleaseRule{inner: slice}, nil
-	}
-
-	if uint32(sliceLen) < HeaderSizeUint*2 {
-		errMsg := strings.Join([]string{"TotalSizeNotMatch", "ReleaseRule", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(HeaderSizeUint * 2))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	offsetFirst := unpackNumber(slice[HeaderSizeUint:])
-	if uint32(offsetFirst)%HeaderSizeUint != 0 || uint32(offsetFirst) < HeaderSizeUint*2 {
-		errMsg := strings.Join([]string{"OffsetsNotMatch", "ReleaseRule", strconv.Itoa(int(offsetFirst % 4)), "!= 0", strconv.Itoa(int(offsetFirst)), "<", strconv.Itoa(int(HeaderSizeUint * 2))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	if sliceLen < int(offsetFirst) {
-		errMsg := strings.Join([]string{"HeaderIsBroken", "ReleaseRule", strconv.Itoa(int(sliceLen)), "<", strconv.Itoa(int(offsetFirst))}, " ")
-		return nil, errors.New(errMsg)
-	}
-
-	fieldCount := uint32(offsetFirst)/HeaderSizeUint - 1
-	if fieldCount < 3 {
-		return nil, errors.New("FieldCountNotMatch")
-	} else if !compatible && fieldCount > 3 {
-		return nil, errors.New("FieldCountNotMatch")
-	}
-
-	offsets := make([]uint32, fieldCount)
-
-	for i := 0; i < int(fieldCount); i++ {
-		offsets[i] = uint32(unpackNumber(slice[HeaderSizeUint:][int(HeaderSizeUint)*i:]))
-	}
-	offsets = append(offsets, uint32(totalSize))
-
-	for i := 0; i < len(offsets); i++ {
-		if i&1 != 0 && offsets[i-1] > offsets[i] {
-			return nil, errors.New("OffsetsNotMatch")
-		}
-	}
-
-	var err error
-
-	_, err = Uint32FromSlice(slice[offsets[0]:offsets[1]], compatible)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = Uint64FromSlice(slice[offsets[1]:offsets[2]], compatible)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = Uint64FromSlice(slice[offsets[2]:offsets[3]], compatible)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ReleaseRule{inner: slice}, nil
-}
-
-func (s *ReleaseRule) TotalSize() uint {
-	return uint(unpackNumber(s.inner))
-}
-func (s *ReleaseRule) FieldCount() uint {
-	var number uint = 0
-	if uint32(s.TotalSize()) == HeaderSizeUint {
-		return number
-	}
-	number = uint(unpackNumber(s.inner[HeaderSizeUint:]))/4 - 1
-	return number
-}
-func (s *ReleaseRule) Len() uint {
-	return s.FieldCount()
-}
-func (s *ReleaseRule) IsEmpty() bool {
-	return s.Len() == 0
-}
-func (s *ReleaseRule) CountExtraFields() uint {
-	return s.FieldCount() - 3
-}
-
-func (s *ReleaseRule) HasExtraFields() bool {
-	return 3 != s.FieldCount()
-}
-
-func (s *ReleaseRule) Length() *Uint32 {
-	start := unpackNumber(s.inner[4:])
-	end := unpackNumber(s.inner[8:])
-	return Uint32FromSliceUnchecked(s.inner[start:end])
-}
-
-func (s *ReleaseRule) ReleaseStart() *Uint64 {
-	start := unpackNumber(s.inner[8:])
-	end := unpackNumber(s.inner[12:])
-	return Uint64FromSliceUnchecked(s.inner[start:end])
-}
-
-func (s *ReleaseRule) ReleaseEnd() *Uint64 {
-	var ret *Uint64
-	start := unpackNumber(s.inner[12:])
-	if s.HasExtraFields() {
-		end := unpackNumber(s.inner[16:])
-		ret = Uint64FromSliceUnchecked(s.inner[start:end])
-	} else {
-		ret = Uint64FromSliceUnchecked(s.inner[start:])
-	}
-	return ret
-}
-
-func (s *ReleaseRule) AsBuilder() ReleaseRuleBuilder {
-	ret := NewReleaseRuleBuilder().Length(*s.Length()).ReleaseStart(*s.ReleaseStart()).ReleaseEnd(*s.ReleaseEnd())
+	ret := NewConfigCellReleaseBuilder().LuckyNumber(*s.LuckyNumber())
 	return *ret
 }
 

@@ -124,6 +124,7 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 	}
 
 	for _, builder := range builderMap {
+		builder.SubAccount.Nonce++
 		accountInfo := tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,
@@ -198,6 +199,7 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 
 	var accountInfos []tables.TableAccountInfo
 	for _, builder := range builderMap {
+		builder.SubAccount.Nonce++
 		accountInfo := tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,

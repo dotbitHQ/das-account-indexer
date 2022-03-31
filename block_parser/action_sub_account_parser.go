@@ -124,13 +124,12 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 	}
 
 	for _, builder := range builderMap {
-		builder.SubAccount.Nonce++
 		accountInfo := tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,
 			Outpoint:       common.OutPoint2String(req.TxHash, 0),
 			AccountId:      builder.SubAccount.AccountId,
-			Nonce:          builder.SubAccount.Nonce,
+			Nonce:          builder.CurrentSubAccount.Nonce,
 		}
 
 		subAccount, err := builder.ConvertToEditValue()
@@ -199,13 +198,12 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 
 	var accountInfos []tables.TableAccountInfo
 	for _, builder := range builderMap {
-		builder.SubAccount.Nonce++
 		accountInfo := tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,
 			Outpoint:       common.OutPoint2String(req.TxHash, 0),
 			AccountId:      builder.SubAccount.AccountId,
-			Nonce:          builder.SubAccount.Nonce,
+			Nonce:          builder.CurrentSubAccount.Nonce,
 		}
 
 		subAccount, err := builder.ConvertToEditValue()

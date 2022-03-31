@@ -13,16 +13,17 @@ const (
 )
 
 type SubAccountBuilder struct {
-	Signature   []byte
-	SignRole    []byte
-	PrevRoot    []byte
-	CurrentRoot []byte
-	Proof       []byte
-	Version     uint32
-	SubAccount  *SubAccount
-	EditKey     []byte
-	EditValue   []byte
-	Account     string
+	Signature         []byte
+	SignRole          []byte
+	PrevRoot          []byte
+	CurrentRoot       []byte
+	Proof             []byte
+	Version           uint32
+	SubAccount        *SubAccount
+	EditKey           []byte
+	EditValue         []byte
+	Account           string
+	CurrentSubAccount *SubAccount
 }
 
 type SubAccountParam struct {
@@ -87,7 +88,30 @@ func SubAccountBuilderMapFromTx(tx *types.Transaction) (map[string]*SubAccountBu
 			if err != nil {
 				return false, err
 			}
-			respMap[builder.Account] = builder
+
+			currentSubAccount := *builder.SubAccount
+			builder.CurrentSubAccount = &currentSubAccount
+
+			editKey := string(builder.EditKey)
+			if editKey != "" {
+				builder.CurrentSubAccount.Nonce++
+			}
+			switch editKey {
+			case common.EditKeyOwner, common.EditKeyManager:
+				builder.CurrentSubAccount.Lock = &types.Script{
+					CodeHash: builder.SubAccount.Lock.CodeHash,
+					HashType: builder.SubAccount.Lock.HashType,
+					Args:     builder.EditValue,
+				}
+			case common.EditKeyRecords:
+				records := builder.ConvertEditValueToRecords()
+				builder.CurrentSubAccount.Records = ConvertToSubAccountRecords(records)
+			case common.EditKeyExpiredAt:
+				expiredAt := builder.ConvertEditValueToExpiredAt()
+				builder.CurrentSubAccount.ExpiredAt, _ = molecule.Bytes2GoU64(expiredAt.RawData())
+			}
+
+			respMap[builder.SubAccount.AccountId] = builder
 		}
 		return true, nil
 	})

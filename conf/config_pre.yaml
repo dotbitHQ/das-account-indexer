@@ -1,0 +1,36 @@
+server:
+  is_update: false
+  net: 2 # 1-mainnet 2-testnet
+  http_server_addr: ":8121"
+  http_server_addr_indexer: ":8122"
+  http_server_addr_reverse: ":8123"
+chain:
+  ckb_url: "http://127.0.0.1:8114"
+  index_url: "http://127.0.0.1:8116"
+  current_block_number: 1927285
+  confirm_num: 4
+  concurrency_num: 100
+db:
+  mysql:
+    addr: "127.0.0.1:3306"
+    user: "root"
+    password: "123456"
+    db_name: "das_account_indexer"
+    max_open_conn: 100
+    max_idle_conn: 50
+cache:
+  redis:
+    addr: "127.0.0.1:6379"
+    password: ""
+    db_num: 0
+das_lib:
+  thq_code_hash: "0x96248cdefb09eed910018a847cfb51ad044c2d7db650112931760e3ef34a7e9a"
+  das_contract_args: "0xbc502a34a430e3e167c82a24db6f9237b15ebf35"
+  das_contract_code_hash: "0x00000000000000000000000000000000000000000000000000545950455f4944"
+  map_das_contract:
+    "config-cell-type": "0x44a18479eec3cef7a161e8861c019d195a84c4f318d032ee523d1f662de883be"
+    "account-cell-type": "0x334540e23ec513f691cdd9490818237cbc9675861e4f19c480e0c520c715fd34"
+    "balance-cell-type": "0xb941db6d85cc9a32acec3eacdd9332ff7a0d855a6e8cb514040a7698994ccdb5"
+    "das-lock": "0x326df166e3f0a900a0aee043e31a4dea0f01ea3307e6e235f09d1b4220b75fbd"
+    "reverse-record-cell-type": "0x5c1ff43607024c3347925236eef9bbafbb4dc5232c64a2a537ed1d08ffc48eee"
+    "sub-account-cell-type": "0x63ca3e26cc69809f06735c6d9139ec2d84f2a277f13509a54060d6ee19423b5b"

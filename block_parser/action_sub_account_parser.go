@@ -139,10 +139,13 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 		}
 		switch string(builder.EditKey) {
 		case common.EditKeyOwner:
-			oID, _, oCT, _, oA, _ := core.FormatDasLockToHexAddress(common.Hex2Bytes(subAccount.LockArgs))
+			oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(common.Hex2Bytes(subAccount.LockArgs))
 			accountInfo.OwnerAlgorithmId = oID
 			accountInfo.OwnerChainType = oCT
 			accountInfo.Owner = oA
+			accountInfo.ManagerAlgorithmId = mID
+			accountInfo.ManagerChainType = mCT
+			accountInfo.Manager = mA
 			if err = b.DbDao.EditOwnerSubAccount(accountInfo); err != nil {
 				resp.Err = fmt.Errorf("EditOwnerSubAccount err: %s", err.Error())
 				return

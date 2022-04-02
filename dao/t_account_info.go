@@ -108,6 +108,7 @@ func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo, account
 func (d *DbDao) EditOwnerSubAccount(accountInfo tables.TableAccountInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Select("block_number", "block_timestamp", "outpoint",
+			"manager_chain_type", "manager", "manager_algorithm_id",
 			"owner_chain_type", "owner", "owner_algorithm_id", "nonce").
 			Where("account_id = ?", accountInfo.AccountId).
 			Updates(accountInfo).Error; err != nil {

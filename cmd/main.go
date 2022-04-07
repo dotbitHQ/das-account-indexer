@@ -79,15 +79,16 @@ func runServer(ctx *cli.Context) error {
 	log.Info("ckb node ok")
 
 	// das core
+	env := core.InitEnv(config.Cfg.Server.Net)
 	ops := []core.DasCoreOption{
 		core.WithClient(ckbClient),
-		core.WithDasContractArgs(config.Cfg.DasLib.DasContractArgs),
-		core.WithDasContractCodeHash(config.Cfg.DasLib.DasContractCodeHash),
+		core.WithDasContractArgs(env.ContractArgs),
+		core.WithDasContractCodeHash(env.ContractCodeHash),
 		core.WithDasNetType(config.Cfg.Server.Net),
-		core.WithTHQCodeHash(config.Cfg.DasLib.THQCodeHash),
+		core.WithTHQCodeHash(env.THQCodeHash),
 	}
 	dasCore := core.NewDasCore(ctxServer, &wgServer, ops...)
-	dasCore.InitDasContract(config.Cfg.DasLib.MapDasContract)
+	dasCore.InitDasContract(env.MapContract)
 	if err := dasCore.InitDasConfigCell(); err != nil {
 		return fmt.Errorf("InitDasConfigCell err: %s", err.Error())
 	}

@@ -63,12 +63,6 @@ type CfgServer struct {
 			DbNum    int    `json:"db_num" yaml:"db_num"`
 		} `json:"redis" yaml:"redis"`
 	} `json:"cache" yaml:"cache"`
-	DasLib struct {
-		THQCodeHash         string                            `json:"thq_code_hash" yaml:"thq_code_hash"`
-		DasContractArgs     string                            `json:"das_contract_args" yaml:"das_contract_args"`
-		DasContractCodeHash string                            `json:"das_contract_code_hash" yaml:"das_contract_code_hash"`
-		MapDasContract      map[common.DasContractName]string `json:"map_das_contract" yaml:"map_das_contract"`
-	} `json:"das_lib" yaml:"das_lib"`
 }
 
 type DbMysql struct {

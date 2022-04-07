@@ -23,14 +23,3 @@ cache:
     addr: "127.0.0.1:6379"
     password: ""
     db_num: 0
-das_lib:
-  thq_code_hash: "0x9e537bf5b8ec044ca3f53355e879f3fd8832217e4a9b41d9994cf0c547241a79"
-  das_contract_args: "0xc126635ece567c71c50f7482c5db80603852c306"
-  das_contract_code_hash: "0x00000000000000000000000000000000000000000000000000545950455f4944"
-  map_das_contract:
-    "config-cell-type": "0x3775c65aabe8b79980c4933dd2f4347fa5ef03611cef64328685618aa7535794"
-    "account-cell-type": "0x96dc231bbbee6aa474076468640f9e0ad27cf13b1343716a7ce04b116ea18ba8"
-    "balance-cell-type": "0xbdc8f42643ccad23e8df3d2e8dbdea9201812cd1b7f84c46e69b020529629822"
-    "das-lock": "0xda22fd296682488687a6035b5fc97c269b72d7de128034389bd03041b40309c0"
-    "reverse-record-cell-type": "0x000f3e1a89d85d268ed6d36578d474ecf91d8809f4f696dd2e5b97fe67b84a2e"
-    "sub-account-cell-type": ""

@@ -97,7 +97,14 @@ func SubAccountBuilderMapFromTx(tx *types.Transaction) (map[string]*SubAccountBu
 				builder.CurrentSubAccount.Nonce++
 			}
 			switch editKey {
-			case common.EditKeyOwner, common.EditKeyManager:
+			case common.EditKeyOwner:
+				builder.CurrentSubAccount.Lock = &types.Script{
+					CodeHash: builder.SubAccount.Lock.CodeHash,
+					HashType: builder.SubAccount.Lock.HashType,
+					Args:     builder.EditValue,
+				}
+				builder.CurrentSubAccount.Records = nil
+			case common.EditKeyManager:
 				builder.CurrentSubAccount.Lock = &types.Script{
 					CodeHash: builder.SubAccount.Lock.CodeHash,
 					HashType: builder.SubAccount.Lock.HashType,
@@ -391,4 +398,20 @@ func (p *SubAccountParam) NewSubAccountWitness() ([]byte, error) {
 	bys := p.GenSubAccountBytes()
 	witness := GenDasDataWitnessWithByte(common.ActionDataTypeSubAccount, bys)
 	return witness, nil
+}
+
+func ConvertSubAccountCellOutputData(data []byte) (smtRoot []byte, profit uint64) {
+	if len(data) == 32 {
+		smtRoot = data
+	} else if len(data) == 40 {
+		smtRoot = data[:32]
+		profit, _ = molecule.Bytes2GoU64(data[32:])
+	}
+	return
+}
+
+func BuildSubAccountCellOutputData(smtRoot []byte, profit uint64) []byte {
+	data := molecule.GoU64ToMoleculeU64(profit)
+	smtRoot = append(smtRoot, data.RawData()...)
+	return smtRoot
 }

@@ -477,3 +477,17 @@ func (c *ConfigCellDataBuilder) LuckyNumber() (uint32, error) {
 	}
 	return 0, fmt.Errorf("ConfigCellRelease is nil")
 }
+
+func (c *ConfigCellDataBuilder) NewSubAccountPrice() (uint64, error) {
+	if c.ConfigCellSubAccount != nil {
+		return molecule.Bytes2GoU64(c.ConfigCellSubAccount.NewSubAccountPrice().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellSubAccount is nil")
+}
+
+func (c *ConfigCellDataBuilder) RenewSubAccountPrice() (uint64, error) {
+	if c.ConfigCellSubAccount != nil {
+		return molecule.Bytes2GoU64(c.ConfigCellSubAccount.RenewSubAccountPrice().RawData())
+	}
+	return 0, fmt.Errorf("ConfigCellSubAccount is nil")
+}

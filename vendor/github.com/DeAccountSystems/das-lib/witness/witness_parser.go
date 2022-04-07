@@ -817,6 +817,7 @@ func ParserConfigCellMain(witnessByte []byte) interface{} {
 	ckbAnyoneCanPayIndex, _ := molecule.Bytes2GoU32(configCellMain.DasLockOutPointTable().CkbAnyoneCanPay().Index().RawData())
 	ethIndex, _ := molecule.Bytes2GoU32(configCellMain.DasLockOutPointTable().Eth().Index().RawData())
 	tronIndex, _ := molecule.Bytes2GoU32(configCellMain.DasLockOutPointTable().Tron().Index().RawData())
+	ed25519Index, _ := molecule.Bytes2GoU32(configCellMain.DasLockOutPointTable().Ed25519().Index().RawData())
 	return map[string]interface{}{
 		"witness":      common.Bytes2Hex(witnessByte),
 		"witness_hash": common.Bytes2Hex(common.Blake2b(configCellMain.AsSlice())),
@@ -855,6 +856,10 @@ func ParserConfigCellMain(witnessByte []byte) interface{} {
 				"tron": map[string]interface{}{
 					"tx_hash": common.Bytes2Hex(configCellMain.DasLockOutPointTable().Tron().TxHash().RawData()),
 					"index":   tronIndex,
+				},
+				"ed25519": map[string]interface{}{
+					"tx_hash": common.Bytes2Hex(configCellMain.DasLockOutPointTable().Ed25519().TxHash().RawData()),
+					"index":   ed25519Index,
 				},
 			},
 		},

@@ -80,7 +80,7 @@ func runServer(ctx *cli.Context) error {
 	log.Info("ckb node ok")
 
 	// das core
-	env := core.InitEnvOpt(config.Cfg.Server.Net, common.DasContractNameConfigCellType, common.DASContractNameSubAccountCellType,
+	env := core.InitEnvOpt(config.Cfg.Server.Net, common.DasContractNameConfigCellType, common.DasContractNameAccountCellType,
 		common.DasContractNameBalanceCellType, common.DasContractNameDispatchCellType,
 		common.DasContractNameReverseRecordCellType, common.DASContractNameSubAccountCellType)
 	ops := []core.DasCoreOption{

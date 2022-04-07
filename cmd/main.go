@@ -8,6 +8,7 @@ import (
 	"das-account-indexer/http_server"
 	"das-account-indexer/http_server/handle"
 	"fmt"
+	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/DeAccountSystems/das-lib/core"
 	"github.com/DeAccountSystems/das-lib/txbuilder"
 	"github.com/nervosnetwork/ckb-sdk-go/rpc"
@@ -79,7 +80,9 @@ func runServer(ctx *cli.Context) error {
 	log.Info("ckb node ok")
 
 	// das core
-	env := core.InitEnv(config.Cfg.Server.Net)
+	env := core.InitEnvOpt(config.Cfg.Server.Net, common.DasContractNameConfigCellType, common.DASContractNameSubAccountCellType,
+		common.DasContractNameBalanceCellType, common.DasContractNameDispatchCellType,
+		common.DasContractNameReverseRecordCellType, common.DASContractNameSubAccountCellType)
 	ops := []core.DasCoreOption{
 		core.WithClient(ckbClient),
 		core.WithDasContractArgs(env.ContractArgs),

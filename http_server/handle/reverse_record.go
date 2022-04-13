@@ -32,7 +32,8 @@ type formatReqKeyInfo struct {
 }
 
 type RespReverseRecord struct {
-	Account string `json:"account"`
+	Account      string `json:"account"`
+	AccountAlias string `json:"account_alias"`
 }
 
 func (h *HttpHandle) JsonRpcReverseRecord(p json.RawMessage, apiResp *code.ApiResp) {
@@ -146,6 +147,30 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 		}
 	}
 
+	resp.AccountAlias = FormatDotToSharp(resp.Account)
+
 	apiResp.ApiRespOK(resp)
 	return nil
+}
+
+func FormatDotToSharp(account string) string {
+	countDot := strings.Count(account, ".")
+	countSharp := strings.Count(account, "#")
+	if countDot == 2 && countSharp == 0 {
+		list := strings.Split(account, ".")
+		return list[1] + "#" + list[0] + ".bit"
+	}
+	return account
+}
+
+func FormatSharpToDot(account string) string {
+	countDot := strings.Count(account, ".")
+	countSharp := strings.Count(account, "#")
+	if countDot == 1 && countSharp == 1 {
+		indexSharp := strings.Index(account, "#")
+		indexDot := strings.Index(account, ".")
+
+		return account[indexSharp+1:indexDot] + "." + account[:indexSharp] + ".bit"
+	}
+	return account
 }

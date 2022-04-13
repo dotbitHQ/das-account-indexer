@@ -40,3 +40,10 @@ func BenchmarkSearchAccount(b *testing.B) {
 	}
 	b.StopTimer()
 }
+
+func TestFormatDotToSharp(t *testing.T) {
+	fmt.Println(handle.FormatDotToSharp("a.b.bit"))
+	//fmt.Println(handle.FormatDotToSharp("a#b.bit"))
+	//fmt.Println(handle.FormatSharpToDot("a.b.bit"))
+	fmt.Println(handle.FormatSharpToDot("a#b.bit"))
+}

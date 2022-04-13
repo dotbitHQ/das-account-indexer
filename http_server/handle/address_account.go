@@ -85,6 +85,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 			OutPoint: common.String2OutPointStruct(v.Outpoint),
 			AccountData: AccountData{
 				Account:             v.Account,
+				AccountAlias:        FormatDotToSharp(v.Account),
 				AccountIdHex:        v.AccountId,
 				NextAccountIdHex:    v.NextAccountId,
 				CreateAtUnix:        v.RegisteredAt,

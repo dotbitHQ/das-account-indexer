@@ -18,7 +18,8 @@ type RespAccountList struct {
 }
 
 type RespAddressAccount struct {
-	Account string `json:"account"`
+	Account      string `json:"account"`
+	AccountAlias string `json:"account_alias"`
 }
 
 func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *code.ApiResp) {
@@ -83,7 +84,8 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	}
 
 	for _, v := range list {
-		tmp := RespAddressAccount{Account: v.Account}
+		accountAlias := FormatDotToSharp(v.Account)
+		tmp := RespAddressAccount{Account: v.Account, AccountAlias: accountAlias}
 		resp.AccountList = append(resp.AccountList, tmp)
 	}
 

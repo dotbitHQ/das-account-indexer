@@ -25,6 +25,7 @@ type RespAccountInfo struct {
 
 type AccountInfo struct {
 	Account            string                `json:"account"`
+	AccountAlias       string                `json:"account_alias"`
 	AccountIdHex       string                `json:"account_id_hex"`
 	NextAccountIdHex   string                `json:"next_account_id_hex"`
 	CreateAtUnix       uint64                `json:"create_at_unix"`
@@ -84,6 +85,7 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	var resp RespAccountInfo
 
 	req.Account = strings.TrimSpace(req.Account)
+	req.Account = FormatSharpToDot(req.Account)
 	if err := checkAccount(req.Account, apiResp); err != nil {
 		log.Error("checkAccount err: ", err.Error())
 		return nil
@@ -104,6 +106,7 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	dasLockArgs := core.FormatOwnerManagerAddressToArgs(accountInfo.OwnerChainType, accountInfo.ManagerChainType, accountInfo.Owner, accountInfo.Manager)
 	resp.AccountInfo = AccountInfo{
 		Account:            accountInfo.Account,
+		AccountAlias:       FormatDotToSharp(accountInfo.Account),
 		AccountIdHex:       accountInfo.AccountId,
 		NextAccountIdHex:   accountInfo.NextAccountId,
 		CreateAtUnix:       accountInfo.RegisteredAt,

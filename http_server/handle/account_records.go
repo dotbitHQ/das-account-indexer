@@ -75,6 +75,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 	resp.Records = make([]DataRecord, 0)
 
 	req.Account = strings.TrimSpace(req.Account)
+	req.Account = FormatSharpToDot(req.Account)
 	if err := checkAccount(req.Account, apiResp); err != nil {
 		log.Error("checkAccount err: ", err.Error())
 		return nil

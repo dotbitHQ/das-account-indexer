@@ -18,8 +18,8 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 # get the code
 git clone https://github.com/DeAccountSystems/das-account-indexer.git
 
-# edit conf/config.yaml for your own convenient
-vi conf/config.yaml
+# edit config/config.yaml for your own convenient
+vi config/config.yaml
 
 # init mysql database
 mysql -uroot -p
@@ -29,7 +29,7 @@ mysql -uroot -p
 # compile and run
 cd das-account-indexer
 make default
-./das_account_indexer_server --config=conf/config.yaml
+./das_account_indexer_server --config=config/config.yaml
 # it will take about 3 hours to synchronize to the latest data(Dec 15, 2021)
 ```
 

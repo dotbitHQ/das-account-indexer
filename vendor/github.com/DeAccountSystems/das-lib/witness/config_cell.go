@@ -9,23 +9,24 @@ import (
 )
 
 type ConfigCellDataBuilder struct {
-	ConfigCellAccount               *molecule.ConfigCellAccount
-	ConfigCellPrice                 *molecule.ConfigCellPrice
-	PriceConfigMap                  map[uint8]*molecule.PriceConfig
-	PriceMaxLength                  uint8
-	ConfigCellSecondaryMarket       *molecule.ConfigCellSecondaryMarket
-	ConfigCellIncome                *molecule.ConfigCellIncome
-	ConfigCellProfitRate            *molecule.ConfigCellProfitRate
-	ConfigCellMain                  *molecule.ConfigCellMain
-	ConfigCellReverseResolution     *molecule.ConfigCellReverseResolution
-	ConfigCellProposal              *molecule.ConfigCellProposal
-	ConfigCellApply                 *molecule.ConfigCellApply
-	ConfigCellRelease               *molecule.ConfigCellRelease
-	ConfigCellSubAccount            *molecule.ConfigCellSubAccount
-	ConfigCellRecordKeys            []string
-	ConfigCellEmojis                []string
-	ConfigCellUnavailableAccountMap map[string]struct{}
-	ConfigCellPreservedAccountMap   map[string]struct{}
+	ConfigCellAccount                *molecule.ConfigCellAccount
+	ConfigCellPrice                  *molecule.ConfigCellPrice
+	PriceConfigMap                   map[uint8]*molecule.PriceConfig
+	PriceMaxLength                   uint8
+	ConfigCellSecondaryMarket        *molecule.ConfigCellSecondaryMarket
+	ConfigCellIncome                 *molecule.ConfigCellIncome
+	ConfigCellProfitRate             *molecule.ConfigCellProfitRate
+	ConfigCellMain                   *molecule.ConfigCellMain
+	ConfigCellReverseResolution      *molecule.ConfigCellReverseResolution
+	ConfigCellProposal               *molecule.ConfigCellProposal
+	ConfigCellApply                  *molecule.ConfigCellApply
+	ConfigCellRelease                *molecule.ConfigCellRelease
+	ConfigCellSubAccount             *molecule.ConfigCellSubAccount
+	ConfigCellRecordKeys             []string
+	ConfigCellEmojis                 []string
+	ConfigCellUnavailableAccountMap  map[string]struct{}
+	ConfigCellPreservedAccountMap    map[string]struct{}
+	ConfigCellSubAccountWhiteListMap map[string]struct{}
 }
 
 func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *types.Transaction, configCellTypeArgs common.ConfigCellTypeArgs) error {
@@ -150,6 +151,18 @@ func ConfigCellDataBuilderRefByTypeArgs(builder *ConfigCellDataBuilder, tx *type
 				fmt.Println(tmp, "ok")
 			}
 			builder.ConfigCellUnavailableAccountMap[tmp] = struct{}{}
+		}
+	case common.ConfigCellTypeArgsSubAccountWhiteList:
+		if builder.ConfigCellSubAccountWhiteListMap == nil {
+			builder.ConfigCellSubAccountWhiteListMap = make(map[string]struct{})
+		}
+		dataLength, err := molecule.Bytes2GoU32(configCellDataBys[:4])
+		if err != nil {
+			return fmt.Errorf("preserved account err: %s", err.Error())
+		}
+		for i := 20; i <= len(configCellDataBys[4:dataLength]); i += 20 {
+			tmp := common.Bytes2Hex(configCellDataBys[4:dataLength][i-20 : i])
+			builder.ConfigCellSubAccountWhiteListMap[tmp] = struct{}{}
 		}
 	case common.ConfigCellTypeArgsPreservedAccount00,
 		common.ConfigCellTypeArgsPreservedAccount01,

@@ -10,14 +10,21 @@ import (
 	"time"
 )
 
-func ParserWitnessData(witnessByte []byte) interface{} {
+func ParserWitnessAction(witnessByte []byte) string {
 	if len(witnessByte) <= common.WitnessDasTableTypeEndIndex+1 {
-		return parserDefaultWitness(witnessByte)
+		return ""
 	}
 	if string(witnessByte[0:common.WitnessDasCharLen]) != common.WitnessDas {
+		return ""
+	}
+	return common.Bytes2Hex(witnessByte[common.WitnessDasCharLen:common.WitnessDasTableTypeEndIndex])
+}
+
+func ParserWitnessData(witnessByte []byte) interface{} {
+	actionDataType := ParserWitnessAction(witnessByte)
+	if actionDataType == "" {
 		return parserDefaultWitness(witnessByte)
 	}
-	actionDataType := common.Bytes2Hex(witnessByte[common.WitnessDasCharLen:common.WitnessDasTableTypeEndIndex])
 
 	switch actionDataType {
 	case common.ActionDataTypeActionData:

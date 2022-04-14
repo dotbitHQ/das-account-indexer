@@ -37,8 +37,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/DATA-DOG/go-sqlmock v1.3.3/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
-github.com/DeAccountSystems/das-lib v0.0.0-20220412092954-fc7d0823fb4a h1:7Fttm1P7pYY67tKthqDCZVut629Wv/O+q5h4dYObfsA=
-github.com/DeAccountSystems/das-lib v0.0.0-20220412092954-fc7d0823fb4a/go.mod h1:YRU7JOwGtiln9Zm9fAfgympeiKCEBHkLinPaz7SKKLU=
+github.com/DeAccountSystems/das-lib v0.0.0-20220414025926-78cc84c3140f h1:YZXpMr5evIrU5Q7VDjbhmkDAJ2Aef3gI9uNFJMdC2wk=
+github.com/DeAccountSystems/das-lib v0.0.0-20220414025926-78cc84c3140f/go.mod h1:YRU7JOwGtiln9Zm9fAfgympeiKCEBHkLinPaz7SKKLU=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 h1:fLjPD/aNc3UIOA6tDi6QXUemppXK3P9BI7mr2hd6gx8=

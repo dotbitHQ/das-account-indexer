@@ -1,6 +1,6 @@
 # github.com/Andrew-M-C/go.emoji v0.0.0-20211011074904-61cf526972e1
 github.com/Andrew-M-C/go.emoji/official
-# github.com/DeAccountSystems/das-lib v0.0.0-20220414025926-78cc84c3140f
+# github.com/DeAccountSystems/das-lib v0.0.0-20220415024942-667e80949392
 ## explicit
 github.com/DeAccountSystems/das-lib/common
 github.com/DeAccountSystems/das-lib/core

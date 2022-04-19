@@ -18,12 +18,12 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 # get the code
 git clone https://github.com/DeAccountSystems/das-account-indexer.git
 
-# edit config/config.yaml for your own convenient
-vi config/config.yaml
+# init config/config.yaml for your own convenient
+cp config/config.example.yaml config/config.yaml
 
-# init mysql database
+# create mysql database
 mysql -uroot -p
-> source das-account-indexer/tables/sql.sql
+> create database das_account_indexer;
 > quit;
 
 # compile and run
@@ -31,6 +31,20 @@ cd das-account-indexer
 make default
 ./das_account_indexer_server --config=config/config.yaml
 # it will take about 3 hours to synchronize to the latest data(Dec 15, 2021)
+```
+
+## Docker Build
+```bash
+# get the code, init config/config.yaml and create mysql database
+...
+
+# compile and run
+cd das-account-indexer
+docker build --tag das-indexer .
+docker run -dp 8121:8121 -p 8122:8122 -p 8123:8123 --name das-indexer-server --restart=always das-indexer
+
+# remove dangling images 
+docker system prune 
 ```
 
 ## API Usage

@@ -16,5 +16,6 @@
 .idea
 bin
 
-# config file
+# temp file
 config/config.yaml
+mysql-data

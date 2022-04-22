@@ -1,0 +1,38 @@
+version: '3'
+networks:
+  mynetwork:
+    ipam:
+      driver: default
+      config:
+        - subnet: 182.17.0.0/16
+          gateway: 182.17.0.1
+
+services:
+  bit-indexer:
+    image: slagga/bit-indexer:latest
+    restart: always
+    working_dir: /app
+    entrypoint: ["/app/bit-indexer", "--config", "/app/config/config.yaml"]
+    ports:
+      - "8118:8118"
+      - "9118:9118"
+    volumes:
+      - $PWD/config/config.yaml:/app/config/config.yaml
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - $PWD/mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: bit_indexer
+      TZ: Asia/Shanghai
+      # This allows ip ranges from 182.17.0.1 to 182.17.255.255 to connect to root
+      MYSQL_ROOT_HOST: "182.17.%.%"
+    networks:
+      - mynetwork

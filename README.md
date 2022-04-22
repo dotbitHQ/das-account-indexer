@@ -33,18 +33,13 @@ make default
 # it will take about 3 hours to synchronize to the latest data(Dec 15, 2021)
 ```
 
-## Docker Build
+## Docker Install
 ```bash
-# get the code, init config/config.yaml and create mysql database
-...
+# if you already have a mysql database installed, just run
+docker run -dp 8121-8123:8121-8123 -v $PWD/config/config.yaml:/app/config/config.yaml --name bit-indexer-server slagga/bit-indexer
 
-# compile and run
-cd das-account-indexer
-docker build --tag das-indexer .
-docker run -dp 8121:8121 -p 8122:8122 -p 8123:8123 --name das-indexer-server --restart=always das-indexer
-
-# remove dangling images 
-docker system prune 
+# if not, you need docker-compose to automate the installation
+docker-compose up -d
 ```
 
 ## API Usage

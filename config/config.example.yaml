@@ -6,19 +6,19 @@ server:
 chain:
   ckb_url: "http://127.0.0.1:8114"
   index_url: "http://127.0.0.1:8116"
-  current_block_number: 4872287
+  current_block_number: 4872287 # 4872287: mainnet 1927285: testnet
   confirm_num: 4
   concurrency_num: 100
 db:
   mysql:
-    addr: "127.0.0.1:3306"
+    addr: "127.0.0.1:3306" # 172.17.0.1: docker 182.17.0.1: docker-compose
     user: "root"
     password: "123456"
-    db_name: "das_account_indexer"
+    db_name: "bit_account_indexer"
     max_open_conn: 100
     max_idle_conn: 50
 cache:
   redis:
-    addr: "127.0.0.1:6379"
+    addr: "127.0.0.1:6379" # 172.17.0.1: docker 182.17.0.1: docker-compose
     password: ""
     db_num: 0

@@ -9,7 +9,7 @@ WORKDIR /app
 
 COPY . ./
 
-RUN go build -ldflags -s -v -o das-indexer cmd/main.go
+RUN go build -ldflags -s -v -o bit-indexer cmd/main.go
 
 ##
 ## Deploy
@@ -28,9 +28,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-COPY --from=build /app/das-indexer /app/das-indexer
+COPY --from=build /app/bit-indexer /app/bit-indexer
 COPY --from=build /app/config/config.yaml /app/config/config.yaml
 
 EXPOSE 8121 8122 8123
 
-ENTRYPOINT ["/app/das-indexer", "--config", "/app/config/config.yaml"]
+ENTRYPOINT ["/app/bit-indexer", "--config", "/app/config/config.yaml"]

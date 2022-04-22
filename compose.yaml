@@ -12,12 +12,16 @@ services:
     image: slagga/bit-indexer:latest
     restart: always
     working_dir: /app
-    entrypoint: ["/app/bit-indexer", "--config", "/app/config/config.yaml"]
+    entrypoint: [ "/app/bit-indexer", "--config", "/app/config/config.yaml" ]
     ports:
-      - "8118:8118"
-      - "9118:9118"
+      - "8121:8121"
+      - "8122:8122"
+      - "8123:8123"
     volumes:
       - $PWD/config/config.yaml:/app/config/config.yaml
+    depends_on:
+      - mysql
+      - redis
     networks:
       - mynetwork
 
@@ -30,9 +34,17 @@ services:
       - $PWD/mysql-data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: bit_indexer
+      MYSQL_DATABASE: bit_account_indexer
       TZ: Asia/Shanghai
       # This allows ip ranges from 182.17.0.1 to 182.17.255.255 to connect to root
       MYSQL_ROOT_HOST: "182.17.%.%"
+    networks:
+      - mynetwork
+
+  redis:
+    image: redis:5.0
+    restart: always
+    ports:
+      - "6379:6379"
     networks:
       - mynetwork

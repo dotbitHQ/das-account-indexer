@@ -7,6 +7,7 @@ const (
 	DasActionApplyRegister          DasAction = "apply_register"
 	DasActionRefundApply            DasAction = "refund_apply"
 	DasActionPreRegister            DasAction = "pre_register"
+	DasActionRefundPreRegister      DasAction = "refund_pre_register"
 	DasActionPropose                DasAction = "propose"
 	DasActionTransferAccount        DasAction = "transfer_account"
 	DasActionRenewAccount           DasAction = "renew_account"

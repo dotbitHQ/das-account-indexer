@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -24,11 +25,6 @@ type ReqKeyInfo struct {
 		ChainId  code.ChainId  `json:"chain_id"`
 		Key      string        `json:"key"`
 	} `json:"key_info"`
-}
-
-type formatReqKeyInfo struct {
-	ChainType common.ChainType
-	Address   string
 }
 
 type RespReverseRecord struct {
@@ -79,11 +75,14 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func checkReqKeyInfo(req *ReqKeyInfo, apiResp *code.ApiResp) *formatReqKeyInfo {
-	var res formatReqKeyInfo
+func checkReqKeyInfo(daf *core.DasAddressFormat, req *ReqKeyInfo, apiResp *code.ApiResp) *core.DasAddressHex {
 	if req.Type != "blockchain" {
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
-		return &res
+		return nil
+	}
+	if req.KeyInfo.Key == "" {
+		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
+		return nil
 	}
 	dasChainType := code.FormatCoinTypeToDasChainType(req.KeyInfo.CoinType)
 	if dasChainType == -1 {
@@ -91,32 +90,48 @@ func checkReqKeyInfo(req *ReqKeyInfo, apiResp *code.ApiResp) *formatReqKeyInfo {
 	}
 	if dasChainType == -1 {
 		if strings.HasPrefix(req.KeyInfo.Key, "0x") {
-			dasChainType = common.ChainTypeEth
+			if ok, err := regexp.MatchString("^0x[0-9a-fA-F]{40}$", req.KeyInfo.Key); err != nil {
+				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+				return nil
+			} else if ok {
+				dasChainType = common.ChainTypeEth
+			} else if ok, err = regexp.MatchString("^0x[0-9a-fA-F]{64}$", req.KeyInfo.Key); err != nil {
+				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+				return nil
+			} else if ok {
+				dasChainType = common.ChainTypeMixin
+			} else {
+				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
+				return nil
+			}
 		} else {
 			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("coin_type [%s] and chain_id [%s] is invalid", req.KeyInfo.CoinType, req.KeyInfo.ChainId))
-			return &res
+			return nil
 		}
 	}
-	if req.KeyInfo.Key == "" {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
-		return &res
+	addrHex, err := daf.NormalToHex(core.DasAddressNormal{
+		ChainType:     dasChainType,
+		AddressNormal: req.KeyInfo.Key,
+		Is712:         true,
+	})
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+		return nil
 	}
-	res.ChainType = dasChainType
-	res.Address = core.FormatAddressToHex(dasChainType, req.KeyInfo.Key)
-	return &res
+	return &addrHex
 }
 
 func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) error {
 	var resp RespReverseRecord
-	res := checkReqKeyInfo(&req.ReqKeyInfo, apiResp)
+	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ReqKeyInfo, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil
 	}
 
-	reverse, err := h.DbDao.FindLatestReverseRecord(res.ChainType, res.Address)
+	reverse, err := h.DbDao.FindLatestReverseRecord(res.ChainType, res.AddressHex)
 	if err != nil {
-		log.Error("FindLatestReverseRecord err:", err.Error(), res.ChainType, res.Address)
+		log.Error("FindLatestReverseRecord err:", err.Error(), res.ChainType, res.AddressHex)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
 		return nil
 	} else if reverse.Id == 0 {
@@ -127,19 +142,19 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(reverse.Account))
 	account, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
-		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.Address, reverse.Account)
+		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account err")
 		return nil
 	}
 
-	if account.OwnerChainType == res.ChainType && strings.EqualFold(account.Owner, res.Address) {
+	if account.OwnerChainType == res.ChainType && strings.EqualFold(account.Owner, res.AddressHex) {
 		resp.Account = account.Account
-	} else if account.ManagerChainType == res.ChainType && strings.EqualFold(account.Manager, res.Address) {
+	} else if account.ManagerChainType == res.ChainType && strings.EqualFold(account.Manager, res.AddressHex) {
 		resp.Account = account.Account
 	} else {
-		record, err := h.DbDao.FindRecordByAccountIdAddressValue(account.AccountId, res.Address)
+		record, err := h.DbDao.FindRecordByAccountIdAddressValue(account.AccountId, res.AddressHex)
 		if err != nil {
-			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.Address, reverse.Account)
+			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account record err")
 			return nil
 		} else if record.Id > 0 {

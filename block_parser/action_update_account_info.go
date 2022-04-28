@@ -4,7 +4,6 @@ import (
 	"das-account-indexer/tables"
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
-	"github.com/DeAccountSystems/das-lib/core"
 	"github.com/DeAccountSystems/das-lib/witness"
 	"strconv"
 )
@@ -24,7 +23,11 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
 	}
-	oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(req.Tx.Outputs[builder.Index].Lock.Args)
+	ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(req.Tx.Outputs[builder.Index].Lock.Args)
+	if err != nil {
+		resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
+		return
+	}
 
 	accountInfo := tables.TableAccountInfo{
 		BlockNumber:        req.BlockNumber,
@@ -33,12 +36,12 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 		AccountId:          builder.AccountId,
 		NextAccountId:      builder.NextAccountId,
 		Account:            builder.Account,
-		OwnerChainType:     oCT,
-		Owner:              oA,
-		OwnerAlgorithmId:   oID,
-		ManagerChainType:   mCT,
-		Manager:            mA,
-		ManagerAlgorithmId: mID,
+		OwnerChainType:     ownerHex.ChainType,
+		Owner:              ownerHex.AddressHex,
+		OwnerAlgorithmId:   ownerHex.DasAlgorithmId,
+		ManagerChainType:   managerHex.ChainType,
+		Manager:            managerHex.AddressHex,
+		ManagerAlgorithmId: managerHex.DasAlgorithmId,
 		Status:             tables.AccountStatus(builder.Status),
 		RegisteredAt:       builder.RegisteredAt,
 		ExpiredAt:          builder.ExpiredAt,

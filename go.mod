@@ -3,7 +3,7 @@ module das-account-indexer
 go 1.15
 
 require (
-	github.com/DeAccountSystems/das-lib v0.0.0-20220415024942-667e80949392
+	github.com/DeAccountSystems/das-lib v0.0.0-20220428061712-5460703d9be4
 	github.com/elazarl/goproxy v0.0.0-20211114080932-d06c3be7c11b // indirect
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-gonic/gin v1.7.7
@@ -16,3 +16,5 @@ require (
 	gorm.io/gorm v1.22.4
 	moul.io/http2curl v1.0.0 // indirect
 )
+
+replace github.com/ethereum/go-ethereum v1.9.14 => github.com/ethereum/go-ethereum v1.10.17

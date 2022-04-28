@@ -4,7 +4,6 @@ import (
 	"das-account-indexer/tables"
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
-	"github.com/DeAccountSystems/das-lib/core"
 	"github.com/DeAccountSystems/das-lib/witness"
 	"strconv"
 	"time"
@@ -69,7 +68,11 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 
 	var accountInfos []tables.TableAccountInfo
 	for _, v := range builderMap {
-		oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(v.SubAccount.Lock.Args)
+		ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccount.Lock.Args)
+		if err != nil {
+			resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
+			return
+		}
 
 		accountInfos = append(accountInfos, tables.TableAccountInfo{
 			BlockNumber:          req.BlockNumber,
@@ -78,12 +81,12 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 			AccountId:            v.SubAccount.AccountId,
 			ParentAccountId:      builder.AccountId,
 			Account:              v.Account,
-			OwnerChainType:       oCT,
-			Owner:                oA,
-			OwnerAlgorithmId:     oID,
-			ManagerChainType:     mCT,
-			Manager:              mA,
-			ManagerAlgorithmId:   mID,
+			OwnerChainType:       ownerHex.ChainType,
+			Owner:                ownerHex.AddressHex,
+			OwnerAlgorithmId:     ownerHex.DasAlgorithmId,
+			ManagerChainType:     managerHex.ChainType,
+			Manager:              managerHex.AddressHex,
+			ManagerAlgorithmId:   managerHex.DasAlgorithmId,
 			Status:               tables.AccountStatus(v.SubAccount.Status),
 			EnableSubAccount:     tables.EnableSubAccount(v.SubAccount.EnableSubAccount),
 			RenewSubAccountPrice: v.SubAccount.RenewSubAccountPrice,
@@ -139,22 +142,30 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 		}
 		switch string(builder.EditKey) {
 		case common.EditKeyOwner:
-			oID, mID, oCT, mCT, oA, mA := core.FormatDasLockToHexAddress(common.Hex2Bytes(subAccount.LockArgs))
-			accountInfo.OwnerAlgorithmId = oID
-			accountInfo.OwnerChainType = oCT
-			accountInfo.Owner = oA
-			accountInfo.ManagerAlgorithmId = mID
-			accountInfo.ManagerChainType = mCT
-			accountInfo.Manager = mA
+			ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(common.Hex2Bytes(subAccount.LockArgs))
+			if err != nil {
+				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
+				return
+			}
+			accountInfo.OwnerAlgorithmId = ownerHex.DasAlgorithmId
+			accountInfo.OwnerChainType = ownerHex.ChainType
+			accountInfo.Owner = ownerHex.AddressHex
+			accountInfo.ManagerAlgorithmId = managerHex.DasAlgorithmId
+			accountInfo.ManagerChainType = managerHex.ChainType
+			accountInfo.Manager = managerHex.AddressHex
 			if err = b.DbDao.EditOwnerSubAccount(accountInfo); err != nil {
 				resp.Err = fmt.Errorf("EditOwnerSubAccount err: %s", err.Error())
 				return
 			}
 		case common.EditKeyManager:
-			_, mID, _, mCT, _, mA := core.FormatDasLockToHexAddress(common.Hex2Bytes(subAccount.LockArgs))
-			accountInfo.ManagerAlgorithmId = mID
-			accountInfo.ManagerChainType = mCT
-			accountInfo.Manager = mA
+			_, managerHex, err := b.DasCore.Daf().ArgsToHex(common.Hex2Bytes(subAccount.LockArgs))
+			if err != nil {
+				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
+				return
+			}
+			accountInfo.ManagerAlgorithmId = managerHex.DasAlgorithmId
+			accountInfo.ManagerChainType = managerHex.ChainType
+			accountInfo.Manager = managerHex.AddressHex
 			if err = b.DbDao.EditManagerSubAccount(accountInfo); err != nil {
 				resp.Err = fmt.Errorf("EditManagerSubAccount err: %s", err.Error())
 				return

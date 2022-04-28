@@ -67,7 +67,9 @@ func (d *DasTxBuilder) addInputsForTx(inputs []*types.CellInput) error {
 				} else {
 					cellDepList = append(cellDepList, &types.CellDep{OutPoint: dasContract.OutPoint, DepType: types.DepTypeCode})
 					if contractName == common.DasContractNameDispatchCellType {
-						oID, mID, _, _, _, _ := core.FormatDasLockToHexAddress(item.Cell.Output.Lock.Args)
+						daf := core.DasAddressFormat{DasNetType: d.dasCore.NetType()}
+						ownerHex, managerHex, _ := daf.ArgsToHex(item.Cell.Output.Lock.Args)
+						oID, mID := ownerHex.DasAlgorithmId, managerHex.DasAlgorithmId
 						oSo, _ := core.GetDasSoScript(oID.ToSoScriptType())
 						mSo, _ := core.GetDasSoScript(mID.ToSoScriptType())
 						cellDepList = append(cellDepList, oSo.ToCellDep())

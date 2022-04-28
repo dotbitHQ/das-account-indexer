@@ -112,7 +112,34 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	}
 
 	resp.OutPoint = common.String2OutPointStruct(accountInfo.Outpoint)
-	dasLockArgs := core.FormatOwnerManagerAddressToArgs(accountInfo.OwnerChainType, accountInfo.ManagerChainType, accountInfo.Owner, accountInfo.Manager)
+
+	ownerHex := core.DasAddressHex{
+		DasAlgorithmId: accountInfo.OwnerAlgorithmId,
+		AddressHex:     accountInfo.Owner,
+		IsMulti:        false,
+		ChainType:      accountInfo.OwnerChainType,
+	}
+	managerHex := core.DasAddressHex{
+		DasAlgorithmId: accountInfo.ManagerAlgorithmId,
+		AddressHex:     accountInfo.Manager,
+		IsMulti:        false,
+		ChainType:      accountInfo.ManagerChainType,
+	}
+	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("HexToArgs err: %s", err.Error())
+	}
+	ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("owner HexToNormal err: %s", err.Error())
+	}
+	managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("manager HexToNormal err: %s", err.Error())
+	}
 	resp.AccountData = AccountData{
 		Account:             accountInfo.Account,
 		AccountAlias:        FormatDotToSharp(accountInfo.Account),
@@ -122,11 +149,11 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 		ExpiredAtUnix:       accountInfo.ExpiredAt,
 		Status:              accountInfo.Status,
 		DasLockArgHex:       common.Bytes2Hex(dasLockArgs),
-		OwnerAddressChain:   accountInfo.OwnerChainType.String(),
+		OwnerAddressChain:   accountInfo.OwnerChainType.ToString(),
 		OwnerLockArgsHex:    common.Bytes2Hex(dasLockArgs[:len(dasLockArgs)/2]),
-		OwnerAddress:        core.FormatHexAddressToNormal(accountInfo.OwnerChainType, accountInfo.Owner),
-		ManagerAddressChain: accountInfo.ManagerChainType.String(),
-		ManagerAddress:      core.FormatHexAddressToNormal(accountInfo.ManagerChainType, accountInfo.Manager),
+		OwnerAddress:        ownerNormal.AddressNormal,
+		ManagerAddressChain: accountInfo.ManagerChainType.ToString(),
+		ManagerAddress:      managerNormal.AddressNormal,
 		ManagerLockArgsHex:  common.Bytes2Hex(dasLockArgs[len(dasLockArgs)/2:]),
 		Records:             make([]DataRecord, 0),
 	}

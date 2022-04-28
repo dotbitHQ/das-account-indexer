@@ -13,8 +13,8 @@ import (
 )
 
 type SignData struct {
-	SignType common.DasAlgorithmId `json:"sign_type"` // 签名类型
-	SignMsg  string                `json:"sign_msg"`  // 待签名信息
+	SignType common.DasAlgorithmId `json:"sign_type"`
+	SignMsg  string                `json:"sign_msg"`
 }
 
 func (d *DasTxBuilder) GenerateDigestListFromTx(skipGroups []int) ([]SignData, error) {
@@ -88,18 +88,18 @@ func (d *DasTxBuilder) generateDigestByGroup(group []int, skipGroups []int) (Sig
 	if len(group) > 1 {
 		for i := 1; i < len(group); i++ {
 			data = d.Transaction.Witnesses[group[i]]
-			length := make([]byte, 8)
-			binary.LittleEndian.PutUint64(length, uint64(len(data)))
-			message = append(message, length...)
+			lengthTmp := make([]byte, 8)
+			binary.LittleEndian.PutUint64(lengthTmp, uint64(len(data)))
+			message = append(message, lengthTmp...)
 			message = append(message, data...)
 		}
 	}
 	// hash witnesses which do not in any input group
-	for _, witness := range d.Transaction.Witnesses[len(d.Transaction.Inputs):] {
-		length := make([]byte, 8)
-		binary.LittleEndian.PutUint64(length, uint64(len(witness)))
-		message = append(message, length...)
-		message = append(message, witness...)
+	for _, wit := range d.Transaction.Witnesses[len(d.Transaction.Inputs):] {
+		lengthTmp := make([]byte, 8)
+		binary.LittleEndian.PutUint64(lengthTmp, uint64(len(wit)))
+		message = append(message, lengthTmp...)
+		message = append(message, wit...)
 	}
 
 	message, err = blake2b.Blake256(message)
@@ -112,7 +112,10 @@ func (d *DasTxBuilder) generateDigestByGroup(group []int, skipGroups []int) (Sig
 		return signData, fmt.Errorf("getInputCell err: %s", err.Error())
 	}
 
-	ownerAlgorithmId, managerAlgorithmId, _, _, _, _ := core.FormatDasLockToHexAddress(item.Cell.Output.Lock.Args)
+	daf := core.DasAddressFormat{DasNetType: d.dasCore.NetType()}
+	ownerHex, managerHex, _ := daf.ArgsToHex(item.Cell.Output.Lock.Args)
+	ownerAlgorithmId, managerAlgorithmId := ownerHex.DasAlgorithmId, managerHex.DasAlgorithmId
+
 	signData.SignMsg = digest
 	signData.SignType = ownerAlgorithmId
 

@@ -146,6 +146,7 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 	action.Params = actionDataBuilder.ParamsStr
 
 	dasMessage := ""
+	daf := core.DasAddressFormat{DasNetType: d.dasCore.NetType()}
 	switch action.Action {
 	case common.DasActionEditManager:
 		dasMessage = fmt.Sprintf("EDIT MANAGER OF ACCOUNT %s", d.account)
@@ -156,8 +157,11 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 		if err != nil {
 			return nil, "", fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		}
-		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[builder.Index].Lock.Args)
-		dasMessage = fmt.Sprintf("TRANSFER THE ACCOUNT %s TO %s", d.account, oA)
+		if ownerNormal, _, err := daf.ArgsToNormal(d.Transaction.Outputs[builder.Index].Lock.Args); err != nil {
+			return nil, "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+		} else {
+			dasMessage = fmt.Sprintf("TRANSFER THE ACCOUNT %s TO %s", d.account, ownerNormal.AddressNormal)
+		}
 	case common.DasActionTransfer, common.DasActionWithdrawFromWallet:
 		dasMessage, err = d.getWithdrawDasMessage()
 		if err != nil {
@@ -172,14 +176,23 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 	case common.DasActionBuyAccount:
 		dasMessage = fmt.Sprintf("BUY %s WITH %s CKB", d.account, common.Capacity2Str(d.salePrice))
 	case common.DasActionDeclareReverseRecord:
-		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		dasMessage = fmt.Sprintf("DECLARE A REVERSE RECORD FROM %s TO %s", oA, d.account)
+		if ownerNormal, _, err := daf.ArgsToNormal(d.Transaction.Outputs[0].Lock.Args); err != nil {
+			return nil, "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+		} else {
+			dasMessage = fmt.Sprintf("DECLARE A REVERSE RECORD FROM %s TO %s", ownerNormal.AddressNormal, d.account)
+		}
 	case common.DasActionRedeclareReverseRecord:
-		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		dasMessage = fmt.Sprintf("REDECLARE A REVERSE RECORD FROM %s TO %s", oA, d.account)
+		if ownerNormal, _, err := daf.ArgsToNormal(d.Transaction.Outputs[0].Lock.Args); err != nil {
+			return nil, "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+		} else {
+			dasMessage = fmt.Sprintf("REDECLARE A REVERSE RECORD FROM %s TO %s", ownerNormal.AddressNormal, d.account)
+		}
 	case common.DasActionRetractReverseRecord:
-		_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(d.Transaction.Outputs[0].Lock.Args)
-		dasMessage = fmt.Sprintf("RETRACT REVERSE RECORDS ON %s", oA)
+		if ownerNormal, _, err := daf.ArgsToNormal(d.Transaction.Outputs[0].Lock.Args); err != nil {
+			return nil, "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+		} else {
+			dasMessage = fmt.Sprintf("RETRACT REVERSE RECORDS ON %s", ownerNormal.AddressNormal)
+		}
 	case common.DasActionMakeOffer:
 		builder, err := witness.OfferCellDataBuilderFromTx(d.Transaction, common.DataTypeNew)
 		if err != nil {
@@ -222,9 +235,13 @@ func (d *DasTxBuilder) getWithdrawDasMessage() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("getInputCell err: %s", err.Error())
 	}
-	_, _, _, _, oA, _ := core.FormatDasLockToNormalAddress(item.Cell.Output.Lock.Args)
-	//dasMessage := fmt.Sprintf("%s:%s(%s CKB) TO ", oCT.String(), oA, common.Capacity2Str(inputsCapacity))
-	dasMessage := fmt.Sprintf("%s(%s CKB) TO ", oA, common.Capacity2Str(inputsCapacity))
+
+	daf := core.DasAddressFormat{DasNetType: d.dasCore.NetType()}
+	ownerNormal, _, err := daf.ArgsToNormal(item.Cell.Output.Lock.Args)
+	if err != nil {
+		return "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+	}
+	dasMessage := fmt.Sprintf("%s(%s CKB) TO ", ownerNormal.AddressNormal, common.Capacity2Str(inputsCapacity))
 
 	// need merge outputs the capacity with the same lock script
 	var mapOutputs = make(map[string]uint64)
@@ -241,8 +258,11 @@ func (d *DasTxBuilder) getWithdrawDasMessage() (string, error) {
 	for _, v := range d.Transaction.Outputs {
 		chainStrTmp, receiverAddr := "", ""
 		if v.Lock.CodeHash.Hex() == dasLock.ContractTypeId.Hex() {
-			_, _, oCTTmp, _, oATmp, _ := core.FormatDasLockToNormalAddress(v.Lock.Args)
-			chainStrTmp, receiverAddr = oCTTmp.String(), oATmp
+			ownerNormal, _, err = daf.ArgsToNormal(v.Lock.Args)
+			if err != nil {
+				return "", fmt.Errorf("ArgsToNormal err: %s", err.Error())
+			}
+			chainStrTmp, receiverAddr = ownerNormal.ChainType.ToString(), ownerNormal.AddressNormal
 		} else {
 			addr, _ := common.ConvertScriptToAddress(mod, v.Lock)
 			chainStrTmp, receiverAddr = "CKB", addr
@@ -259,7 +279,6 @@ func (d *DasTxBuilder) getWithdrawDasMessage() (string, error) {
 	for _, v := range sortList {
 		capacity := mapOutputs[v]
 		tmp := strings.Split(v, "-")
-		//dasMessage = dasMessage + fmt.Sprintf("%s:%s(%s CKB), ", tmp[0], tmp[1], common.Capacity2Str(capacity))
 		dasMessage = dasMessage + fmt.Sprintf("%s(%s CKB), ", tmp[1], common.Capacity2Str(capacity))
 	}
 

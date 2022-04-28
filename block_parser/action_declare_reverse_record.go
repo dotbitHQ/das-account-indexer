@@ -4,7 +4,6 @@ import (
 	"das-account-indexer/tables"
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
-	"github.com/DeAccountSystems/das-lib/core"
 )
 
 func (b *BlockParser) ActionDeclareReverseRecord(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
@@ -18,15 +17,19 @@ func (b *BlockParser) ActionDeclareReverseRecord(req *FuncTransactionHandleReq) 
 	log.Info("das tx:", req.Action, req.TxHash)
 
 	account := string(req.Tx.OutputsData[0])
-	oID, _, oCT, _, oA, _ := core.FormatDasLockToHexAddress(req.Tx.Outputs[0].Lock.Args)
+	ownerHex, _, err := b.DasCore.Daf().ArgsToHex(req.Tx.Outputs[0].Lock.Args)
+	if err != nil {
+		resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
+		return
+	}
 
 	reverseInfo := tables.TableReverseInfo{
 		BlockNumber:    req.BlockNumber,
 		BlockTimestamp: req.BlockTimestamp,
 		Outpoint:       common.OutPoint2String(req.TxHash, 0),
-		AlgorithmId:    oID,
-		ChainType:      oCT,
-		Address:        oA,
+		AlgorithmId:    ownerHex.DasAlgorithmId,
+		ChainType:      ownerHex.ChainType,
+		Address:        ownerHex.AddressHex,
 		Account:        account,
 		Capacity:       req.Tx.Outputs[0].Capacity,
 	}

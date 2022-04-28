@@ -171,9 +171,9 @@ func formatAddress(daf *core.DasAddressFormat, addr string) (core.DasAddressHex,
 		chainType = common.ChainTypeTron
 	} else if strings.HasPrefix(addr, "ckt") || strings.HasPrefix(addr, "ckb") {
 		chainType = common.ChainTypeCkbMulti
-	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 22 {
+	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 42 {
 		chainType = common.ChainTypeEth
-	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 34 {
+	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 66 {
 		chainType = common.ChainTypeMixin
 	}
 	return daf.NormalToHex(core.DasAddressNormal{

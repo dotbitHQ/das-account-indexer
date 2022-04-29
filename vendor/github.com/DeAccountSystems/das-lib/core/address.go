@@ -28,6 +28,7 @@ type DasAddressFormat struct {
 	DasNetType common.DasNetType
 }
 
+// only for .bit normal address
 func (d *DasAddressFormat) NormalToHex(p DasAddressNormal) (r DasAddressHex, e error) {
 	r.ChainType = p.ChainType
 	switch p.ChainType {
@@ -90,20 +91,16 @@ func (d *DasAddressFormat) NormalToHex(p DasAddressNormal) (r DasAddressHex, e e
 	return
 }
 
+// only for .bit hex address
 func (d *DasAddressFormat) HexToNormal(p DasAddressHex) (r DasAddressNormal, e error) {
 	switch p.DasAlgorithmId {
-	case common.DasAlgorithmIdCkb, common.DasAlgorithmIdCkbMulti, common.DasAlgorithmIdCkbSingle:
+	case common.DasAlgorithmIdCkbMulti, common.DasAlgorithmIdCkbSingle:
 		script := common.GetNormalLockScript(p.AddressHex)
-		switch p.DasAlgorithmId {
-		case common.DasAlgorithmIdCkb:
-			r.ChainType = common.ChainTypeCkb
-		case common.DasAlgorithmIdCkbMulti:
+		r.ChainType = common.ChainTypeCkbSingle
+		if p.DasAlgorithmId == common.DasAlgorithmIdCkbMulti {
 			r.ChainType = common.ChainTypeCkbMulti
 			script = common.GetNormalLockScriptByMultiSig(p.AddressHex)
-		case common.DasAlgorithmIdCkbSingle:
-			r.ChainType = common.ChainTypeCkbSingle
 		}
-		r.ChainType = common.ChainTypeCkbMulti
 
 		mode := address.Mainnet
 		if d.DasNetType != common.DasNetTypeMainNet {
@@ -147,6 +144,8 @@ func (d *DasAddressFormat) HexToNormal(p DasAddressHex) (r DasAddressNormal, e e
 
 	return
 }
+
+// only for .bit hex address
 func (d *DasAddressFormat) HexToScript(p DasAddressHex) (lockScript, typeScript *types.Script, e error) {
 	if p.DasAlgorithmId == common.DasAlgorithmIdEth712 {
 		contractBalance, err := GetDasContractInfo(common.DasContractNameBalanceCellType)
@@ -171,13 +170,31 @@ func (d *DasAddressFormat) HexToScript(p DasAddressHex) (lockScript, typeScript 
 	lockScript = contractDispatch.ToScript(args)
 	return
 }
+
+// only for .bit hex address
+func (d *DasAddressFormat) HexToArgs(owner, manager DasAddressHex) (args []byte, e error) {
+	ownerArgs, err := d.HexToHalfArgs(owner)
+	if err != nil {
+		e = fmt.Errorf("HexToHalfArgs err: %s", err.Error())
+		return
+	}
+	managerArgs, err := d.HexToHalfArgs(manager)
+	if err != nil {
+		e = fmt.Errorf("HexToHalfArgs err: %s", err.Error())
+		return
+	}
+	args = append(ownerArgs, managerArgs...)
+	return
+}
+
+// only for .bit hex address
 func (d *DasAddressFormat) HexToHalfArgs(p DasAddressHex) (args []byte, e error) {
 	argsStr := ""
 	switch p.DasAlgorithmId {
-	case common.DasAlgorithmIdCkb:
-		argsStr = strings.TrimPrefix(p.AddressHex, common.HexPreFix)
 	case common.DasAlgorithmIdCkbMulti:
 		argsStr = common.DasLockCkbMultiPreFix + strings.TrimPrefix(p.AddressHex, common.HexPreFix)
+	case common.DasAlgorithmIdCkbSingle:
+		argsStr = common.DasLockCkbSinglePreFix + strings.TrimPrefix(p.AddressHex, common.HexPreFix)
 	case common.DasAlgorithmIdEth:
 		argsStr = common.DasLockEthPreFix + strings.TrimPrefix(p.AddressHex, common.HexPreFix)
 	case common.DasAlgorithmIdTron:
@@ -194,21 +211,8 @@ func (d *DasAddressFormat) HexToHalfArgs(p DasAddressHex) (args []byte, e error)
 	}
 	return
 }
-func (d *DasAddressFormat) HexToArgs(owner, manager DasAddressHex) (args []byte, e error) {
-	ownerArgs, err := d.HexToHalfArgs(owner)
-	if err != nil {
-		e = fmt.Errorf("HexToHalfArgs err: %s", err.Error())
-		return
-	}
-	managerArgs, err := d.HexToHalfArgs(manager)
-	if err != nil {
-		e = fmt.Errorf("HexToHalfArgs err: %s", err.Error())
-		return
-	}
-	args = append(ownerArgs, managerArgs...)
-	return
-}
 
+// only for .bit args
 func (d *DasAddressFormat) ArgsToNormal(args []byte) (ownerNormal, managerNormal DasAddressNormal, e error) {
 	ownerHex, managerHex, err := d.ArgsToHex(args)
 	if err != nil {
@@ -222,6 +226,8 @@ func (d *DasAddressFormat) ArgsToNormal(args []byte) (ownerNormal, managerNormal
 	}
 	return
 }
+
+// only for .bit args
 func (d *DasAddressFormat) ArgsToHex(args []byte) (ownerHex, managerHex DasAddressHex, e error) {
 	owner, manager, err := d.argsToHalfArgs(args)
 	if err != nil {
@@ -243,7 +249,8 @@ func (d *DasAddressFormat) argsToHalfArgs(args []byte) (owner, manager []byte, e
 	oID := common.DasAlgorithmId(args[0])
 	splitLen := 0
 	switch oID {
-	case common.DasAlgorithmIdCkb, common.DasAlgorithmIdCkbMulti, common.DasAlgorithmIdEth, common.DasAlgorithmIdEth712, common.DasAlgorithmIdTron:
+	case common.DasAlgorithmIdCkbMulti, common.DasAlgorithmIdCkbSingle, common.DasAlgorithmIdTron,
+		common.DasAlgorithmIdEth, common.DasAlgorithmIdEth712:
 		splitLen = common.DasLockArgsLen / 2
 	case common.DasAlgorithmIdEd25519:
 		splitLen = common.DasLockArgsLenMax / 2
@@ -257,9 +264,6 @@ func (d *DasAddressFormat) argsToHalfArgs(args []byte) (owner, manager []byte, e
 func (d *DasAddressFormat) halfArgsToHex(args []byte) (r DasAddressHex, e error) {
 	r.DasAlgorithmId = common.DasAlgorithmId(args[0])
 	switch r.DasAlgorithmId {
-	case common.DasAlgorithmIdCkb:
-		r.ChainType = common.ChainTypeCkb
-		r.AddressHex = common.HexPreFix + hex.EncodeToString(args[1:])
 	case common.DasAlgorithmIdCkbMulti:
 		r.ChainType = common.ChainTypeCkbMulti
 		r.AddressHex = common.HexPreFix + hex.EncodeToString(args[1:])
@@ -282,6 +286,7 @@ func (d *DasAddressFormat) halfArgsToHex(args []byte) (r DasAddressHex, e error)
 	return
 }
 
+// for .bit or normal ckb script
 func (d *DasAddressFormat) ScriptToHex(s *types.Script) (ownerHex, managerHex DasAddressHex, e error) {
 	if s == nil {
 		e = fmt.Errorf("script is nil")

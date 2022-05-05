@@ -14,7 +14,7 @@ db:
     addr: "127.0.0.1:3306" # 172.17.0.1: docker 182.17.0.1: docker-compose
     user: "root"
     password: "123456"
-    db_name: "bit_account_indexer"
+    db_name: "das_account_indexer"
     max_open_conn: 100
     max_idle_conn: 50
 cache:

@@ -1,6 +1,8 @@
  * [Prerequisites](#prerequisites)
- * [Install](#install)
- * [API Usage](#usage)
+ * [Install &amp; Run](#install--run)
+      * [Source Compile](#source-compile)
+      * [Docker](#docker)
+ * [API Usage](#api-usage)
  * [Others](#others)
     
 
@@ -12,8 +14,9 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 * go version >= 1.15.0 
 * Redis >= 5.0 (for cache, not necessary)
 
-## Install
+## Install & Run
 
+### Source Compile
 ```shell
 # get the code
 git clone https://github.com/DeAccountSystems/das-account-indexer.git
@@ -33,22 +36,20 @@ make default
 # it will take about 3 hours to synchronize to the latest data(Dec 15, 2021)
 ```
 
-## Docker Install
+### Docker
 * docker >= 20.10
 * docker-compose >= 2.2.2
 
-if you already have a mysql database installed, just run
 ```bash
-docker run -dp 8121-8123:8121-8123 -v $PWD/config/config.yaml:/app/config/config.yaml --name das-indexer-server slagga/das-indexer
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+docker-compose up -d
 ```
 
-if not, you need docker-compose to automate the installation
+_if you already have a mysql installed, just run_
 ```bash
-curl -SL https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-
-sudo chmod +x /usr/local/bin/docker-compose
-
-docker-compose up -d
+docker run -dp 8121-8123:8121-8123 -v $PWD/config/config.yaml:/app/config/config.yaml --name das-indexer-server slagga/das-indexer
 ```
 
 ## API Usage

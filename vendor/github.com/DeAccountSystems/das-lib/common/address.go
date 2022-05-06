@@ -11,20 +11,23 @@ import (
 type ChainType int
 
 const (
-	ChainTypeCkb   ChainType = 0
-	ChainTypeEth   ChainType = 1
-	ChainTypeBtc   ChainType = 2
-	ChainTypeTron  ChainType = 3
-	ChainTypeMixin ChainType = 4
+	ChainTypeCkb       ChainType = 0 // ckb short address
+	ChainTypeEth       ChainType = 1
+	ChainTypeTron      ChainType = 3
+	ChainTypeMixin     ChainType = 4
+	ChainTypeCkbMulti  ChainType = 5
+	ChainTypeCkbSingle ChainType = 6
 
-	HexPreFix            = "0x"
-	TronPreFix           = "41"
-	TronBase58PreFix     = "T"
-	DasLockCkbPreFix     = "00"
-	DasLockEthPreFix     = "03"
-	DasLockTronPreFix    = "04"
-	DasLockEth712PreFix  = "05"
-	DasLockEd25519PreFix = "06"
+	HexPreFix              = "0x"
+	TronPreFix             = "41"
+	TronBase58PreFix       = "T"
+	DasLockCkbPreFix       = "00"
+	DasLockCkbMultiPreFix  = "01"
+	DasLockCkbSinglePreFix = "02"
+	DasLockEthPreFix       = "03"
+	DasLockTronPreFix      = "04"
+	DasLockEth712PreFix    = "05"
+	DasLockEd25519PreFix   = "06"
 )
 
 const (
@@ -48,12 +51,10 @@ const (
 	NextAccountIdEndIndex   = NextAccountIdStartIndex + NextAccountIdLen
 )
 
-func (c ChainType) String() string {
+func (c ChainType) ToString() string {
 	switch c {
-	case ChainTypeCkb:
+	case ChainTypeCkb, ChainTypeCkbMulti, ChainTypeCkbSingle:
 		return "CKB"
-	case ChainTypeBtc:
-		return "BTC"
 	case ChainTypeEth:
 		return "ETH"
 	case ChainTypeTron:
@@ -62,6 +63,26 @@ func (c ChainType) String() string {
 		return "MIXIN"
 	}
 	return ""
+}
+
+func (c ChainType) ToDasAlgorithmId(is712 bool) DasAlgorithmId {
+	switch c {
+	case ChainTypeEth:
+		if is712 {
+			return DasAlgorithmIdEth712
+		}
+		return DasAlgorithmIdEth
+	case ChainTypeTron:
+		return DasAlgorithmIdTron
+	case ChainTypeMixin:
+		return DasAlgorithmIdEd25519
+	case ChainTypeCkbMulti:
+		return DasAlgorithmIdCkbMulti
+	case ChainTypeCkbSingle:
+		return DasAlgorithmIdCkbSingle
+	default:
+		return DasAlgorithmIdCkb
+	}
 }
 
 func TronHexToBase58(address string) (string, error) {
@@ -86,14 +107,4 @@ func ConvertScriptToAddress(mode address.Mode, script *types.Script) (string, er
 		return address.ConvertScriptToShortAddress(mode, script)
 	}
 	return address.ConvertScriptToAddress(mode, script)
-
-	//if script.HashType == types.HashTypeType && len(script.Args) >= 20 && len(script.Args) <= 22 {
-	//	return address.ConvertScriptToShortAddress(mode, script)
-	//}
-	//
-	//hashType := address.FullTypeFormat
-	//if script.HashType == types.HashTypeData {
-	//	hashType = address.FullDataFormat
-	//}
-	//return address.ConvertScriptToFullAddress(hashType, mode, script)
 }

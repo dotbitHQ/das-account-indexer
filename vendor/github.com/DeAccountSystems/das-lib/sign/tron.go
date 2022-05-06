@@ -44,6 +44,7 @@ func TronVerifySignature(signType bool, sign []byte, rawByte []byte, base58Addr 
 	}
 
 	if signType {
+		l = 32 // fix tron sign
 		rawByte = append([]byte(fmt.Sprintf(common.TronMessageHeader, l)), rawByte...)
 	}
 

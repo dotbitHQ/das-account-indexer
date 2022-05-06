@@ -103,7 +103,33 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	}
 
 	resp.OutPoint = common.String2OutPointStruct(accountInfo.Outpoint)
-	dasLockArgs := core.FormatOwnerManagerAddressToArgs(accountInfo.OwnerChainType, accountInfo.ManagerChainType, accountInfo.Owner, accountInfo.Manager)
+	ownerHex := core.DasAddressHex{
+		DasAlgorithmId: accountInfo.OwnerAlgorithmId,
+		AddressHex:     accountInfo.Owner,
+		IsMulti:        false,
+		ChainType:      accountInfo.OwnerChainType,
+	}
+	managerHex := core.DasAddressHex{
+		DasAlgorithmId: accountInfo.ManagerAlgorithmId,
+		AddressHex:     accountInfo.Manager,
+		IsMulti:        false,
+		ChainType:      accountInfo.ManagerChainType,
+	}
+	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("HexToArgs err: %s", err.Error())
+	}
+	ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("owner HexToNormal err: %s", err.Error())
+	}
+	managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		return fmt.Errorf("manager HexToNormal err: %s", err.Error())
+	}
 	resp.AccountInfo = AccountInfo{
 		Account:            accountInfo.Account,
 		AccountAlias:       FormatDotToSharp(accountInfo.Account),
@@ -114,9 +140,9 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		Status:             accountInfo.Status,
 		DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
 		OwnerAlgorithmId:   accountInfo.OwnerAlgorithmId,
-		OwnerKey:           core.FormatHexAddressToNormal(accountInfo.OwnerChainType, accountInfo.Owner),
+		OwnerKey:           ownerNormal.AddressNormal,
 		ManagerAlgorithmId: accountInfo.ManagerAlgorithmId,
-		ManagerKey:         core.FormatHexAddressToNormal(accountInfo.ManagerChainType, accountInfo.Manager),
+		ManagerKey:         managerNormal.AddressNormal,
 	}
 
 	apiResp.ApiRespOK(resp)

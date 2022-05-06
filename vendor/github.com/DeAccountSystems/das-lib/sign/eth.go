@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/signer/core"
+	"github.com/ethereum/go-ethereum/signer/core/apitypes"
 	"strings"
 )
 
@@ -82,7 +82,7 @@ func VerifyPersonalSignature(sign []byte, rawByte []byte, address string) (bool,
 	return strings.EqualFold(recoveredAddr.Hex(), address), nil
 }
 
-func EIP712Signature(typedData core.TypedData, hexPrivateKey string) ([]byte, []byte, error) {
+func EIP712Signature(typedData apitypes.TypedData, hexPrivateKey string) ([]byte, []byte, error) {
 
 	domainSeparator, err := typedData.HashStruct("EIP712Domain", typedData.Domain.Map())
 	if err != nil {
@@ -114,7 +114,7 @@ func EIP712Signature(typedData core.TypedData, hexPrivateKey string) ([]byte, []
 	return dataHash, signature, nil
 }
 
-func VerifyEIP712Signature(typedData core.TypedData, sign []byte, address string) (bool, error) {
+func VerifyEIP712Signature(typedData apitypes.TypedData, sign []byte, address string) (bool, error) {
 	if len(sign) != 65 { // sign check
 		return false, fmt.Errorf("invalid param")
 	}

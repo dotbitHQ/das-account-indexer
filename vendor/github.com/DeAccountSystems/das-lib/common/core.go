@@ -11,11 +11,13 @@ const (
 type DasAlgorithmId int
 
 const (
-	DasAlgorithmIdCkb     DasAlgorithmId = 0
-	DasAlgorithmIdEth     DasAlgorithmId = 3
-	DasAlgorithmIdTron    DasAlgorithmId = 4
-	DasAlgorithmIdEth712  DasAlgorithmId = 5
-	DasAlgorithmIdEd25519 DasAlgorithmId = 6
+	DasAlgorithmIdCkb       DasAlgorithmId = 0
+	DasAlgorithmIdCkbMulti  DasAlgorithmId = 1
+	DasAlgorithmIdCkbSingle DasAlgorithmId = 2
+	DasAlgorithmIdEth       DasAlgorithmId = 3
+	DasAlgorithmIdTron      DasAlgorithmId = 4
+	DasAlgorithmIdEth712    DasAlgorithmId = 5
+	DasAlgorithmIdEd25519   DasAlgorithmId = 6
 )
 
 func (d DasAlgorithmId) Bytes() []byte {
@@ -24,8 +26,10 @@ func (d DasAlgorithmId) Bytes() []byte {
 
 func (d DasAlgorithmId) ToSoScriptType() SoScriptType {
 	switch d {
-	case DasAlgorithmIdCkb:
-		return SoScriptTypeCkb
+	case DasAlgorithmIdCkbSingle:
+		return SoScriptTypeCkbSingle
+	case DasAlgorithmIdCkbMulti:
+		return SoScriptTypeCkbMulti
 	case DasAlgorithmIdEth, DasAlgorithmIdEth712:
 		return SoScriptTypeEth
 	case DasAlgorithmIdTron:
@@ -33,6 +37,23 @@ func (d DasAlgorithmId) ToSoScriptType() SoScriptType {
 	case DasAlgorithmIdEd25519:
 		return SoScriptTypeEd25519
 	default:
-		return SoScriptTypeCkb
+		return SoScriptTypeCkbSingle
+	}
+}
+
+func (d DasAlgorithmId) ToChainType() ChainType {
+	switch d {
+	case DasAlgorithmIdCkbSingle:
+		return ChainTypeCkbSingle
+	case DasAlgorithmIdCkbMulti:
+		return ChainTypeCkbMulti
+	case DasAlgorithmIdEth, DasAlgorithmIdEth712:
+		return ChainTypeEth
+	case DasAlgorithmIdTron:
+		return ChainTypeTron
+	case DasAlgorithmIdEd25519:
+		return ChainTypeMixin
+	default:
+		return ChainTypeCkb
 	}
 }

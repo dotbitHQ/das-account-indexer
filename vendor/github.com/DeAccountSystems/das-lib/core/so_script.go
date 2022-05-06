@@ -15,7 +15,7 @@ type SoScript struct {
 func (d *DasCore) InitDasSoScript() error {
 	DasSoScriptMap.Store(common.SoScriptTypeEth, &SoScript{Name: common.SoScriptTypeEth})
 	DasSoScriptMap.Store(common.SoScriptTypeTron, &SoScript{Name: common.SoScriptTypeTron})
-	DasSoScriptMap.Store(common.SoScriptTypeCkb, &SoScript{Name: common.SoScriptTypeCkb})
+	DasSoScriptMap.Store(common.SoScriptTypeCkbSingle, &SoScript{Name: common.SoScriptTypeCkbSingle})
 	DasSoScriptMap.Store(common.SoScriptTypeCkbMulti, &SoScript{Name: common.SoScriptTypeCkbMulti})
 	DasSoScriptMap.Store(common.SoScriptTypeEd25519, &SoScript{Name: common.SoScriptTypeEd25519})
 	return d.asyncDasSoScript()
@@ -51,7 +51,7 @@ func (d *DasCore) asyncDasSoScript() error {
 		if itemSo, okSo := value.(*SoScript); okSo {
 			txHash := types.Hash{}
 			switch key {
-			case common.SoScriptTypeCkb:
+			case common.SoScriptTypeCkbSingle:
 				txHash = types.HexToHash(common.Bytes2Hex(dasLockOutPoint.CkbSignall().TxHash().RawData()))
 			case common.SoScriptTypeCkbMulti:
 				txHash = types.HexToHash(common.Bytes2Hex(dasLockOutPoint.CkbMultisign().TxHash().RawData()))

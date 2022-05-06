@@ -68,15 +68,15 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	var resp RespAccountList
 	resp.AccountList = make([]RespAddressAccount, 0)
 
-	res := checkReqKeyInfo(&req.ReqKeyInfo, apiResp)
+	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ReqKeyInfo, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil
 	}
 
-	log.Info("doAccountList:", res.ChainType, res.Address)
+	log.Info("doAccountList:", res.ChainType, res.AddressHex)
 
-	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.Address)
+	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.AddressHex)
 	if err != nil {
 		log.Error("FindAccountListByAddress err:", err.Error(), req.KeyInfo)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")

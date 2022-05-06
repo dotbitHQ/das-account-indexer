@@ -5,6 +5,7 @@ import "github.com/DeAccountSystems/das-lib/common"
 type CoinType string // EIP-155
 
 const (
+	CoinTypeCKB   = "309"
 	CoinTypeEth   = "60"
 	CoinTypeTrx   = "195"
 	CoinTypeBNB   = "714"
@@ -13,6 +14,8 @@ const (
 
 func FormatCoinTypeToDasChainType(coinType CoinType) common.ChainType {
 	switch coinType {
+	case CoinTypeCKB:
+		return common.ChainTypeCkbMulti
 	case CoinTypeEth, CoinTypeBNB, CoinTypeMatic:
 		return common.ChainTypeEth
 	case CoinTypeTrx:

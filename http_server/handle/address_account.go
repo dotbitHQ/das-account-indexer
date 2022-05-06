@@ -68,10 +68,14 @@ func (h *HttpHandle) AddressAccount(ctx *gin.Context) {
 func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiResp) error {
 	var resp = make([]RespSearchAccount, 0)
 
-	chainType, address := formatAddress(req.Address)
-	log.Info("formatAddress:", req.Address, chainType, address)
+	addrHex, err := formatAddress(h.DasCore.Daf(), req.Address)
+	if err != nil {
+		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+		return fmt.Errorf("formatAddress err: %s", err.Error())
+	}
+	log.Info("formatAddress:", req.Address, addrHex.ChainType, addrHex.AddressHex)
 
-	list, err := h.DbDao.FindAccountListByAddress(chainType, address)
+	list, err := h.DbDao.FindAccountListByAddress(addrHex.ChainType, addrHex.AddressHex)
 	if err != nil {
 		log.Error("FindAccountListByAddress err:", err.Error(), req.Address)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")
@@ -80,7 +84,33 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 	var accountIds []string
 	var mapAccountIndex = make(map[string]int)
 	for i, v := range list {
-		dasLockArgs := core.FormatOwnerManagerAddressToArgs(v.OwnerChainType, v.ManagerChainType, v.Owner, v.Manager)
+		ownerHex := core.DasAddressHex{
+			DasAlgorithmId: v.OwnerAlgorithmId,
+			AddressHex:     v.Owner,
+			IsMulti:        false,
+			ChainType:      v.OwnerChainType,
+		}
+		managerHex := core.DasAddressHex{
+			DasAlgorithmId: v.ManagerAlgorithmId,
+			AddressHex:     v.Manager,
+			IsMulti:        false,
+			ChainType:      v.ManagerChainType,
+		}
+		dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
+		if err != nil {
+			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			return fmt.Errorf("HexToArgs err: %s", err.Error())
+		}
+		ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
+		if err != nil {
+			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			return fmt.Errorf("owner HexToNormal err: %s", err.Error())
+		}
+		managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
+		if err != nil {
+			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			return fmt.Errorf("manager HexToNormal err: %s", err.Error())
+		}
 		tmp := RespSearchAccount{
 			OutPoint: common.String2OutPointStruct(v.Outpoint),
 			AccountData: AccountData{
@@ -92,11 +122,11 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 				ExpiredAtUnix:       v.ExpiredAt,
 				Status:              v.Status,
 				DasLockArgHex:       common.Bytes2Hex(dasLockArgs),
-				OwnerAddressChain:   v.OwnerChainType.String(),
+				OwnerAddressChain:   v.OwnerChainType.ToString(),
 				OwnerLockArgsHex:    common.Bytes2Hex(dasLockArgs[:len(dasLockArgs)/2]),
-				OwnerAddress:        core.FormatHexAddressToNormal(v.OwnerChainType, v.Owner),
-				ManagerAddressChain: v.ManagerChainType.String(),
-				ManagerAddress:      core.FormatHexAddressToNormal(v.ManagerChainType, v.Manager),
+				OwnerAddress:        ownerNormal.AddressNormal,
+				ManagerAddressChain: v.ManagerChainType.ToString(),
+				ManagerAddress:      managerNormal.AddressNormal,
 				ManagerLockArgsHex:  common.Bytes2Hex(dasLockArgs[len(dasLockArgs)/2:]),
 				Records:             make([]DataRecord, 0),
 			},
@@ -132,14 +162,23 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 	return nil
 }
 
-func formatAddress(address string) (common.ChainType, string) {
-	if strings.HasPrefix(address, common.TronBase58PreFix) {
-		return common.ChainTypeTron, core.FormatAddressToHex(common.ChainTypeTron, address)
-	} else if strings.HasPrefix(address, common.TronPreFix) {
-		return common.ChainTypeTron, address
-	} else if strings.HasPrefix(address, common.HexPreFix) {
-		return common.ChainTypeEth, address
-	} else {
-		return common.ChainTypeEth, address
+func formatAddress(daf *core.DasAddressFormat, addr string) (core.DasAddressHex, error) {
+	chainType := common.ChainTypeEth
+	if strings.HasPrefix(addr, common.TronBase58PreFix) {
+		chainType = common.ChainTypeTron
+		//return common.ChainTypeTron, core.FormatAddressToHex(common.ChainTypeTron, address)
+	} else if strings.HasPrefix(addr, common.TronPreFix) {
+		chainType = common.ChainTypeTron
+	} else if strings.HasPrefix(addr, "ckt") || strings.HasPrefix(addr, "ckb") {
+		chainType = common.ChainTypeCkbMulti
+	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 42 {
+		chainType = common.ChainTypeEth
+	} else if strings.HasPrefix(addr, common.HexPreFix) && len(addr) == 66 {
+		chainType = common.ChainTypeMixin
 	}
+	return daf.NormalToHex(core.DasAddressNormal{
+		ChainType:     chainType,
+		AddressNormal: addr,
+		Is712:         true,
+	})
 }

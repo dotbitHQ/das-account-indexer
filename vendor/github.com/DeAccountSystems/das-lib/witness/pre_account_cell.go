@@ -195,7 +195,7 @@ func (p *PreAccountCellDataBuilder) GenWitness(param *PreAccountCellParam) ([]by
 		tmp := molecule.NewDataBuilder().Dep(*oldDataEntityOpt).Build()
 		witness := GenDasDataWitness(common.ActionDataTypePreAccountCell, &tmp)
 		return witness, nil, nil
-	case common.DasActionConfirmProposal:
+	case common.DasActionConfirmProposal, common.DasActionRefundPreRegister:
 		oldDataEntityOpt := p.getOldDataEntityOpt(param)
 		tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).Build()
 		witness := GenDasDataWitness(common.ActionDataTypePreAccountCell, &tmp)

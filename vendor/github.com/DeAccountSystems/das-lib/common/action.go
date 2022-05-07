@@ -39,6 +39,11 @@ const (
 	DasActionEditSubAccount    DasAction = "edit_sub_account"
 	DasActionRenewSubAccount   DasAction = "renew_sub_account"
 	DasActionRecycleSubAccount DasAction = "recycle_sub_account"
+
+	DasActionLockAccountForCrossChain      DasAction = "lock_account_for_cross_chain"
+	DasActionUnlockAccountForCrossChain    DasAction = "unlock_account_for_cross_chain"
+	DasActionLockSubAccountForCrossChain   DasAction = "lock_sub_account_for_cross_chain"
+	DasActionUnlockSubAccountForCrossChain DasAction = "unlock_sub_account_for_cross_chain"
 )
 
 const (

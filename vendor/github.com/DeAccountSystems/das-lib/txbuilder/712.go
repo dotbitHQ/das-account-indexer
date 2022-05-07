@@ -217,8 +217,6 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 			return nil, "", fmt.Errorf("OfferCellDataBuilderFromTx err: %s", err.Error())
 		}
 		dasMessage = fmt.Sprintf("ACCEPT THE OFFER ON %s WITH %s CKB", builder.Account, common.Capacity2Str(builder.Price))
-	case common.DasActionEnableSubAccount:
-		dasMessage = fmt.Sprintf("")
 	default:
 		return nil, "", fmt.Errorf("not support action[%s]", action)
 	}

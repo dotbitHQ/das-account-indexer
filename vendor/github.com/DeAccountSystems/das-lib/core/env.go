@@ -27,6 +27,7 @@ var EnvMainNet = Env{
 		common.DasContractNameReverseRecordCellType: "0x000f3e1a89d85d268ed6d36578d474ecf91d8809f4f696dd2e5b97fe67b84a2e",
 		common.DASContractNameOfferCellType:         "0x3ffc0f8b0ce4bc09f700ca84355a092447d79fc5224a6fbd64af95af840af91b",
 		common.DASContractNameSubAccountCellType:    "0x97b19f14184f24d55b1247596a5d7637f133c7bb7735f0ae962dc709c5fc1e2e",
+		common.DASContractNameEip712LibCellType:     "",
 	},
 }
 
@@ -48,6 +49,7 @@ var EnvTestnet2 = Env{
 		common.DasContractNameReverseRecordCellType: "0x334d7841eb156b8aa5abd7b09277e91e782d840140905496bb5bff0ea6ce9d75",
 		common.DASContractNameOfferCellType:         "0x443b2d1b3b00ffab1a2287d84c47b2c31a11aad24b183d732c213a69e3d6d390",
 		common.DASContractNameSubAccountCellType:    "0x63ca3e26cc69809f06735c6d9139ec2d84f2a277f13509a54060d6ee19423b5b",
+		common.DASContractNameEip712LibCellType:     "0x16549cab7e92afb5f157141bc9da7781ce692a3144e47e2b8879a8d5a57b87c6",
 	},
 }
 
@@ -69,6 +71,7 @@ var EnvTestnet3 = Env{
 		common.DasContractNameReverseRecordCellType: "0x80963278cbdc61cdafd5250555984b71ad016798b8879adc0e6b1ee7e01b7912",
 		common.DASContractNameOfferCellType:         "0xc69186c17e41fead0f87eb1f94829778e98a398be202655ac59fdb9567d05bae",
 		common.DASContractNameSubAccountCellType:    "0x57498a2df0c0137146ced681fa1854599e404da5804c1a5ff45d954c3cc89bfd",
+		common.DASContractNameEip712LibCellType:     "",
 	},
 }
 

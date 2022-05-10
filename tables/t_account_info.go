@@ -37,6 +37,7 @@ const (
 	AccountStatusNormal    AccountStatus = 0
 	AccountStatusOnSale    AccountStatus = 1
 	AccountStatusOnAuction AccountStatus = 2
+	AccountStatusOnLock    AccountStatus = 3
 
 	AccountEnableStatusOff EnableSubAccount = 0
 	AccountEnableStatusOn  EnableSubAccount = 1

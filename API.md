@@ -24,7 +24,31 @@ Please familiarize yourself with the meaning of some common parameters before re
 | account                                                                                  | Contains the suffix `.bit` in it                                    |
 | key                                                                                      | Generally refers to the blockchain address for now                  |
 
-_You can provide either `coin_type` or `chain_id`. The `coin_type` will be used, if you provide both_
+_You can provide either `coin_type` or `chain_id`. The `coin_type` will be used, if you provide both._
+
+
+#### Full Functional Indexer
+
+```json
+https://indexer-not-use-in-production-env.did.id
+```
+
+This service can query all data, but as its domain name describes, it is not recommended that developers use this
+Indexer in production.
+
+#### Basic Functional Indexer
+
+```json
+https://indexer-basic.did.id
+```
+
+This service can only query basic account data and .bit Alias data. The specific interfaces are as follows:
+
+* das_serverInfo
+* das_reverseRecord
+* das_accountInfo
+* das_accountList
+
 
 ### Get Server Info
 

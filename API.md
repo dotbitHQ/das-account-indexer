@@ -23,7 +23,7 @@ Please familiarize yourself with the meaning of some common parameters before re
 | account                                                                                  | Contains the suffix `.bit` in it                                    |
 | key                                                                                      | Generally refers to the blockchain address for now                  |
 
-_You can provide either `coin_type` or `chain_id`. The `coin_type` will be used, if you provide both_
+_You can provide either `coin_type` or `chain_id`. The `coin_type` will be used, if you provide both._
 
 #### Full Functional Indexer
 

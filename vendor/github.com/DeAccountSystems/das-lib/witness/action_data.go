@@ -62,6 +62,16 @@ func ActionDataBuilderFromTx(tx *types.Transaction) (*ActionDataBuilder, error) 
 				resp.Params = append(resp.Params, channelLockRaw)
 				resp.Params = append(resp.Params, raw[lenRaw-1:lenRaw])
 				resp.ParamsStr = common.GetMaxHashLenParams(common.Bytes2Hex(inviterLockRaw)) + "," + common.GetMaxHashLenParams(common.Bytes2Hex(channelLockRaw)) + "," + common.Bytes2Hex(raw[lenRaw-1:lenRaw])
+			} else if resp.Action == common.DasActionLockAccountForCrossChain {
+				raw := actionData.Params().RawData()
+				if len(raw) == 17 {
+					coinType := raw[:8]
+					chainId := raw[8:16]
+					resp.Params = append(resp.Params, coinType)
+					resp.Params = append(resp.Params, chainId)
+					resp.Params = append(resp.Params, raw[16:])
+					resp.ParamsStr = common.GetMaxHashLenParams(common.Bytes2Hex(coinType)) + "," + common.GetMaxHashLenParams(common.Bytes2Hex(chainId)) + "," + common.Bytes2Hex(raw[16:])
+				}
 			} else {
 				resp.Params = append(resp.Params, actionData.Params().RawData())
 				resp.ParamsStr = common.Bytes2Hex(actionData.Params().RawData())

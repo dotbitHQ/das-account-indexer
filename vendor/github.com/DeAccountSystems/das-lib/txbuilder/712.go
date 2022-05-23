@@ -217,6 +217,8 @@ func (d *DasTxBuilder) getMMJsonActionAndMessage() (*common.MMJsonAction, string
 			return nil, "", fmt.Errorf("OfferCellDataBuilderFromTx err: %s", err.Error())
 		}
 		dasMessage = fmt.Sprintf("ACCEPT THE OFFER ON %s WITH %s CKB", builder.Account, common.Capacity2Str(builder.Price))
+	case common.DasActionLockAccountForCrossChain:
+		dasMessage = fmt.Sprintf("LOCK %s FOR CROSS CHAIN", d.account)
 	default:
 		return nil, "", fmt.Errorf("not support action[%s]", action)
 	}

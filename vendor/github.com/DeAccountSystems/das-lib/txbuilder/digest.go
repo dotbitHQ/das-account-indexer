@@ -17,6 +17,53 @@ type SignData struct {
 	SignMsg  string                `json:"sign_msg"`
 }
 
+func (d *DasTxBuilder) GenerateMultiSignDigest(group []int, firstN uint8, signatures [][]byte, sortArgsList [][]byte) ([]byte, error) {
+	if len(group) == 0 {
+		return nil, fmt.Errorf("group is nil")
+	}
+
+	wa := GenerateMultiSignWitnessArgs(firstN, signatures, sortArgsList)
+	data, err := wa.Serialize()
+	if err != nil {
+		return nil, err
+	}
+	length := make([]byte, 8)
+	binary.LittleEndian.PutUint64(length, uint64(len(data)))
+
+	hash, err := d.Transaction.ComputeHash()
+	if err != nil {
+		return nil, err
+	}
+	message := append(hash.Bytes(), length...)
+	message = append(message, data...)
+
+	// hash the other witnesses in the group
+	if len(group) > 1 {
+		for i := 1; i < len(group); i++ {
+			data = d.Transaction.Witnesses[group[i]]
+			lengthTmp := make([]byte, 8)
+			binary.LittleEndian.PutUint64(lengthTmp, uint64(len(data)))
+			message = append(message, lengthTmp...)
+			message = append(message, data...)
+		}
+	}
+
+	// hash witnesses which do not in any input group
+	for _, wit := range d.Transaction.Witnesses[len(d.Transaction.Inputs):] {
+		lengthTmp := make([]byte, 8)
+		binary.LittleEndian.PutUint64(lengthTmp, uint64(len(wit)))
+		message = append(message, lengthTmp...)
+		message = append(message, wit...)
+	}
+
+	message, err = blake2b.Blake256(message)
+	if err != nil {
+		return nil, err
+	}
+
+	return message, nil
+}
+
 func (d *DasTxBuilder) GenerateDigestListFromTx(skipGroups []int) ([]SignData, error) {
 	skipGroups = append(skipGroups, d.ServerSignGroup...)
 	groups, err := d.getGroupsFromTx()

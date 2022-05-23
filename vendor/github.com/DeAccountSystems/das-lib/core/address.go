@@ -254,6 +254,8 @@ func (d *DasAddressFormat) argsToHalfArgs(args []byte) (owner, manager []byte, e
 		splitLen = common.DasLockArgsLen / 2
 	case common.DasAlgorithmIdEd25519:
 		splitLen = common.DasLockArgsLenMax / 2
+	case common.DasAlgorithmIdCkb:
+		splitLen = common.DasLockArgsLen / 2
 	default:
 		return
 	}
@@ -279,6 +281,9 @@ func (d *DasAddressFormat) halfArgsToHex(args []byte) (r DasAddressHex, e error)
 		r.AddressHex = common.TronPreFix + hex.EncodeToString(args[1:])
 	case common.DasAlgorithmIdEd25519:
 		r.ChainType = common.ChainTypeMixin
+		r.AddressHex = common.HexPreFix + hex.EncodeToString(args[1:])
+	case common.DasAlgorithmIdCkb:
+		r.ChainType = common.ChainTypeCkb
 		r.AddressHex = common.HexPreFix + hex.EncodeToString(args[1:])
 	default:
 		e = fmt.Errorf("not support DasAlgorithmId [%d]", r.DasAlgorithmId)

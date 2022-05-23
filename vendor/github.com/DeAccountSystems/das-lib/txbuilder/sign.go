@@ -3,9 +3,61 @@ package txbuilder
 import (
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/nervosnetwork/ckb-sdk-go/transaction"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"strings"
 )
+
+func GenerateMultiSignWitnessArgs(firstN uint8, signatures [][]byte, sortArgsList [][]byte) *types.WitnessArgs {
+	var lock []byte
+
+	lock = append(lock, 0)
+
+	// first n
+	lock = append(lock, firstN)
+
+	// signature num
+	sigNum := uint8(len(signatures))
+	lock = append(lock, sigNum)
+
+	// address num
+	addressNum := uint8(len(sortArgsList))
+	lock = append(lock, addressNum)
+
+	// args_of_all_addresses
+	for _, v := range sortArgsList {
+		lock = append(lock, v...)
+	}
+
+	// signatures
+	for _, v := range signatures {
+		if len(v) > 0 {
+			lock = append(lock, v...)
+		} else {
+			lock = append(lock, transaction.SignaturePlaceholder...)
+		}
+	}
+
+	wa := types.WitnessArgs{
+		Lock:       lock,
+		InputType:  nil,
+		OutputType: nil,
+	}
+
+	return &wa
+}
+
+func (d *DasTxBuilder) AddMultiSignatureForTx(group []int, firstN uint8, signatures [][]byte, sortArgsList [][]byte) error {
+	wa := GenerateMultiSignWitnessArgs(firstN, signatures, sortArgsList)
+
+	wab, err := wa.Serialize()
+	if err != nil {
+		return err
+	}
+
+	d.Transaction.Witnesses[group[0]] = wab
+	return nil
+}
 
 func (d *DasTxBuilder) AddSignatureForTx(signData []SignData) error {
 	if signData == nil || len(signData) == 0 {

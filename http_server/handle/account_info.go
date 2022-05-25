@@ -15,7 +15,8 @@ import (
 )
 
 type ReqAccountInfo struct {
-	Account string `json:"account"`
+	Account   string `json:"account"`
+	AccountId string `json:"account_id"`
 }
 
 type RespAccountInfo struct {
@@ -84,15 +85,17 @@ func (h *HttpHandle) AccountInfo(ctx *gin.Context) {
 func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) error {
 	var resp RespAccountInfo
 
-	req.Account = strings.TrimSpace(req.Account)
-	req.Account = FormatSharpToDot(req.Account)
-	if err := checkAccount(req.Account, apiResp); err != nil {
-		log.Error("checkAccount err: ", err.Error())
-		return nil
+	accountId := req.AccountId
+	if accountId == "" {
+		req.Account = strings.TrimSpace(req.Account)
+		req.Account = FormatSharpToDot(req.Account)
+		if err := checkAccount(req.Account, apiResp); err != nil {
+			log.Error("checkAccount err: ", err.Error())
+			return nil
+		}
+		accountId = common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	}
-
-	accountId := common.GetAccountIdByAccount(req.Account)
-	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(common.Bytes2Hex(accountId))
+	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")

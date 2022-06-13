@@ -15,7 +15,6 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 	} else if !isCV {
 		return
 	}
-
 	log.Info("das tx:", req.Action, req.TxHash)
 
 	mapPreBuilder, err := witness.PreAccountCellDataBuilderMapFromTx(req.Tx, common.DataTypeOld)

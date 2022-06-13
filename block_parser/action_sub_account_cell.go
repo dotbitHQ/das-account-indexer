@@ -6,7 +6,6 @@ import (
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/DeAccountSystems/das-lib/witness"
 	"strconv"
-	"time"
 )
 
 func (b *BlockParser) ActionEnableSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
@@ -17,7 +16,6 @@ func (b *BlockParser) ActionEnableSubAccount(req *FuncTransactionHandleReq) (res
 		log.Warn("not current version enable sub account tx")
 		return
 	}
-
 	log.Info("ActionEnableSubAccount:", req.BlockNumber, req.TxHash)
 
 	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
@@ -51,7 +49,6 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		log.Warn("not current version create sub account tx")
 		return
 	}
-
 	log.Info("ActionCreateSubAccount:", req.BlockNumber, req.TxHash)
 
 	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
@@ -117,7 +114,6 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 		log.Warn("not current version edit sub account tx")
 		return
 	}
-
 	log.Info("ActionEditSubAccount:", req.BlockNumber, req.TxHash)
 
 	builderMap, err := witness.SubAccountBuilderMapFromTx(req.Tx)
@@ -194,7 +190,11 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 }
 
 func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
-	panic("ActionRenewSubAccount")
+	log.Info("ActionRenewSubAccount:", req.BlockNumber, req.TxHash)
+	return
+}
+
+/*func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	if isCV, err := isCurrentVersionTx(req.Tx, common.DASContractNameSubAccountCellType); err != nil {
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
@@ -202,7 +202,6 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 		log.Warn("not current version renew sub account tx")
 		return
 	}
-
 	log.Info("ActionRenewSubAccount:", req.BlockNumber, req.TxHash)
 
 	builderMap, err := witness.SubAccountBuilderMapFromTx(req.Tx)
@@ -238,10 +237,14 @@ func (b *BlockParser) ActionRenewSubAccount(req *FuncTransactionHandleReq) (resp
 	}
 
 	return
-}
+}*/
 
 func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
-	panic("ActionRenewSubAccount")
+	log.Info("ActionRecycleSubAccount:", req.BlockNumber, req.TxHash)
+	return
+}
+
+/*func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	if isCV, err := isCurrentVersionTx(req.Tx, common.DASContractNameSubAccountCellType); err != nil {
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
@@ -249,7 +252,6 @@ func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (re
 		log.Warn("not current version recycle sub account tx")
 		return
 	}
-
 	log.Info("ActionRecycleSubAccount:", req.BlockNumber, req.TxHash)
 
 	builderMap, err := witness.SubAccountBuilderMapFromTx(req.Tx)
@@ -273,5 +275,10 @@ func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (re
 		return
 	}
 
+	return
+}*/
+
+func (b *BlockParser) ActionUpdateSubAccountInfo(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+	log.Info("ActionUpdateSubAccountInfo:", req.BlockNumber, req.TxHash, req.Action)
 	return
 }

@@ -35,6 +35,9 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionTransferAccount] = b.ActionUpdateAccountInfo
 
 	b.MapTransactionHandle[common.DasActionAcceptOffer] = b.ActionUpdateAccountInfo
+	b.MapTransactionHandle[common.DasActionLockAccountForCrossChain] = b.ActionUpdateAccountInfo
+	b.MapTransactionHandle[common.DasActionUnlockAccountForCrossChain] = b.ActionUpdateAccountInfo
+	b.MapTransactionHandle[common.DasActionRecycleExpiredAccount] = b.ActionRecycleExpiredAccount
 
 	b.MapTransactionHandle[common.DasActionDeclareReverseRecord] = b.ActionDeclareReverseRecord
 	b.MapTransactionHandle[common.DasActionRedeclareReverseRecord] = b.ActionRedeclareReverseRecord
@@ -45,12 +48,8 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionEditSubAccount] = b.ActionEditSubAccount
 	b.MapTransactionHandle[common.DasActionRenewSubAccount] = b.ActionRenewSubAccount
 	b.MapTransactionHandle[common.DasActionRecycleSubAccount] = b.ActionRecycleSubAccount
-	b.MapTransactionHandle[common.DasActionRecycleExpiredAccount] = b.ActionRecycleSubAccount
-	b.MapTransactionHandle[common.DasActionLockSubAccountForCrossChain] = b.ActionRecycleSubAccount
-	b.MapTransactionHandle[common.DasActionUnlockSubAccountForCrossChain] = b.ActionRecycleSubAccount
-
-	b.MapTransactionHandle[common.DasActionLockAccountForCrossChain] = b.ActionUpdateAccountInfo
-	b.MapTransactionHandle[common.DasActionUnlockAccountForCrossChain] = b.ActionUpdateAccountInfo
+	b.MapTransactionHandle[common.DasActionLockSubAccountForCrossChain] = b.ActionUpdateSubAccountInfo
+	b.MapTransactionHandle[common.DasActionUnlockSubAccountForCrossChain] = b.ActionUpdateSubAccountInfo
 }
 
 func isCurrentVersionTx(tx *types.Transaction, name common.DasContractName) (bool, error) {

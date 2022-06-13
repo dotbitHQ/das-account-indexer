@@ -15,7 +15,6 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 	} else if !isCV {
 		return
 	}
-
 	log.Info("das tx:", req.Action, req.TxHash)
 
 	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
@@ -66,5 +65,10 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 		return
 	}
 
+	return
+}
+
+func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+	log.Info("ActionRecycleExpiredAccount:", req.BlockNumber, req.TxHash)
 	return
 }

@@ -682,7 +682,7 @@ func ParserOfferCell(witnessByte []byte) interface{} {
 }
 
 func ParserSubAccount(witnessByte []byte) interface{} {
-	builder, _ := SubAccountBuilderFromBytes(witnessByte)
+	builder, _ := SubAccountBuilderFromBytes(witnessByte[common.WitnessDasTableTypeEndIndex:])
 	if builder == nil {
 		return parserDefaultWitness(witnessByte)
 	}
@@ -1107,7 +1107,7 @@ func ParserConfigCellSubAccount(witnessByte []byte) interface{} {
 	return map[string]interface{}{
 		"witness":      common.Bytes2Hex(witnessByte),
 		"witness_hash": common.Bytes2Hex(common.Blake2b(configCellSubAccount.AsSlice())),
-		"name":         "ConfigCellReverseRecord",
+		"name":         "ConfigCellSubAccount",
 		"data": map[string]interface{}{
 			"basic_capacity":          ConvertCapacity(basicCapacity),
 			"prepared_fee_capacity":   ConvertCapacity(preparedFeeCapacity),

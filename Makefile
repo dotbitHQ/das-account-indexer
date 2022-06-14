@@ -1,5 +1,5 @@
 # go build
-GO_BUILD=go build -ldflags -s -v -i
+GO_BUILD=go build -ldflags -s -v
 BINARY_NAME=das_account_indexer_server
 
 # update

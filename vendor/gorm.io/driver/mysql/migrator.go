@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -13,57 +14,6 @@ import (
 type Migrator struct {
 	migrator.Migrator
 	Dialector
-}
-
-type Column struct {
-	name              string
-	nullable          sql.NullString
-	datatype          string
-	maxLen            sql.NullInt64
-	precision         sql.NullInt64
-	scale             sql.NullInt64
-	datetimePrecision sql.NullInt64
-}
-
-func (c Column) Name() string {
-	return c.name
-}
-
-func (c Column) DatabaseTypeName() string {
-	return c.datatype
-}
-
-func (c Column) Length() (int64, bool) {
-	if c.maxLen.Valid {
-		return c.maxLen.Int64, c.maxLen.Valid
-	}
-
-	return 0, false
-}
-
-func (c Column) Nullable() (bool, bool) {
-	if c.nullable.Valid {
-		return c.nullable.String == "YES", true
-	}
-
-	return false, false
-}
-
-// DecimalSize return precision int64, scale int64, ok bool
-func (c Column) DecimalSize() (int64, int64, bool) {
-	if c.precision.Valid {
-		if c.scale.Valid {
-			return c.precision.Int64, c.scale.Int64, true
-		}
-
-		return c.precision.Int64, 0, true
-	}
-
-	if c.datetimePrecision.Valid {
-		return c.datetimePrecision.Int64, 0, true
-	}
-
-	return 0, 0, false
 }
 
 func (m Migrator) FullDataTypeOf(field *schema.Field) clause.Expr {
@@ -159,17 +109,17 @@ func (m Migrator) RenameIndex(value interface{}, oldName, newName string) error 
 
 func (m Migrator) DropTable(values ...interface{}) error {
 	values = m.ReorderModels(values, false)
-	tx := m.DB.Session(&gorm.Session{})
-	tx.Exec("SET FOREIGN_KEY_CHECKS = 0;")
-	for i := len(values) - 1; i >= 0; i-- {
-		if err := m.RunWithValue(values[i], func(stmt *gorm.Statement) error {
-			return tx.Exec("DROP TABLE IF EXISTS ? CASCADE", clause.Table{Name: stmt.Table}).Error
-		}); err != nil {
-			return err
+	return m.DB.Connection(func(tx *gorm.DB) error {
+		tx.Exec("SET FOREIGN_KEY_CHECKS = 0;")
+		for i := len(values) - 1; i >= 0; i-- {
+			if err := m.RunWithValue(values[i], func(stmt *gorm.Statement) error {
+				return tx.Exec("DROP TABLE IF EXISTS ? CASCADE", clause.Table{Name: stmt.Table}).Error
+			}); err != nil {
+				return err
+			}
 		}
-	}
-	tx.Exec("SET FOREIGN_KEY_CHECKS = 1;")
-	return nil
+		return tx.Exec("SET FOREIGN_KEY_CHECKS = 1;").Error
+	})
 }
 
 func (m Migrator) DropConstraint(value interface{}, name string) error {
@@ -194,13 +144,24 @@ func (m Migrator) ColumnTypes(value interface{}) ([]gorm.ColumnType, error) {
 	err := m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		var (
 			currentDatabase = m.DB.Migrator().CurrentDatabase()
-			columnTypeSQL   = "SELECT column_name, is_nullable, data_type, character_maximum_length, numeric_precision, numeric_scale "
+			columnTypeSQL   = "SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale "
+			rows, err       = m.DB.Session(&gorm.Session{}).Table(stmt.Table).Limit(1).Rows()
 		)
+
+		if err != nil {
+			return err
+		}
+
+		rawColumnTypes, err := rows.ColumnTypes()
+
+		if err := rows.Close(); err != nil {
+			return err
+		}
 
 		if !m.DisableDatetimePrecision {
 			columnTypeSQL += ", datetime_precision "
 		}
-		columnTypeSQL += "FROM information_schema.columns WHERE table_schema = ? AND table_name = ?"
+		columnTypeSQL += "FROM information_schema.columns WHERE table_schema = ? AND table_name = ? ORDER BY ORDINAL_POSITION"
 
 		columns, rowErr := m.DB.Raw(columnTypeSQL, currentDatabase, stmt.Table).Rows()
 		if rowErr != nil {
@@ -210,17 +171,57 @@ func (m Migrator) ColumnTypes(value interface{}) ([]gorm.ColumnType, error) {
 		defer columns.Close()
 
 		for columns.Next() {
-			var column Column
-			var values = []interface{}{&column.name, &column.nullable, &column.datatype,
-				&column.maxLen, &column.precision, &column.scale}
+			var (
+				column            migrator.ColumnType
+				datetimePrecision sql.NullInt64
+				extraValue        sql.NullString
+				columnKey         sql.NullString
+				values            = []interface{}{
+					&column.NameValue, &column.DefaultValueValue, &column.NullableValue, &column.DataTypeValue, &column.LengthValue, &column.ColumnTypeValue, &columnKey, &extraValue, &column.CommentValue, &column.DecimalSizeValue, &column.ScaleValue,
+				}
+			)
 
 			if !m.DisableDatetimePrecision {
-				values = append(values, &column.datetimePrecision)
+				values = append(values, &datetimePrecision)
 			}
 
 			if scanErr := columns.Scan(values...); scanErr != nil {
 				return scanErr
 			}
+
+			column.PrimaryKeyValue = sql.NullBool{Bool: false, Valid: true}
+			column.UniqueValue = sql.NullBool{Bool: false, Valid: true}
+			switch columnKey.String {
+			case "PRI":
+				column.PrimaryKeyValue = sql.NullBool{Bool: true, Valid: true}
+			case "UNI":
+				column.UniqueValue = sql.NullBool{Bool: true, Valid: true}
+			}
+
+			if strings.Contains(extraValue.String, "auto_increment") {
+				column.AutoIncrementValue = sql.NullBool{Bool: true, Valid: true}
+			}
+
+			column.DefaultValueValue.String = strings.Trim(column.DefaultValueValue.String, "'")
+			if m.Dialector.DontSupportNullAsDefaultValue {
+				// rewrite mariadb default value like other version
+				if column.DefaultValueValue.Valid && column.DefaultValueValue.String == "NULL" {
+					column.DefaultValueValue.Valid = false
+					column.DefaultValueValue.String = ""
+				}
+			}
+
+			if datetimePrecision.Valid {
+				column.DecimalSizeValue = datetimePrecision
+			}
+
+			for _, c := range rawColumnTypes {
+				if c.Name() == column.NameValue.String {
+					column.SQLColumnType = c
+					break
+				}
+			}
+
 			columnTypes = append(columnTypes, column)
 		}
 
@@ -228,4 +229,18 @@ func (m Migrator) ColumnTypes(value interface{}) ([]gorm.ColumnType, error) {
 	})
 
 	return columnTypes, err
+}
+
+func (m Migrator) CurrentDatabase() (name string) {
+	baseName := m.Migrator.CurrentDatabase()
+	m.DB.Raw(
+		"SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE ? ORDER BY SCHEMA_NAME=? DESC limit 1",
+		baseName+"%", baseName).Scan(&name)
+	return
+}
+
+func (m Migrator) GetTables() (tableList []string, err error) {
+	err = m.DB.Raw("SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA=?", m.CurrentDatabase()).
+		Scan(&tableList).Error
+	return
 }

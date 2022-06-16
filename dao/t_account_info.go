@@ -174,3 +174,38 @@ func (d *DbDao) RecycleSubAccount(accountId []string) error {
 		return nil
 	})
 }
+
+func (d *DbDao) GetAccountInfoByParentAccountId(parentAccountId string) (accountInfos []tables.TableAccountInfo, err error) {
+	err = d.db.Where("parent_account_id=?", parentAccountId).Find(&accountInfos).Error
+	return
+}
+
+func (d *DbDao) RecycleExpiredAccount(previousAccountId, previousNextAccountId, accountId string, subAccountIds []string) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(tables.TableAccountInfo{}).Where("account_id=?", previousAccountId).Updates(map[string]interface{}{
+			"next_account_id": previousNextAccountId,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id=?", accountId).Delete(&tables.TableAccountInfo{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id=?", accountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+
+		if len(subAccountIds) > 0 {
+			if err := tx.Where("account_id IN(?)", subAccountIds).Delete(&tables.TableAccountInfo{}).Error; err != nil {
+				return err
+			}
+
+			if err := tx.Where("account_id IN(?)", subAccountIds).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}

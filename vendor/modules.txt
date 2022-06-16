@@ -1,6 +1,6 @@
-# github.com/Andrew-M-C/go.emoji v0.0.0-20211011074904-61cf526972e1
+# github.com/Andrew-M-C/go.emoji v1.0.1
 github.com/Andrew-M-C/go.emoji/official
-# github.com/DeAccountSystems/das-lib v0.0.0-20220609082857-12aa48912226
+# github.com/DeAccountSystems/das-lib v0.0.0-20220616075235-a8d4d202ba1d
 ## explicit
 github.com/DeAccountSystems/das-lib/common
 github.com/DeAccountSystems/das-lib/core
@@ -139,7 +139,7 @@ github.com/pelletier/go-toml/v2/internal/tracker
 github.com/pkg/errors
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
-# github.com/scorpiotzh/mylog v1.0.9
+# github.com/scorpiotzh/mylog v1.0.10
 ## explicit
 github.com/scorpiotzh/mylog
 # github.com/scorpiotzh/toolib v1.1.4

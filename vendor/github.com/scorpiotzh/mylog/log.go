@@ -24,17 +24,17 @@ const (
 	colorFatal = 91
 )
 
-type logger struct {
+type Logger struct {
 	log   *zap.SugaredLogger
 	name  string
 	level int
 }
 
-func (l *logger) ErrStack() {
+func (l *Logger) ErrStack() {
 	l.Warn(string(debug.Stack()))
 }
 
-func (l *logger) Debugf(format string, a ...interface{}) {
+func (l *Logger) Debugf(format string, a ...interface{}) {
 	if l.level > LevelDebug {
 		return
 	}
@@ -42,7 +42,7 @@ func (l *logger) Debugf(format string, a ...interface{}) {
 	l.log.Debug(msg)
 }
 
-func (l *logger) Infof(format string, a ...interface{}) {
+func (l *Logger) Infof(format string, a ...interface{}) {
 	if l.level > LevelInfo {
 		return
 	}
@@ -50,7 +50,7 @@ func (l *logger) Infof(format string, a ...interface{}) {
 	l.log.Info(msg)
 }
 
-func (l *logger) Warnf(format string, a ...interface{}) {
+func (l *Logger) Warnf(format string, a ...interface{}) {
 	if l.level > LevelWarn {
 		return
 	}
@@ -58,7 +58,7 @@ func (l *logger) Warnf(format string, a ...interface{}) {
 	l.log.Warn(msg)
 }
 
-func (l *logger) Errorf(format string, a ...interface{}) {
+func (l *Logger) Errorf(format string, a ...interface{}) {
 	if l.level > LevelError {
 		return
 	}
@@ -66,7 +66,7 @@ func (l *logger) Errorf(format string, a ...interface{}) {
 	l.log.Error(msg)
 }
 
-func (l *logger) Panicf(format string, a ...interface{}) {
+func (l *Logger) Panicf(format string, a ...interface{}) {
 	if l.level > LevelPanic {
 		return
 	}
@@ -74,7 +74,7 @@ func (l *logger) Panicf(format string, a ...interface{}) {
 	l.log.Panic(msg)
 }
 
-func (l *logger) Fatalf(format string, a ...interface{}) {
+func (l *Logger) Fatalf(format string, a ...interface{}) {
 	if l.level > LevelFatal {
 		return
 	}
@@ -82,7 +82,7 @@ func (l *logger) Fatalf(format string, a ...interface{}) {
 	l.log.Fatal(msg)
 }
 
-func (l *logger) Debug(a ...interface{}) {
+func (l *Logger) Debug(a ...interface{}) {
 	if l.level > LevelDebug {
 		return
 	}
@@ -90,7 +90,7 @@ func (l *logger) Debug(a ...interface{}) {
 	l.log.Debug(msg)
 }
 
-func (l *logger) Info(a ...interface{}) {
+func (l *Logger) Info(a ...interface{}) {
 	if l.level > LevelInfo {
 		return
 	}
@@ -98,7 +98,7 @@ func (l *logger) Info(a ...interface{}) {
 	l.log.Info(msg)
 }
 
-func (l *logger) Warn(a ...interface{}) {
+func (l *Logger) Warn(a ...interface{}) {
 	if l.level > LevelWarn {
 		return
 	}
@@ -106,7 +106,7 @@ func (l *logger) Warn(a ...interface{}) {
 	l.log.Warn(msg)
 }
 
-func (l *logger) Error(a ...interface{}) {
+func (l *Logger) Error(a ...interface{}) {
 	if l.level > LevelError {
 		return
 	}
@@ -114,7 +114,7 @@ func (l *logger) Error(a ...interface{}) {
 	l.log.Error(msg)
 }
 
-func (l *logger) Panic(a ...interface{}) {
+func (l *Logger) Panic(a ...interface{}) {
 	if l.level > LevelPanic {
 		return
 	}
@@ -122,7 +122,7 @@ func (l *logger) Panic(a ...interface{}) {
 	l.log.Panic(msg)
 }
 
-func (l *logger) Fatal(a ...interface{}) {
+func (l *Logger) Fatal(a ...interface{}) {
 	if l.level > LevelFatal {
 		return
 	}

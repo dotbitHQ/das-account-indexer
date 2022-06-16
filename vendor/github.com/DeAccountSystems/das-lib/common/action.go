@@ -34,18 +34,18 @@ const (
 	DasActionCancelOffer DasAction = "cancel_offer"
 	DasActionAcceptOffer DasAction = "accept_offer"
 
-	DasActionEnableSubAccount  DasAction = "enable_sub_account"
-	DasActionCreateSubAccount  DasAction = "create_sub_account"
-	DasActionEditSubAccount    DasAction = "edit_sub_account"
-	DasActionRenewSubAccount   DasAction = "renew_sub_account"
-	DasActionRecycleSubAccount DasAction = "recycle_sub_account"
-
-	DasActionLockAccountForCrossChain      DasAction = "lock_account_for_cross_chain"
-	DasActionUnlockAccountForCrossChain    DasAction = "unlock_account_for_cross_chain"
+	DasActionEnableSubAccount              DasAction = "enable_sub_account"
+	DasActionCreateSubAccount              DasAction = "create_sub_account"
+	DasActionEditSubAccount                DasAction = "edit_sub_account"
+	DasActionRenewSubAccount               DasAction = "renew_sub_account"
+	DasActionRecycleSubAccount             DasAction = "recycle_sub_account"
 	DasActionLockSubAccountForCrossChain   DasAction = "lock_sub_account_for_cross_chain"
 	DasActionUnlockSubAccountForCrossChain DasAction = "unlock_sub_account_for_cross_chain"
 
-	DasActionRecycleExpiredAccount DasAction = "recycle_expired_account"
+	DasActionLockAccountForCrossChain   DasAction = "lock_account_for_cross_chain"
+	DasActionUnlockAccountForCrossChain DasAction = "unlock_account_for_cross_chain"
+	DasActionForceRecoverAccountStatus  DasAction = "force_recover_account_status"
+	DasActionRecycleExpiredAccount      DasAction = "recycle_expired_account"
 )
 
 const (

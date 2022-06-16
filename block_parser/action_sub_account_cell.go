@@ -274,6 +274,6 @@ func (b *BlockParser) ActionRecycleSubAccount(req *FuncTransactionHandleReq) (re
 }*/
 
 func (b *BlockParser) ActionUpdateSubAccountInfo(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
-	log.Info("ActionUpdateSubAccountInfo:", req.BlockNumber, req.TxHash, req.Action)
+	log.Info("das tx:", req.Action, req.TxHash)
 	return
 }

@@ -131,7 +131,7 @@ func (a *AccountSaleCellDataBuilder) GenWitness(p *AccountSaleCellParam) ([]byte
 		tmp := molecule.NewDataBuilder().New(newDataEntityOpt).Build()
 		witness := GenDasDataWitness(common.ActionDataTypeAccountSaleCell, &tmp)
 		return witness, common.Blake2b(newAccountSaleCellData.AsSlice()), nil
-	case common.DasActionCancelAccountSale, common.DasActionBuyAccount:
+	case common.DasActionCancelAccountSale, common.DasActionBuyAccount, common.DasActionForceRecoverAccountStatus:
 		oldDataEntityOpt := a.getOldDataEntityOpt(p)
 
 		tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).Build()

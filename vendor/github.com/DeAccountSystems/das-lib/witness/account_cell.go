@@ -367,7 +367,8 @@ func (a *AccountCellDataBuilder) GenWitness(p *AccountCellParam) ([]byte, []byte
 		return witness, common.Blake2b(newAccountCellData.AsSlice()), nil
 	case common.DasActionCreateSubAccount:
 		oldDataEntityOpt := a.getOldDataEntityOpt(p)
-		newAccountCellData := a.getNewAccountCellDataBuilder().Build()
+		newBuilder := a.getNewAccountCellDataBuilder()
+		newAccountCellData := newBuilder.Build()
 		newAccountCellDataBytes := molecule.GoBytes2MoleculeBytes(newAccountCellData.AsSlice())
 
 		newDataEntity := molecule.NewDataEntityBuilder().Entity(newAccountCellDataBytes).
@@ -392,7 +393,7 @@ func (a *AccountCellDataBuilder) GenWitness(p *AccountCellParam) ([]byte, []byte
 		tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).New(newDataEntityOpt).Build()
 		witness := GenDasDataWitness(common.ActionDataTypeAccountCell, &tmp)
 		return witness, common.Blake2b(newAccountCellData.AsSlice()), nil
-	case common.DasActionUnlockAccountForCrossChain:
+	case common.DasActionUnlockAccountForCrossChain, common.DasActionForceRecoverAccountStatus:
 		oldDataEntityOpt := a.getOldDataEntityOpt(p)
 		newBuilder := a.getNewAccountCellDataBuilder()
 		newBuilder.Status(molecule.GoU8ToMoleculeU8(p.Status))
@@ -406,6 +407,29 @@ func (a *AccountCellDataBuilder) GenWitness(p *AccountCellParam) ([]byte, []byte
 		tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).New(newDataEntityOpt).Build()
 		witness := GenDasDataWitness(common.ActionDataTypeAccountCell, &tmp)
 		return witness, common.Blake2b(newAccountCellData.AsSlice()), nil
+	case common.DasActionRecycleExpiredAccount:
+		if p.SubAction == "previous" {
+			oldDataEntityOpt := a.getOldDataEntityOpt(p)
+			newBuilder := a.getNewAccountCellDataBuilder()
+			newAccountCellData := newBuilder.Build()
+			newAccountCellDataBytes := molecule.GoBytes2MoleculeBytes(newAccountCellData.AsSlice())
+
+			newDataEntity := molecule.NewDataEntityBuilder().Entity(newAccountCellDataBytes).
+				Version(DataEntityVersion3).Index(molecule.GoU32ToMoleculeU32(p.NewIndex)).Build()
+			newDataEntityOpt := molecule.NewDataEntityOptBuilder().Set(newDataEntity).Build()
+
+			tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).New(newDataEntityOpt).Build()
+			witness := GenDasDataWitness(common.ActionDataTypeAccountCell, &tmp)
+			return witness, common.Blake2b(newAccountCellData.AsSlice()), nil
+		} else if p.SubAction == "current" {
+			oldDataEntityOpt := a.getOldDataEntityOpt(p)
+
+			tmp := molecule.NewDataBuilder().Old(*oldDataEntityOpt).Build()
+			witness := GenDasDataWitness(common.ActionDataTypeAccountCell, &tmp)
+			return witness, nil, nil
+		} else {
+			return nil, nil, fmt.Errorf("not exist sub action [%s]", p.SubAction)
+		}
 	}
 	return nil, nil, fmt.Errorf("not exist action [%s]", p.Action)
 }

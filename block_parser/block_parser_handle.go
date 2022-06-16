@@ -37,6 +37,7 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionAcceptOffer] = b.ActionUpdateAccountInfo
 	b.MapTransactionHandle[common.DasActionLockAccountForCrossChain] = b.ActionUpdateAccountInfo
 	b.MapTransactionHandle[common.DasActionUnlockAccountForCrossChain] = b.ActionUpdateAccountInfo
+	b.MapTransactionHandle[common.DasActionForceRecoverAccountStatus] = b.ActionUpdateAccountInfo
 	b.MapTransactionHandle[common.DasActionRecycleExpiredAccount] = b.ActionRecycleExpiredAccount
 
 	b.MapTransactionHandle[common.DasActionDeclareReverseRecord] = b.ActionDeclareReverseRecord

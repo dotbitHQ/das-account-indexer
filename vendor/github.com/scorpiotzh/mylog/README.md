@@ -23,8 +23,7 @@ log.Errorf("aaa %s aaa", "bbb")
 * log > file
 ```go
 
-InitMyLog(nil)
-log := NewLogger("file", LevelDebug)
+log := NewLoggerDefault("test", LevelDebug, nil)
 
 log.Debug("aaaaa")
 log.Debugf("aaa %s aaa", "bbb")

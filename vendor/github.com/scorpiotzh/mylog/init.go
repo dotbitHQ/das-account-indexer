@@ -41,8 +41,8 @@ func initLog() *zap.SugaredLogger {
 	return zapLogger.Sugar()
 }
 
-func NewLogger(name string, level int) *logger {
-	return &logger{
+func NewLogger(name string, level int) *Logger {
+	return &Logger{
 		name:  name,
 		level: level,
 		log:   initLog(),
@@ -75,8 +75,8 @@ func initDefaultLog(fileOut *lumberjack.Logger) *zap.SugaredLogger {
 	return zapLogger.Sugar()
 }
 
-func NewLoggerDefault(name string, level int, fileOut *lumberjack.Logger) *logger {
-	return &logger{
+func NewLoggerDefault(name string, level int, fileOut *lumberjack.Logger) *Logger {
+	return &Logger{
 		name:  name,
 		level: level,
 		log:   initDefaultLog(fileOut),

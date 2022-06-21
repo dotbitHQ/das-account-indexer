@@ -59,7 +59,16 @@ func (d *DasCore) InitDasConfigCell() error {
 	DasConfigCellMap.Store(common.ConfigCellTypeArgsCharSetHanS, &DasConfigCellInfo{Name: "CharSetHanS"})
 	DasConfigCellMap.Store(common.ConfigCellTypeArgsCharSetHanT, &DasConfigCellInfo{Name: "CharSetHanT"})
 
-	return d.AsyncDasConfigCell()
+	if err := d.AsyncDasConfigCell(); err != nil {
+		return fmt.Errorf("AsyncDasConfigCell err: %s", err.Error())
+	}
+	builder, err := d.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsCharSetEmoji)
+	if err != nil {
+		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
+	}
+	common.InitEmoji(builder.ConfigCellEmojis)
+
+	return nil
 }
 
 func (d *DasCore) RunAsyncDasConfigCell(t time.Duration) {
@@ -118,12 +127,6 @@ func (d *DasCore) AsyncDasConfigCell() error {
 			}
 		}
 	}
-
-	builder, err := d.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsCharSetEmoji)
-	if err != nil {
-		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
-	}
-	common.InitEmoji(builder.ConfigCellEmojis)
 	return nil
 }
 

@@ -41,6 +41,9 @@ func (d *DasTxBuilder) addInputsForTx(inputs []*types.CellInput) error {
 
 	var cellDepList []*types.CellDep
 	for i, v := range inputs {
+		if v == nil {
+			return fmt.Errorf("input is nil")
+		}
 		item, err := d.getInputCell(v.PreviousOutput)
 		if err != nil {
 			return fmt.Errorf("getInputCell err: %s", err.Error())

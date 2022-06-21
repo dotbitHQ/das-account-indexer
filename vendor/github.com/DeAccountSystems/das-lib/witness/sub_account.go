@@ -400,18 +400,51 @@ func (p *SubAccountParam) NewSubAccountWitness() ([]byte, error) {
 	return witness, nil
 }
 
-func ConvertSubAccountCellOutputData(data []byte) (smtRoot []byte, profit uint64) {
+// ===================== outputs data ====================
+
+type SubAccountCellDataDetail struct {
+	SmtRoot    []byte
+	DasProfit  uint64
+	HashType   []byte
+	CustomArgs []byte
+}
+
+func ConvertSubAccountCellOutputData(data []byte) (detail SubAccountCellDataDetail) {
 	if len(data) == 32 {
-		smtRoot = data
+		detail.SmtRoot = data
 	} else if len(data) == 40 {
-		smtRoot = data[:32]
-		profit, _ = molecule.Bytes2GoU64(data[32:])
+		detail.SmtRoot = data[:32]
+		detail.DasProfit, _ = molecule.Bytes2GoU64(data[32:40])
+	} else if len(data) > 40 {
+		detail.SmtRoot = data[:32]
+		detail.DasProfit, _ = molecule.Bytes2GoU64(data[32:40])
+		detail.HashType = data[40:41]
+		detail.CustomArgs = data[41:]
 	}
 	return
 }
 
-func BuildSubAccountCellOutputData(smtRoot []byte, profit uint64) []byte {
-	data := molecule.GoU64ToMoleculeU64(profit)
-	smtRoot = append(smtRoot, data.RawData()...)
-	return smtRoot
+func BuildSubAccountCellOutputData(detail SubAccountCellDataDetail) []byte {
+	dasProfit := molecule.GoU64ToMoleculeU64(detail.DasProfit)
+	data := append(detail.SmtRoot, dasProfit.RawData()...)
+	data = append(data, detail.HashType...)
+	data = append(data, detail.CustomArgs...)
+	return data
 }
+
+//
+//func ConvertSubAccountCellOutputData(data []byte) (smtRoot []byte, profit uint64) {
+//	if len(data) == 32 {
+//		smtRoot = data
+//	} else if len(data) == 40 {
+//		smtRoot = data[:32]
+//		profit, _ = molecule.Bytes2GoU64(data[32:])
+//	}
+//	return
+//}
+//
+//func BuildSubAccountCellOutputData(smtRoot []byte, profit uint64) []byte {
+//	data := molecule.GoU64ToMoleculeU64(profit)
+//	smtRoot = append(smtRoot, data.RawData()...)
+//	return smtRoot
+//}

@@ -17,7 +17,7 @@ const (
 var CharSetTypeEmojiMap = make(map[string]struct{})
 
 const (
-	CharSetTypeNumber = "0123456789"
+	CharSetTypeNumber = "0123456789-"
 	CharSetTypeEn     = "abcdefghijklmnopqrstuvwxyz"
 )
 
@@ -42,12 +42,13 @@ func AccountCharsToAccount(accountChars *molecule.AccountChars) string {
 }
 
 func AccountToAccountChars(account string) ([]AccountCharSet, error) {
-	if strings.HasSuffix(account, DasAccountSuffix) {
-		account = strings.TrimSuffix(account, DasAccountSuffix)
+	if index := strings.Index(account, "."); index > 0 {
+		account = account[:index]
 	}
 
+	chars := []rune(account)
 	var list []AccountCharSet
-	for _, v := range account {
+	for _, v := range chars {
 		char := string(v)
 		var charSetName AccountCharType
 		if _, ok := CharSetTypeEmojiMap[char]; ok {

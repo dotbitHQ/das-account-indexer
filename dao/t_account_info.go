@@ -208,3 +208,11 @@ func (d *DbDao) RecycleExpiredAccount(previousAccountId, previousNextAccountId, 
 		return nil
 	})
 }
+
+func (d *DbDao) UpdateAccountOutpoint(accountId, outpoint string) error {
+	return d.db.Model(tables.TableAccountInfo{}).
+		Where("account_id=?", accountId).
+		Updates(map[string]interface{}{
+			"outpoint": outpoint,
+		}).Error
+}

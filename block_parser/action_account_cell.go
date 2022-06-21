@@ -82,9 +82,19 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
 	}
-	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeOld)
+	var builder *witness.AccountCellDataBuilder
+	builderMap, err := witness.AccountCellDataBuilderMapFromTx(req.Tx, common.DataTypeOld)
 	if err != nil {
-		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("AccountCellDataBuilderMapFromTx err: %s", err.Error())
+		return
+	}
+	for _, v := range builderMap {
+		if v.Index == 1 {
+			builder = v
+		}
+	}
+	if builder == nil {
+		resp.Err = fmt.Errorf("AccountCellDataBuilder is nil")
 		return
 	}
 	var subAccountIds []string

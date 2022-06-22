@@ -97,19 +97,8 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 		resp.Err = fmt.Errorf("AccountCellDataBuilder is nil")
 		return
 	}
-	var subAccountIds []string
-	if builder.EnableSubAccount == 1 {
-		accountInfos, err := b.DbDao.GetAccountInfoByParentAccountId(builder.AccountId)
-		if err != nil {
-			resp.Err = fmt.Errorf("GetAccountInfoByParentAccountId err: %s", err.Error())
-			return
-		}
-		for _, accountInfo := range accountInfos {
-			subAccountIds = append(subAccountIds, accountInfo.AccountId)
-		}
-	}
 
-	if err = b.DbDao.RecycleExpiredAccount(previousBuilder.AccountId, previousBuilder.NextAccountId, builder.AccountId, subAccountIds); err != nil {
+	if err = b.DbDao.RecycleExpiredAccount(previousBuilder.AccountId, previousBuilder.NextAccountId, builder.AccountId, builder.EnableSubAccount); err != nil {
 		resp.Err = fmt.Errorf("RecycleExpiredAccount err: %s", err.Error())
 		return
 	}

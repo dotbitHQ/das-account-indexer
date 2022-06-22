@@ -167,13 +167,14 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 			var recordsInfos []tables.TableRecordsInfo
 			for _, v := range subAccount.Records {
 				recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
-					AccountId: builder.SubAccount.AccountId,
-					Account:   builder.Account,
-					Key:       v.Key,
-					Type:      v.Type,
-					Label:     v.Label,
-					Value:     v.Value,
-					Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
+					AccountId:       builder.SubAccount.AccountId,
+					ParentAccountId: common.Bytes2Hex(req.Tx.Outputs[0].Type.Args),
+					Account:         builder.Account,
+					Key:             v.Key,
+					Type:            v.Type,
+					Label:           v.Label,
+					Value:           v.Value,
+					Ttl:             strconv.FormatUint(uint64(v.TTL), 10),
 				})
 			}
 			if err = b.DbDao.EditRecordsSubAccount(accountInfo, recordsInfos); err != nil {

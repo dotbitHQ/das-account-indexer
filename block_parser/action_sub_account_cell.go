@@ -1,13 +1,11 @@
 package block_parser
 
 import (
-	"bytes"
 	"das-account-indexer/tables"
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
 	"github.com/DeAccountSystems/das-lib/core"
 	"github.com/DeAccountSystems/das-lib/witness"
-	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"strconv"
 )
 
@@ -58,28 +56,27 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		resp.Err = fmt.Errorf("GetDasContractInfo err: %s", err.Error())
 		return
 	}
-	var subCellOutput *types.CellOutput
-	var subOutputsData []byte
-	for i, v := range req.Tx.Outputs {
-		if v.Type != nil && contractSub.IsSameTypeId(v.Type.CodeHash) {
-			subCellOutput = req.Tx.Outputs[i]
-			subOutputsData = req.Tx.OutputsData[i]
-		}
-	}
-	if subCellOutput == nil {
-		resp.Err = fmt.Errorf("subCellOutput is nil")
+	contractAcc, err := core.GetDasContractInfo(common.DasContractNameAccountCellType)
+	if err != nil {
+		resp.Err = fmt.Errorf("GetDasContractInfo err: %s", err.Error())
 		return
 	}
-	parentAccountId := common.Bytes2Hex(subCellOutput.Type.Args)
-	subDataDetail := witness.ConvertSubAccountCellOutputData(subOutputsData)
-	customScriptArgs := make([]byte, 33)
+	var parentAccountId, accountCellOutpoint string
+	for i, v := range req.Tx.Outputs {
+		if v.Type != nil && contractSub.IsSameTypeId(v.Type.CodeHash) {
+			parentAccountId = common.Bytes2Hex(v.Type.Args)
+		}
+		if v.Type != nil && contractAcc.IsSameTypeId(v.Type.CodeHash) {
+			accountCellOutpoint = common.OutPoint2String(req.TxHash, uint(i))
+		}
+	}
 
 	var parentAccountInfo tables.TableAccountInfo
-	if len(subDataDetail.CustomScriptArgs) == 0 || bytes.Compare(customScriptArgs, subDataDetail.CustomScriptArgs) == 0 {
+	if accountCellOutpoint != "" {
 		parentAccountInfo = tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,
-			Outpoint:       common.OutPoint2String(req.TxHash, 0),
+			Outpoint:       accountCellOutpoint,
 			AccountId:      parentAccountId,
 		}
 	}

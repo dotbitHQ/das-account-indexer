@@ -1,10 +1,13 @@
 package block_parser
 
 import (
+	"bytes"
 	"das-account-indexer/tables"
 	"fmt"
 	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/DeAccountSystems/das-lib/core"
 	"github.com/DeAccountSystems/das-lib/witness"
+	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"strconv"
 )
 
@@ -49,10 +52,36 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 	}
 	log.Info("das tx:", req.Action, req.TxHash)
 
-	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	// check sub-account config custom-script-args or not
+	contractSub, err := core.GetDasContractInfo(common.DASContractNameSubAccountCellType)
 	if err != nil {
-		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		resp.Err = fmt.Errorf("GetDasContractInfo err: %s", err.Error())
 		return
+	}
+	var subCellOutput *types.CellOutput
+	var subOutputsData []byte
+	for i, v := range req.Tx.Outputs {
+		if v.Type != nil && contractSub.IsSameTypeId(v.Type.CodeHash) {
+			subCellOutput = req.Tx.Outputs[i]
+			subOutputsData = req.Tx.OutputsData[i]
+		}
+	}
+	if subCellOutput == nil {
+		resp.Err = fmt.Errorf("subCellOutput is nil")
+		return
+	}
+	parentAccountId := common.Bytes2Hex(subCellOutput.Type.Args)
+	subDataDetail := witness.ConvertSubAccountCellOutputData(subOutputsData)
+	customScriptArgs := make([]byte, 33)
+
+	var parentAccountInfo tables.TableAccountInfo
+	if len(subDataDetail.CustomScriptArgs) == 0 || bytes.Compare(customScriptArgs, subDataDetail.CustomScriptArgs) == 0 {
+		parentAccountInfo = tables.TableAccountInfo{
+			BlockNumber:    req.BlockNumber,
+			BlockTimestamp: req.BlockTimestamp,
+			Outpoint:       common.OutPoint2String(req.TxHash, 0),
+			AccountId:      parentAccountId,
+		}
 	}
 
 	builderMap, err := witness.SubAccountBuilderMapFromTx(req.Tx)
@@ -75,7 +104,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 			BlockTimestamp:       req.BlockTimestamp,
 			Outpoint:             common.OutPoint2String(req.TxHash, 0),
 			AccountId:            v.SubAccount.AccountId,
-			ParentAccountId:      builder.AccountId,
+			ParentAccountId:      parentAccountId,
 			Account:              v.Account,
 			OwnerChainType:       ownerHex.ChainType,
 			Owner:                ownerHex.AddressHex,
@@ -92,13 +121,8 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		})
 		subAccountIds = append(subAccountIds, v.SubAccount.AccountId)
 	}
-	accountInfo := tables.TableAccountInfo{
-		BlockNumber:    req.BlockNumber,
-		BlockTimestamp: req.BlockTimestamp,
-		Outpoint:       common.OutPoint2String(req.TxHash, 0),
-		AccountId:      builder.AccountId,
-	}
-	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, accountInfo); err != nil {
+
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
 		resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
 		return
 	}

@@ -403,32 +403,37 @@ func (p *SubAccountParam) NewSubAccountWitness() ([]byte, error) {
 // ===================== outputs data ====================
 
 type SubAccountCellDataDetail struct {
-	SmtRoot    []byte
-	DasProfit  uint64
-	HashType   []byte
-	CustomArgs []byte
+	SmtRoot          []byte // 32
+	DasProfit        uint64 // 8
+	OwnerProfit      uint64 // 8
+	CustomScriptArgs []byte // 33
 }
 
 func ConvertSubAccountCellOutputData(data []byte) (detail SubAccountCellDataDetail) {
-	if len(data) == 32 {
-		detail.SmtRoot = data
-	} else if len(data) == 40 {
+	if len(data) >= 32 {
 		detail.SmtRoot = data[:32]
+	}
+	if len(data) >= 40 {
 		detail.DasProfit, _ = molecule.Bytes2GoU64(data[32:40])
-	} else if len(data) > 40 {
-		detail.SmtRoot = data[:32]
-		detail.DasProfit, _ = molecule.Bytes2GoU64(data[32:40])
-		detail.HashType = data[40:41]
-		detail.CustomArgs = data[41:]
+	}
+	if len(data) >= 48 {
+		detail.OwnerProfit, _ = molecule.Bytes2GoU64(data[40:48])
+	}
+	if len(data) >= 81 {
+		detail.CustomScriptArgs = data[48:81]
 	}
 	return
 }
 
 func BuildSubAccountCellOutputData(detail SubAccountCellDataDetail) []byte {
 	dasProfit := molecule.GoU64ToMoleculeU64(detail.DasProfit)
+
 	data := append(detail.SmtRoot, dasProfit.RawData()...)
-	data = append(data, detail.HashType...)
-	data = append(data, detail.CustomArgs...)
+	if detail.DasProfit > 0 || len(detail.CustomScriptArgs) > 0 {
+		ownerProfit := molecule.GoU64ToMoleculeU64(detail.OwnerProfit)
+		data = append(data, ownerProfit.RawData()...)
+		data = append(data, detail.CustomScriptArgs...)
+	}
 	return data
 }
 

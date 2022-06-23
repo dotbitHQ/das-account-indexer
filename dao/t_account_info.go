@@ -81,10 +81,16 @@ func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
 }
 
-func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo, accountInfo tables.TableAccountInfo) error {
+func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, accountInfo tables.TableAccountInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
+		if len(subAccountIds) > 0 {
+			if err := tx.Where(" account_id IN(?) ", subAccountIds).
+				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
 		if len(accountInfos) > 0 {
-			return tx.Clauses(clause.OnConflict{
+			if err := tx.Clauses(clause.OnConflict{
 				DoUpdates: clause.AssignmentColumns([]string{
 					"block_number", "block_timestamp", "outpoint",
 					"owner_chain_type", "owner", "owner_algorithm_id",
@@ -92,7 +98,9 @@ func (d *DbDao) CreateSubAccount(accountInfos []tables.TableAccountInfo, account
 					"registered_at", "expired_at", "status",
 					"enable_sub_account", "renew_sub_account_price", "nonce",
 				}),
-			}).Create(&accountInfos).Error
+			}).Create(&accountInfos).Error; err != nil {
+				return err
+			}
 		}
 
 		if err := tx.Select("block_number", "block_timestamp", "outpoint").

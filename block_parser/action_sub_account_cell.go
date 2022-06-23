@@ -62,6 +62,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 	}
 
 	var accountInfos []tables.TableAccountInfo
+	var subAccountIds []string
 	for _, v := range builderMap {
 		ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccount.Lock.Args)
 		if err != nil {
@@ -89,6 +90,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 			RegisteredAt:         v.SubAccount.RegisteredAt,
 			ExpiredAt:            v.SubAccount.ExpiredAt,
 		})
+		subAccountIds = append(subAccountIds, v.SubAccount.AccountId)
 	}
 	accountInfo := tables.TableAccountInfo{
 		BlockNumber:    req.BlockNumber,
@@ -96,7 +98,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		Outpoint:       common.OutPoint2String(req.TxHash, 0),
 		AccountId:      builder.AccountId,
 	}
-	if err = b.DbDao.CreateSubAccount(accountInfos, accountInfo); err != nil {
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, accountInfo); err != nil {
 		resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
 		return
 	}

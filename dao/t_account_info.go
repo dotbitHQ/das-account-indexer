@@ -2,7 +2,7 @@ package dao
 
 import (
 	"das-account-indexer/tables"
-	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/dotbitHQ/das-lib/common"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

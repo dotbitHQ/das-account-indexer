@@ -5,7 +5,6 @@ BINARY_NAME=das_account_indexer_server
 # update
 update:
 	go mod tidy
-	go mod vendor
 
 # linux
 indexer_linux:

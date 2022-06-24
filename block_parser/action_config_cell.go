@@ -2,7 +2,7 @@ package block_parser
 
 import (
 	"fmt"
-	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/dotbitHQ/das-lib/common"
 )
 
 func (b *BlockParser) ActionConfigCell(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {

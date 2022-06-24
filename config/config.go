@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/dotbitHQ/das-lib/common"
 	"github.com/fsnotify/fsnotify"
 	"github.com/scorpiotzh/mylog"
 	"github.com/scorpiotzh/toolib"

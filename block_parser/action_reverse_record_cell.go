@@ -3,7 +3,7 @@ package block_parser
 import (
 	"das-account-indexer/tables"
 	"fmt"
-	"github.com/DeAccountSystems/das-lib/common"
+	"github.com/dotbitHQ/das-lib/common"
 )
 
 func (b *BlockParser) ActionDeclareReverseRecord(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {

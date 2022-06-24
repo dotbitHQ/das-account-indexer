@@ -1,6 +1,6 @@
 package code
 
-import "github.com/DeAccountSystems/das-lib/common"
+import "github.com/dotbitHQ/das-lib/common"
 
 type ChainId string //BIP-44
 

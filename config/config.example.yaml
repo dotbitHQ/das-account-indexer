@@ -4,8 +4,8 @@ server:
   http_server_addr_indexer: ":8122"
   http_server_addr_reverse: ":8123"
 chain:
-  ckb_url: "http://127.0.0.1:8114"
-  index_url: "http://127.0.0.1:8116"
+  ckb_url: "http://127.0.0.1:8114" # https://github.com/nervosnetwork/ckb
+  index_url: "http://127.0.0.1:8116" # https://github.com/nervosnetwork/ckb-indexer
   current_block_number: 4872287 # 4872287: mainnet 1927285: testnet
   confirm_num: 4
   concurrency_num: 100

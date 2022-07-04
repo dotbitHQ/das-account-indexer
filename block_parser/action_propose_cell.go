@@ -56,7 +56,7 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 		})
 		if _, ok := mapPreBuilder[builder.Account]; ok {
 			accountIdList = append(accountIdList, builder.AccountId)
-			list := builder.RecordList()
+			list := builder.Records
 			for _, v := range list {
 				records = append(records, tables.TableRecordsInfo{
 					Account:   builder.Account,

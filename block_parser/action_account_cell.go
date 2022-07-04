@@ -47,7 +47,7 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 	}
 
 	var records []tables.TableRecordsInfo
-	list := builder.RecordList()
+	list := builder.Records
 	for _, v := range list {
 		records = append(records, tables.TableRecordsInfo{
 			Account:   builder.Account,

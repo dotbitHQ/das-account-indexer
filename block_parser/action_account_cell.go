@@ -77,11 +77,6 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 	}
 	log.Info("das tx:", req.Action, req.TxHash)
 
-	previousBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
-	if err != nil {
-		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
-		return
-	}
 	var builder *witness.AccountCellDataBuilder
 	builderMap, err := witness.AccountCellDataBuilderMapFromTx(req.Tx, common.DataTypeOld)
 	if err != nil {
@@ -93,11 +88,28 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 			builder = v
 		}
 	}
-	if builder == nil {
+
+	var previousBuilder *witness.AccountCellDataBuilder
+	res, err := b.DasCore.Client().GetTransaction(b.Ctx, req.Tx.Inputs[0].PreviousOutput.TxHash)
+	if err != nil {
+		resp.Err = fmt.Errorf("GetTransaction err: %s", err.Error())
+		return
+	}
+	previousBuilderMap, err := witness.AccountIdCellDataBuilderFromTx(res.Transaction, common.DataTypeNew)
+	if err != nil {
+		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		return
+	}
+	for _, v := range previousBuilderMap {
+		if v.NextAccountId == builder.AccountId {
+			previousBuilder = v
+		}
+	}
+
+	if builder == nil || previousBuilder == nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilder is nil")
 		return
 	}
-
 	if err = b.DbDao.RecycleExpiredAccount(previousBuilder.AccountId, previousBuilder.NextAccountId, builder.AccountId, builder.EnableSubAccount); err != nil {
 		resp.Err = fmt.Errorf("RecycleExpiredAccount err: %s", err.Error())
 		return

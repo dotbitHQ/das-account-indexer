@@ -88,29 +88,25 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 			builder = v
 		}
 	}
-
-	var previousBuilder *witness.AccountCellDataBuilder
-	res, err := b.DasCore.Client().GetTransaction(b.Ctx, req.Tx.Inputs[0].PreviousOutput.TxHash)
-	if err != nil {
-		resp.Err = fmt.Errorf("GetTransaction err: %s", err.Error())
-		return
-	}
-	previousBuilderMap, err := witness.AccountIdCellDataBuilderFromTx(res.Transaction, common.DataTypeNew)
-	if err != nil {
-		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
-		return
-	}
-	for _, v := range previousBuilderMap {
-		if v.NextAccountId == builder.AccountId {
-			previousBuilder = v
-		}
-	}
-
-	if builder == nil || previousBuilder == nil {
+	if builder == nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilder is nil")
 		return
 	}
-	if err = b.DbDao.RecycleExpiredAccount(previousBuilder.AccountId, previousBuilder.NextAccountId, builder.AccountId, builder.EnableSubAccount); err != nil {
+
+	accountIdByte, err := common.OutputDataToAccountId(req.Tx.OutputsData[0])
+	if err != nil {
+		resp.Err = fmt.Errorf("OutputDataToAccountId err: %s", err.Error())
+		return
+	}
+	nextAccountIdByte, err := common.GetAccountCellNextAccountIdFromOutputData(req.Tx.OutputsData[0])
+	if err != nil {
+		resp.Err = fmt.Errorf("GetAccountCellNextAccountIdFromOutputData err: %s", err.Error())
+		return
+	}
+	accountId := common.Bytes2Hex(accountIdByte)
+	nextAccountId := common.Bytes2Hex(nextAccountIdByte)
+
+	if err = b.DbDao.RecycleExpiredAccount(accountId, nextAccountId, builder.AccountId, builder.EnableSubAccount); err != nil {
 		resp.Err = fmt.Errorf("RecycleExpiredAccount err: %s", err.Error())
 		return
 	}

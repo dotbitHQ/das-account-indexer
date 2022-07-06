@@ -30,11 +30,10 @@ _You can provide either `coin_type` or `chain_id`. The `coin_type` will be used,
 #### Full Functional Indexer
 
 ```json
-https://indexer-not-use-in-production-env.did.id
+https://indexer-v1.did.id
 ```
 
-This service can query all data, but as its domain name describes, it is not recommended that developers use this
-Indexer in production.
+This service can query all data, but it is recommended that developers setup their own Indexer for the sake of decentralization.
 
 #### Basic Functional Indexer
 
@@ -53,7 +52,7 @@ This service can only query basic account data and .bit Alias data. The specific
 ### Get Server Info
 
 **Request**
-* host: `indexer-basic.da.systems`
+* host: `indexer-v1.did.id`
 * path: `/v1/server/info`
 * param: none
 
@@ -73,19 +72,19 @@ This service can only query basic account data and .bit Alias data. The specific
 **Usage**
 
 ```shell
-curl -X POST https://indexer-basic.da.systems/v1/server/info
+curl -X POST https://indexer-v1.did.id/v1/server/info
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
 ```
 
 ### Get Reverse Record Info
 
 **Request**
-* host: `indexer-basic.da.systems`
+* host: `indexer-v1.did.id`
 * path: `/v1/reverse/record`
 * param:
 
@@ -116,20 +115,20 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 **Usage**
 
 ```shell
-curl -X POST https://indexer-basic.da.systems/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
+curl -X POST https://indexer-v1.did.id/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
 ```
 
 ### Get Account Basic Info
 
 **Request**
 
-* host: `indexer-basic.da.systems`
+* host: `indexer-v1.did.id`
 * path: `/v1/account/info`
 * param:
   * You can provide either `account` or `account_id`. The `account_id` will be used, if you provide both.
@@ -172,20 +171,20 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 **Usage**
 
 ```shell
-curl -X POST https://indexer-basic.da.systems/v1/account/info -d'{"account":"phone.bit"}'
+curl -X POST https://indexer-v1.did.id/v1/account/info -d'{"account":"phone.bit"}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountInfo","params": [{"account":"phone.bit"}]}'
 ```
 
 ### Get Account List
 
 **Request**
 
-* host: `indexer-basic.da.systems`
+* host: `indexer-v1.did.id`
 * path: `/v1/account/list`
 * param:
 
@@ -220,13 +219,13 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 **Usage**
 
 ```shell
-curl -X POST https://indexer-basic.da.systems/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}'
+curl -X POST https://indexer-v1.did.id/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}]}'
 ```
 
 ### Get Account Records Info
@@ -274,13 +273,13 @@ curl -X POST https://indexer-basic.da.systems -d'{"jsonrpc": "2.0","id": 1,"meth
 **Usage**
 
 ```shell
-curl -X POST http://127.0.0.1:8122/v1/account/records -d'{"account":"phone.bit"}'
+curl -X POST https://indexer-v1.did.id/v1/account/records -d'{"account":"phone.bit"}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
 ```
 
 ## _Deprecated API List_
@@ -346,13 +345,13 @@ curl -X POST http://127.0.0.1:8122 -d'{"jsonrpc": "2.0","id": 1,"method": "das_a
  _**Usage**_
 
 ```shell
-curl -X POST http://127.0.0.1:8121/v1/search/account -d'{"account":"phone.bit"}'
+curl -X POST https://indexer-v1.did.id/v1/search/account -d'{"account":"phone.bit"}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_searchAccount","params": ["phone.bit"]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_searchAccount","params": ["phone.bit"]}'
 ```
 
 ### _Get Related Accounts By Owner Address_ `Deprecated`
@@ -418,13 +417,13 @@ curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_s
  _**Usage**_
 
 ```shell
-curl -X POST http://127.0.0.1:8121/v1/address/account -d'{"address":"0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"}'
+curl -X POST https://indexer-v1.did.id/v1/address/account -d'{"address":"0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST http://127.0.0.1:8121 -d'{"jsonrpc": "2.0","id": 1,"method": "das_getAddressAccount","params": ["0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_getAddressAccount","params": ["0x773BCCE3B8b41a37CE59FD95F7CBccbff2cfd2D0"]}'
 ```
 
 ## Error

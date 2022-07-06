@@ -93,20 +93,25 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 		return
 	}
 
-	accountIdByte, err := common.OutputDataToAccountId(req.Tx.OutputsData[0])
+	accountId, err := common.OutputDataToAccountId(req.Tx.OutputsData[0])
 	if err != nil {
 		resp.Err = fmt.Errorf("OutputDataToAccountId err: %s", err.Error())
 		return
 	}
-	nextAccountIdByte, err := common.GetAccountCellNextAccountIdFromOutputData(req.Tx.OutputsData[0])
+	nextAccountId, err := common.GetAccountCellNextAccountIdFromOutputData(req.Tx.OutputsData[0])
 	if err != nil {
 		resp.Err = fmt.Errorf("GetAccountCellNextAccountIdFromOutputData err: %s", err.Error())
 		return
 	}
-	accountId := common.Bytes2Hex(accountIdByte)
-	nextAccountId := common.Bytes2Hex(nextAccountIdByte)
+	accountInfo := tables.TableAccountInfo{
+		BlockNumber:    req.BlockNumber,
+		BlockTimestamp: req.BlockTimestamp,
+		Outpoint:       common.OutPoint2String(req.TxHash, 0),
+		AccountId:      common.Bytes2Hex(accountId),
+		NextAccountId:  common.Bytes2Hex(nextAccountId),
+	}
 
-	if err = b.DbDao.RecycleExpiredAccount(accountId, nextAccountId, builder.AccountId, builder.EnableSubAccount); err != nil {
+	if err = b.DbDao.RecycleExpiredAccount(accountInfo, builder.AccountId, builder.EnableSubAccount); err != nil {
 		resp.Err = fmt.Errorf("RecycleExpiredAccount err: %s", err.Error())
 		return
 	}

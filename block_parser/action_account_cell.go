@@ -77,6 +77,19 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 	}
 	log.Info("das tx:", req.Action, req.TxHash)
 
+	previousBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	if err != nil {
+		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		return
+	}
+	accountInfo := tables.TableAccountInfo{
+		BlockNumber:    req.BlockNumber,
+		BlockTimestamp: req.BlockTimestamp,
+		Outpoint:       common.OutPoint2String(req.TxHash, 0),
+		AccountId:      previousBuilder.AccountId,
+		NextAccountId:  previousBuilder.NextAccountId,
+	}
+
 	var builder *witness.AccountCellDataBuilder
 	builderMap, err := witness.AccountCellDataBuilderMapFromTx(req.Tx, common.DataTypeOld)
 	if err != nil {
@@ -91,24 +104,6 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 	if builder == nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilder is nil")
 		return
-	}
-
-	accountId, err := common.OutputDataToAccountId(req.Tx.OutputsData[0])
-	if err != nil {
-		resp.Err = fmt.Errorf("OutputDataToAccountId err: %s", err.Error())
-		return
-	}
-	nextAccountId, err := common.GetAccountCellNextAccountIdFromOutputData(req.Tx.OutputsData[0])
-	if err != nil {
-		resp.Err = fmt.Errorf("GetAccountCellNextAccountIdFromOutputData err: %s", err.Error())
-		return
-	}
-	accountInfo := tables.TableAccountInfo{
-		BlockNumber:    req.BlockNumber,
-		BlockTimestamp: req.BlockTimestamp,
-		Outpoint:       common.OutPoint2String(req.TxHash, 0),
-		AccountId:      common.Bytes2Hex(accountId),
-		NextAccountId:  common.Bytes2Hex(nextAccountId),
 	}
 
 	if err = b.DbDao.RecycleExpiredAccount(accountInfo, builder.AccountId, builder.EnableSubAccount); err != nil {

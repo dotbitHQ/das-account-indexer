@@ -103,8 +103,8 @@ github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5O
 github.com/docker/docker v1.4.2-0.20180625184442-8e610b2b55bf/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/dop251/goja v0.0.0-20211011172007-d99e4b8cbf48/go.mod h1:R9ET47fwRVRPZnOGvHxxhuZcbrMCuiqOz3Rlrh4KSnk=
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
-github.com/dotbitHQ/das-lib v0.0.0-20220704075725-877a1cd0f68f h1:moaYZttKejT+eVV8oElYxvozFFwpjIuBfZrklLlzH6g=
-github.com/dotbitHQ/das-lib v0.0.0-20220704075725-877a1cd0f68f/go.mod h1:cjxR/SvT6w9U2fvNpADeyB31ukYLSrfffC67puHOZ/c=
+github.com/dotbitHQ/das-lib v0.0.0-20220706050529-ea5484f44e01 h1:o+i+pLLj8Xy2AWhSw5SSaOsGQkh0i/ryJMIwM1dl7Zk=
+github.com/dotbitHQ/das-lib v0.0.0-20220706050529-ea5484f44e01/go.mod h1:cjxR/SvT6w9U2fvNpADeyB31ukYLSrfffC67puHOZ/c=
 github.com/eclipse/paho.mqtt.golang v1.2.0/go.mod h1:H9keYFcgq3Qr5OUJm/JZI/i6U7joQ8SYLhZwfeOo6Ts=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/elazarl/goproxy v0.0.0-20220529153421-8ea89ba92021 h1:EbF0UihnxWRcIMOwoVtqnAylsqcjzqpSvMdjF2Ud4rA=

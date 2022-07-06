@@ -189,10 +189,11 @@ func (d *DbDao) GetAccountInfoByParentAccountId(parentAccountId string) (account
 	return
 }
 
-func (d *DbDao) RecycleExpiredAccount(previousAccountId, previousNextAccountId, accountId string, enableSubAccount uint8) error {
+func (d *DbDao) RecycleExpiredAccount(accountInfo tables.TableAccountInfo, accountId string, enableSubAccount uint8) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(&tables.TableAccountInfo{}).Where("account_id=?", previousAccountId).
-			Update("next_account_id", previousNextAccountId).Error; err != nil {
+		if err := tx.Select("block_number", "block_timestamp", "outpoint", "next_account_id").
+			Where("account_id=?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
 			return err
 		}
 

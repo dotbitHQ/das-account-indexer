@@ -2,6 +2,7 @@ package handle
 
 import (
 	"das-account-indexer/http_server/code"
+	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
@@ -89,6 +90,9 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 		return nil
 	} else if accountInfo.Id == 0 {
 		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		return nil
+	} else if accountInfo.Status == tables.AccountStatusOnLock {
+		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account on lock")
 		return nil
 	}
 

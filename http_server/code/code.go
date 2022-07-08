@@ -11,4 +11,5 @@ const (
 
 	ApiCodeAccountFormatInvalid Code = 20006
 	ApiCodeAccountNotExist      Code = 20007
+	ApiCodeAccountOnLock        Code = 20008
 )

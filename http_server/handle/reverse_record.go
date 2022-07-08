@@ -3,6 +3,7 @@ package handle
 import (
 	"das-account-indexer/config"
 	"das-account-indexer/http_server/code"
+	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
@@ -140,25 +141,31 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	}
 
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(reverse.Account))
-	account, err := h.DbDao.FindAccountInfoByAccountId(accountId)
+	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account err")
 		return nil
+	} else if accountInfo.Id == 0 {
+		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		return nil
+	} else if accountInfo.Status == tables.AccountStatusOnLock {
+		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account on lock")
+		return nil
 	}
 
-	if account.OwnerChainType == res.ChainType && strings.EqualFold(account.Owner, res.AddressHex) {
-		resp.Account = account.Account
-	} else if account.ManagerChainType == res.ChainType && strings.EqualFold(account.Manager, res.AddressHex) {
-		resp.Account = account.Account
+	if accountInfo.OwnerChainType == res.ChainType && strings.EqualFold(accountInfo.Owner, res.AddressHex) {
+		resp.Account = accountInfo.Account
+	} else if accountInfo.ManagerChainType == res.ChainType && strings.EqualFold(accountInfo.Manager, res.AddressHex) {
+		resp.Account = accountInfo.Account
 	} else {
-		record, err := h.DbDao.FindRecordByAccountIdAddressValue(account.AccountId, res.AddressHex)
+		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, res.AddressHex)
 		if err != nil {
 			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account record err")
 			return nil
 		} else if record.Id > 0 {
-			resp.Account = account.Account
+			resp.Account = accountInfo.Account
 		}
 	}
 

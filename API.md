@@ -243,6 +243,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```
 
 **Response**
+* key: https://github.com/dotbitHQ/cell-data-generator/blob/master/data/record_key_namespace.txt
 
 ```javascript
 {

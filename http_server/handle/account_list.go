@@ -4,13 +4,14 @@ import (
 	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
+	"github.com/dotbitHQ/das-lib/core"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
 )
 
 type ReqAccountList struct {
-	ReqKeyInfo
+	core.ChainTypeAddress
 }
 
 type RespAccountList struct {
@@ -68,7 +69,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	var resp RespAccountList
 	resp.AccountList = make([]RespAddressAccount, 0)
 
-	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ReqKeyInfo, apiResp)
+	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ChainTypeAddress, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil

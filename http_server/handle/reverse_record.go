@@ -16,16 +16,7 @@ import (
 )
 
 type ReqReverseRecord struct {
-	ReqKeyInfo
-}
-
-type ReqKeyInfo struct {
-	Type    string `json:"type"` // blockchain
-	KeyInfo struct {
-		CoinType code.CoinType `json:"coin_type"`
-		ChainId  code.ChainId  `json:"chain_id"`
-		Key      string        `json:"key"`
-	} `json:"key_info"`
+	core.ChainTypeAddress
 }
 
 type RespReverseRecord struct {
@@ -76,7 +67,7 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func checkReqKeyInfo(daf *core.DasAddressFormat, req *ReqKeyInfo, apiResp *code.ApiResp) *core.DasAddressHex {
+func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, apiResp *code.ApiResp) *core.DasAddressHex {
 	if req.Type != "blockchain" {
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
 		return nil
@@ -85,9 +76,9 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *ReqKeyInfo, apiResp *code.
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
 		return nil
 	}
-	dasChainType := code.FormatCoinTypeToDasChainType(req.KeyInfo.CoinType)
+	dasChainType := common.FormatCoinTypeToDasChainType(req.KeyInfo.CoinType)
 	if dasChainType == -1 {
-		dasChainType = code.FormatChainIdToDasChainType(config.Cfg.Server.Net, req.KeyInfo.ChainId)
+		dasChainType = common.FormatChainIdToDasChainType(config.Cfg.Server.Net, req.KeyInfo.ChainId)
 	}
 	if dasChainType == -1 {
 		if strings.HasPrefix(req.KeyInfo.Key, "0x") {
@@ -124,7 +115,7 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *ReqKeyInfo, apiResp *code.
 
 func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) error {
 	var resp RespReverseRecord
-	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ReqKeyInfo, apiResp)
+	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ChainTypeAddress, apiResp)
 	if apiResp.ErrNo != code.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil

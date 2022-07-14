@@ -12,8 +12,8 @@ type TableRecordsInfo struct {
 	Label           string    `json:"label" gorm:"column:label;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT ''"`
 	Value           string    `json:"value" gorm:"column:value;index:k_value,length:768;type:varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT ''"`
 	Ttl             string    `json:"ttl" gorm:"column:ttl;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT ''"`
-	CreatedAt       time.Time `json:"created_at" gorm:"column:created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
-	UpdatedAt       time.Time `json:"updated_at" gorm:"column:updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
+	CreatedAt       time.Time `json:"created_at" gorm:"column:created_at;index:k_created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
+	UpdatedAt       time.Time `json:"updated_at" gorm:"column:updated_at;index:k_updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
 }
 
 const (

@@ -1,8 +1,9 @@
 package tables
 
 import (
-	"github.com/dotbitHQ/das-lib/common"
 	"time"
+
+	"github.com/dotbitHQ/das-lib/common"
 )
 
 type TableReverseInfo struct {
@@ -15,8 +16,8 @@ type TableReverseInfo struct {
 	Address        string                `json:"address" gorm:"column:address;index:k_address;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT ''"`
 	Account        string                `json:"account" gorm:"column:account;index:k_account;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT ''"`
 	Capacity       uint64                `json:"capacity" gorm:"column:capacity;type:bigint(20) NOT NULL DEFAULT '0' COMMENT ''"`
-	CreatedAt      time.Time             `json:"created_at" gorm:"column:created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
-	UpdatedAt      time.Time             `json:"updated_at" gorm:"column:updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
+	CreatedAt      time.Time             `json:"created_at" gorm:"column:created_at;index:k_created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
+	UpdatedAt      time.Time             `json:"updated_at" gorm:"column:updated_at;index:k_updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
 }
 
 const (

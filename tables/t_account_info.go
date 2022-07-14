@@ -1,8 +1,9 @@
 package tables
 
 import (
-	"github.com/dotbitHQ/das-lib/common"
 	"time"
+
+	"github.com/dotbitHQ/das-lib/common"
 )
 
 type TableAccountInfo struct {
@@ -26,8 +27,8 @@ type TableAccountInfo struct {
 	Nonce                uint64                `json:"nonce" gorm:"column:nonce;type:bigint(20) NOT NULL DEFAULT '0' COMMENT ''"`
 	RegisteredAt         uint64                `json:"registered_at" gorm:"column:registered_at;type:bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT ''"`
 	ExpiredAt            uint64                `json:"expired_at" gorm:"column:expired_at;type:bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT ''"`
-	CreatedAt            time.Time             `json:"created_at" gorm:"column:created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
-	UpdatedAt            time.Time             `json:"updated_at" gorm:"column:updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
+	CreatedAt            time.Time             `json:"created_at" gorm:"column:created_at;index:k_created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
+	UpdatedAt            time.Time             `json:"updated_at" gorm:"column:updated_at;index:k_updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
 }
 
 type AccountStatus int

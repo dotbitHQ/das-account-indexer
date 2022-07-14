@@ -42,7 +42,7 @@ func (h *HttpHandle) JsonRpcAccountRecords(p json.RawMessage, apiResp *code.ApiR
 		return
 	}
 
-	if err = h.doAccountRecords(&req[0], apiResp); err != nil {
+	if err = h.doAccountRecords(&req[0], apiResp, common.ConvertRecordsAddressCoinType); err != nil {
 		log.Error("doAccountRecords err:", err.Error())
 	}
 }
@@ -64,14 +64,16 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 	}
 	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
 
-	if err = h.doAccountRecords(&req, &apiResp); err != nil {
+	if err = h.doAccountRecords(&req, &apiResp, common.ConvertRecordsAddressCoinType); err != nil {
 		log.Error("doAccountRecords err:", err.Error(), funcName)
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiResp) error {
+type ConvertRecordsFunc func(string) string
+
+func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiResp, convertRecordsFunc ConvertRecordsFunc) error {
 	var resp RespAccountRecords
 	resp.Records = make([]DataRecord, 0)
 
@@ -107,7 +109,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 	for _, v := range list {
 		key := fmt.Sprintf("%s.%s", v.Type, v.Key)
 		resp.Records = append(resp.Records, DataRecord{
-			Key:   key,
+			Key:   convertRecordsFunc(key),
 			Label: v.Label,
 			Value: v.Value,
 			TTL:   v.Ttl,

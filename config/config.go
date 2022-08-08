@@ -53,6 +53,9 @@ type CfgServer struct {
 		ConfirmNum         uint64 `json:"confirm_num" yaml:"confirm_num"`
 		ConcurrencyNum     uint64 `json:"concurrency_num" yaml:"concurrency_num"`
 	} `json:"chain" yaml:"chain"`
+	Notice struct {
+		LarkErrUrl string `json:"lark_err_url" yaml:"lark_err_url"`
+	} `json:"notice" yaml:"notice"`
 	DB struct {
 		Mysql DbMysql `json:"mysql" yaml:"mysql"`
 	} `json:"db" yaml:"db"`

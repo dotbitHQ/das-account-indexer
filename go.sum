@@ -72,6 +72,8 @@ github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWR
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
+github.com/clipperhouse/uax29 v1.12.4 h1:on+uPLg2CYxLMReDh3xrIv4F43PtluOmZfszJctSmgI=
+github.com/clipperhouse/uax29 v1.12.4/go.mod h1:JGonRhbyeZzi0GciYzJmXCDP3C/sxVSSv1rBh3zURuU=
 github.com/cloudflare/cloudflare-go v0.14.0/go.mod h1:EnwdgGMaFOruiPZRFSgn+TsQ3hQ7C/YWzIGLeu5c304=
 github.com/consensys/bavard v0.1.8-0.20210406032232-f3452dc9b572/go.mod h1:Bpd0/3mZuaj6Sj+PqrmIquiOKy397AKGThQPaGzNXAQ=
 github.com/consensys/gnark-crypto v0.4.1-0.20210426202927-39ac3d4b3f1f/go.mod h1:815PAHg3wvysy0SyIqanF8gZ0Y1wjk/hrDHD/iT88+Q=
@@ -103,8 +105,8 @@ github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5O
 github.com/docker/docker v1.4.2-0.20180625184442-8e610b2b55bf/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/dop251/goja v0.0.0-20211011172007-d99e4b8cbf48/go.mod h1:R9ET47fwRVRPZnOGvHxxhuZcbrMCuiqOz3Rlrh4KSnk=
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
-github.com/dotbitHQ/das-lib v1.0.1-0.20220808023655-46bcca6fffde h1:/si63bIjyGfOqhBWeJ37Cj5a4GctHbv8/vWQSy9ykgw=
-github.com/dotbitHQ/das-lib v1.0.1-0.20220808023655-46bcca6fffde/go.mod h1:cjxR/SvT6w9U2fvNpADeyB31ukYLSrfffC67puHOZ/c=
+github.com/dotbitHQ/das-lib v1.0.1-0.20220808033537-538e7b4b7e83 h1:hMAr0SKDiQVER7Jb5K9JAc/yDlMcGx4akzMO9xLi/BA=
+github.com/dotbitHQ/das-lib v1.0.1-0.20220808033537-538e7b4b7e83/go.mod h1:nxmnsMZinmIR9K4BtL/UumixgWhwWnf61tasNeRjqZE=
 github.com/eclipse/paho.mqtt.golang v1.2.0/go.mod h1:H9keYFcgq3Qr5OUJm/JZI/i6U7joQ8SYLhZwfeOo6Ts=
 github.com/edsrzf/mmap-go v1.0.0/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/elazarl/goproxy v0.0.0-20220529153421-8ea89ba92021 h1:EbF0UihnxWRcIMOwoVtqnAylsqcjzqpSvMdjF2Ud4rA=

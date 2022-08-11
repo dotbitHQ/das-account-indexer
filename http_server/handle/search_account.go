@@ -168,7 +168,7 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	for _, v := range list {
 		key := fmt.Sprintf("%s.%s", v.Type, v.Key)
 		resp.AccountData.Records = append(resp.AccountData.Records, DataRecord{
-			Key:   key,
+			Key:   common.ConvertRecordsAddressCoinType(key),
 			Label: v.Label,
 			Value: v.Value,
 			TTL:   v.Ttl,

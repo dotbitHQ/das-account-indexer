@@ -92,7 +92,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
+    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
     "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
     "key": "" // address
   }
@@ -192,7 +192,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 714: BNB, 966: Matic
+    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
     "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
     "key": "" // address
   }

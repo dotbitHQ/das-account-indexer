@@ -286,6 +286,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ### Get Account Records Info V2
 
+The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
+
 **Request**
 
 * host: `http://127.0.0.1:8122`

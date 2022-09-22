@@ -3,7 +3,8 @@
     * [Get Reverse Record Info](#get-reverse-record-info)
     * [Get Account Basic Info](#get-account-basic-info)
     * [Get Account List](#get-account-list)  
-    * [Get Account Records Info](#get-account-records-info)   
+    * [Get Account Records Info](#get-account-records-info) 
+    * [Get Account Records Info V2](#get-account-records-info-v2)
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -282,6 +283,62 @@ or json rpc style:
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecords","params": [{"account":"phone.bit"}]}'
 ```
+
+### Get Account Records Info V2
+
+**Request**
+
+* host: `http://127.0.0.1:8122`
+* path: `/v2/account/records`
+* param:
+
+```json
+{
+  "account": "phone.bit"
+}
+```
+
+**Response**
+* key: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+
+```javascript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "account": "phone.bit",
+    "records": [
+      {
+        "key": "address.0",
+        "label": "Personal account",
+        "value": "3EbtqPeAZbX6wmP6idySu4jc2URT8LG2aa",
+        "ttl": "300"
+      },
+      {
+        "key": "address.60",
+        "label": "Personal account",
+        "value": "0x59724739940777947c56C4f2f2C9211cd5130FEf",
+        "ttl": "300"
+      }
+      // ...
+    ]
+  }
+}
+```
+
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v2/account/records -d'{"account":"phone.bit"}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecordsV2","params": [{"account":"phone.bit"}]}'
+```
+
 
 ## _Deprecated API List_
 

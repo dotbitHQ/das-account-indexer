@@ -84,6 +84,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ### Get Reverse Record Info
 
+[❓How to set up an alias](https://app.did.id/alias)
+
 **Request**
 * host: `indexer-v1.did.id`
 * path: `/v1/reverse/record`
@@ -116,13 +118,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}'
+curl -X POST https://indexer-v1.did.id/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x0b4eba3efe8ad25f1fe0bb972fe82349ad9e5155"}}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
 ```
 
 ### Get Account Basic Info

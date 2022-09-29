@@ -83,8 +83,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```
 
 ### Get Reverse Record Info
-
-[❓How to set up an alias](https://app.did.id/alias)
+* You need to set an alias for it to take effect.
+* [❓How to set an alias](https://app.did.id/alias)
 
 **Request**
 * host: `indexer-v1.did.id`

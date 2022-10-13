@@ -233,6 +233,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ### Get Account Records Info
 
+> This is deprecated, please use [Records Info V2 below](https://github.com/dotbitHQ/das-account-indexer/blob/main/API.md#get-account-records-info-v2) instead.
+
 **Request**
 
 * host: `http://127.0.0.1:8122`

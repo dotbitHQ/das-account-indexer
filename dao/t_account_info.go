@@ -235,6 +235,6 @@ func (d *DbDao) GetSubAccountListByParentAccountId(parentAccountId string, limit
 }
 
 func (d *DbDao) GetSubAccountListCountByParentAccountId(parentAccountId string) (count int64, err error) {
-	err = d.db.Where("parent_account_id=?", parentAccountId).Count(&count).Error
+	err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=?", parentAccountId).Count(&count).Error
 	return
 }

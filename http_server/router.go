@@ -35,6 +35,7 @@ func (h *HttpServer) initRouter() {
 			v1Indexer.POST("/account/list", cacheHandle, h.H.AccountList)
 			v1Indexer.POST("/account/records", cacheHandle, h.H.AccountRecords)
 			v1Indexer.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
+			v1Indexer.POST("/sub/account/list", cacheHandle, h.H.SubAccountList)
 		}
 		v2Indexer := h.engineIndexer.Group("v2")
 		{

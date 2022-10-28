@@ -226,3 +226,15 @@ func (d *DbDao) UpdateAccountOutpoint(accountId, outpoint string) error {
 			"outpoint": outpoint,
 		}).Error
 }
+
+func (d *DbDao) GetSubAccountListByParentAccountId(parentAccountId string, limit, offset int) (list []tables.TableAccountInfo, err error) {
+	err = d.db.Where("parent_account_id=?", parentAccountId).
+		Order("account").Limit(limit).Offset(offset).
+		Find(&list).Error
+	return
+}
+
+func (d *DbDao) GetSubAccountListCountByParentAccountId(parentAccountId string) (count int64, err error) {
+	err = d.db.Where("parent_account_id=?", parentAccountId).Count(&count).Error
+	return
+}

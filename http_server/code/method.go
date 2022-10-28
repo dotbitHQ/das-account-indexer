@@ -14,4 +14,6 @@ const (
 	MethodAccountRecords   JsonRpcMethod = "das_accountRecords"
 	MethodAccountRecordsV2 JsonRpcMethod = "das_accountRecordsV2"
 	MethodReverseRecord    JsonRpcMethod = "das_reverseRecord"
+
+	MethodSubAccountList JsonRpcMethod = "das_subAccountList"
 )

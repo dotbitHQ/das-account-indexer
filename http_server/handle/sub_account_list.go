@@ -30,7 +30,6 @@ type SubAccountInfo struct {
 	AccountIdHex       string                `json:"account_id_hex"`
 	CreateAtUnix       uint64                `json:"create_at_unix"`
 	ExpiredAtUnix      uint64                `json:"expired_at_unix"`
-	DasLockArgHex      string                `json:"das_lock_arg_hex"`
 	OwnerAlgorithmId   common.DasAlgorithmId `json:"owner_algorithm_id"`
 	OwnerKey           string                `json:"owner_key"`
 	ManagerAlgorithmId common.DasAlgorithmId `json:"manager_algorithm_id"`

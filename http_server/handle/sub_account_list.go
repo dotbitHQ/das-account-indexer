@@ -19,7 +19,7 @@ type ReqSubAccountList struct {
 
 type RespSubAccountList struct {
 	Account          string                  `json:"account"`
-	AccountId        string                  `json:"account_id"`
+	AccountIdHex     string                  `json:"account_id_hex"`
 	EnableSubAccount tables.EnableSubAccount `json:"enable_sub_account"`
 	SubAccountTotal  int64                   `json:"sub_account_total"`
 	SubAccountList   []SubAccountInfo        `json:"sub_account_list"`
@@ -95,7 +95,7 @@ func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *code.ApiR
 		return nil
 	}
 	resp.Account = accountInfo.Account
-	resp.AccountId = accountInfo.AccountId
+	resp.AccountIdHex = accountInfo.AccountId
 	resp.EnableSubAccount = accountInfo.EnableSubAccount
 
 	if accountInfo.EnableSubAccount == tables.AccountEnableStatusOn {

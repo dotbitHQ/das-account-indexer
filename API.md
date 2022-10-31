@@ -5,6 +5,7 @@
     * [Get Account List](#get-account-list)  
     * [Get Account Records Info](#get-account-records-info) 
     * [Get Account Records Info V2](#get-account-records-info-v2)
+    * [Get Sub-Account List](#get-sub-account-list)
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -345,6 +346,62 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecordsV2","params": [{"account":"phone.bit"}]}'
 ```
 
+### Get Sub-Account List
+
+**Request**
+
+* host: `http://127.0.0.1:8122`
+* path: `/v1/sub/account/list`
+* param:
+
+```javascript
+{
+  "account": "0x.bit",
+  "page": 1,
+  "size": 20
+}
+```
+
+**Response**
+
+* enable_sub_account: 0-unenabled, 1-enabled
+
+```javascript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "account": "0x.bit",
+    "account_id_hex": "0x35612d221d6c02564c36935f81ec8568b07a39f3",
+    "enable_sub_account": 1,
+    "sub_account_total": 300,
+    "sub_account_list": [
+      {
+        "account": "1234.0x.bit",
+        "account_id_hex": "0x673cfe5216652c3b401d904d776dedf4a2ce9f41",
+        "create_at_unix": 0,
+        "expired_at_unix": 0,
+        "owner_algorithm_id": 5,// 3: eth personal sign, 4: tron sign, 5: eip-712
+        "owner_key": "0x...",
+        "manager_algorithm_id": 5,
+        "manager_key": "0x..."
+      }
+    ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/sub/account/list -d'{"account":"0x.bit"}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_subAccountList","params": [{"account":"0x.bit"}]}'
+```
 
 ## _Deprecated API List_
 

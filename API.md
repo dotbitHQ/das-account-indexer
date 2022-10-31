@@ -394,13 +394,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/sub/account/list -d'{"account":"0x.bit"}'
+curl -X POST https://indexer-v1.did.id/v1/sub/account/list -d'{"account":"0x.bit","page":1,"size":20}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_subAccountList","params": [{"account":"0x.bit"}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_subAccountList","params": [{"account":"0x.bit","page":1,"size":20}]}'
 ```
 
 ## _Deprecated API List_

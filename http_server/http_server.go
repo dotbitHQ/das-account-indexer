@@ -13,45 +13,45 @@ var (
 )
 
 type HttpServer struct {
-	Ctx            context.Context
-	Address        string
+	Ctx context.Context
+	//Address        string
 	AddressIndexer string
-	AddressReverse string
-	H              *handle.HttpHandle
+	//AddressReverse string
+	H *handle.HttpHandle
 
-	engine        *gin.Engine
+	//engine        *gin.Engine
 	engineIndexer *gin.Engine
-	engineReverse *gin.Engine
+	//engineReverse *gin.Engine
 
-	srv        *http.Server
+	//srv        *http.Server
 	srvIndexer *http.Server
-	srvReverse *http.Server
+	//srvReverse *http.Server
 }
 
 func (h *HttpServer) Run() {
-	if h.Address != "" {
-		h.engine = gin.New()
-	}
+	//if h.Address != "" {
+	//	h.engine = gin.New()
+	//}
 	if h.AddressIndexer != "" {
 		h.engineIndexer = gin.New()
 	}
-	if h.AddressReverse != "" {
-		h.engineReverse = gin.New()
-	}
+	//if h.AddressReverse != "" {
+	//	h.engineReverse = gin.New()
+	//}
 
 	h.initRouter()
 
-	if h.Address != "" {
-		h.srv = &http.Server{
-			Addr:    h.Address,
-			Handler: h.engine,
-		}
-		go func() {
-			if err := h.srv.ListenAndServe(); err != nil {
-				log.Error("http_server old api run err:", err)
-			}
-		}()
-	}
+	//if h.Address != "" {
+	//	h.srv = &http.Server{
+	//		Addr:    h.Address,
+	//		Handler: h.engine,
+	//	}
+	//	go func() {
+	//		if err := h.srv.ListenAndServe(); err != nil {
+	//			log.Error("http_server old api run err:", err)
+	//		}
+	//	}()
+	//}
 
 	if h.AddressIndexer != "" {
 		h.srvIndexer = &http.Server{
@@ -65,32 +65,34 @@ func (h *HttpServer) Run() {
 		}()
 	}
 
-	if h.AddressReverse != "" {
-		h.srvReverse = &http.Server{
-			Addr:    h.AddressReverse,
-			Handler: h.engineReverse,
-		}
-
-		go func() {
-			if err := h.srvReverse.ListenAndServe(); err != nil {
-				log.Error("http_server reverse api run err:", err)
-			}
-		}()
-	}
+	//if h.AddressReverse != "" {
+	//	h.srvReverse = &http.Server{
+	//		Addr:    h.AddressReverse,
+	//		Handler: h.engineReverse,
+	//	}
+	//
+	//	go func() {
+	//		if err := h.srvReverse.ListenAndServe(); err != nil {
+	//			log.Error("http_server reverse api run err:", err)
+	//		}
+	//	}()
+	//}
 
 }
 
 func (h *HttpServer) Shutdown() {
-	if h.srv != nil {
-		log.Warn("http server Shutdown ... ")
-		if err := h.srv.Shutdown(h.Ctx); err != nil {
-			log.Error("http server Shutdown err:", err.Error())
-		}
+	log.Warn("http server Shutdown ... ")
+	//if err := h.srv.Shutdown(h.Ctx); err != nil {
+	//	log.Error("http server Shutdown err:", err.Error())
+	//}
+
+	if h.srvIndexer != nil {
 		if err := h.srvIndexer.Shutdown(h.Ctx); err != nil {
 			log.Error("http server Shutdown err:", err.Error())
 		}
-		if err := h.srvReverse.Shutdown(h.Ctx); err != nil {
-			log.Error("http server Shutdown err:", err.Error())
-		}
 	}
+
+	//if err := h.srvReverse.Shutdown(h.Ctx); err != nil {
+	//	log.Error("http server Shutdown err:", err.Error())
+	//}
 }

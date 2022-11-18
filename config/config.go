@@ -40,11 +40,11 @@ func AddCfgFileWatcher(configFilePath string) (*fsnotify.Watcher, error) {
 
 type CfgServer struct {
 	Server struct {
-		IsUpdate              bool              `json:"is_update" yaml:"is_update"`
-		Net                   common.DasNetType `json:"net" yaml:"net"`
-		HttpServerAddr        string            `json:"http_server_addr" yaml:"http_server_addr"`
-		HttpServerAddrIndexer string            `json:"http_server_addr_indexer" yaml:"http_server_addr_indexer"`
-		HttpServerAddrReverse string            `json:"http_server_addr_reverse" yaml:"http_server_addr_reverse"`
+		IsUpdate bool              `json:"is_update" yaml:"is_update"`
+		Net      common.DasNetType `json:"net" yaml:"net"`
+		//HttpServerAddr        string            `json:"http_server_addr" yaml:"http_server_addr"`
+		HttpServerAddrIndexer string `json:"http_server_addr_indexer" yaml:"http_server_addr_indexer"`
+		//HttpServerAddrReverse string            `json:"http_server_addr_reverse" yaml:"http_server_addr_reverse"`
 	} `json:"server" yaml:"server"`
 	Chain struct {
 		CkbUrl             string `json:"ckb_url" yaml:"ckb_url"`

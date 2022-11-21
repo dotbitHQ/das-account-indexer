@@ -60,7 +60,7 @@ docker-compose up -d
 _if you already have a mysql installed, just run_
 
 ```bash
-docker run -dp 8121-8123:8121-8123 -v $PWD/config/config.yaml:/app/config/config.yaml --name das-indexer-server slagga/das-indexer
+docker run -dp 8122:8122 -v $PWD/config/config.yaml:/app/config/config.yaml --name das-indexer-server slagga/das-indexer
 ```
 
 ## API Usage

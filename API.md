@@ -37,19 +37,6 @@ https://indexer-v1.did.id
 
 This service can query all data, but it is recommended that developers setup their own Indexer for the sake of decentralization.
 
-#### Basic Functional Indexer
-
-```json
-https://indexer-basic.did.id
-```
-
-This service can only query basic account data and .bit Alias data. The specific interfaces are as follows:
-
-* das_serverInfo
-* das_reverseRecord
-* das_accountInfo
-* das_accountList
-
 
 ### Get Server Info
 

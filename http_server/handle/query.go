@@ -65,6 +65,10 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	log.Info("QueryIndexer:", req.Method, clientIp, toolib.JsonString(req))
 
 	switch req.Method {
+	case code.MethodSearchAccount:
+		h.JsonRpcSearchAccount(req.Params, &apiResp)
+	case code.MethodAddressAccount:
+		h.JsonRpcAddressAccount(req.Params, &apiResp)
 	case code.MethodServerInfo:
 		h.JsonRpcServerInfo(req.Params, &apiResp)
 	case code.MethodAccountInfo:

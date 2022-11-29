@@ -48,8 +48,6 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionCreateSubAccount] = b.ActionCreateSubAccount
 	b.MapTransactionHandle[common.DasActionEditSubAccount] = b.ActionEditSubAccount
 	b.MapTransactionHandle[common.DasActionUpdateSubAccount] = b.ActionUpdateSubAccount
-	b.MapTransactionHandle[common.DasActionRenewSubAccount] = b.ActionRenewSubAccount
-	b.MapTransactionHandle[common.DasActionRecycleSubAccount] = b.ActionRecycleSubAccount
 	b.MapTransactionHandle[common.DasActionLockSubAccountForCrossChain] = b.ActionUpdateSubAccountInfo
 	b.MapTransactionHandle[common.DasActionUnlockSubAccountForCrossChain] = b.ActionUpdateSubAccountInfo
 	b.MapTransactionHandle[common.DasActionConfigSubAccountCustomScript] = b.ActionConfigSubAccountCreatingScript

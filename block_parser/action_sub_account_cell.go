@@ -65,81 +65,85 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 			createBuilderMap[k] = v
 		case common.SubActionEdit:
 			editBuilderMap[k] = v
-		}
-	}
-
-	//create sub-account
-	if len(createBuilderMap) > 0 {
-		// check sub-account config custom-script-args or not
-		contractSub, err := core.GetDasContractInfo(common.DASContractNameSubAccountCellType)
-		if err != nil {
-			resp.Err = fmt.Errorf("GetDasContractInfo err: %s", err.Error())
-			return
-		}
-		contractAcc, err := core.GetDasContractInfo(common.DasContractNameAccountCellType)
-		if err != nil {
-			resp.Err = fmt.Errorf("GetDasContractInfo err: %s", err.Error())
-			return
-		}
-		var parentAccountId, accountCellOutpoint string
-		for i, v := range req.Tx.Outputs {
-			if v.Type != nil && contractSub.IsSameTypeId(v.Type.CodeHash) {
-				parentAccountId = common.Bytes2Hex(v.Type.Args)
-			}
-			if v.Type != nil && contractAcc.IsSameTypeId(v.Type.CodeHash) {
-				accountCellOutpoint = common.OutPoint2String(req.TxHash, uint(i))
-			}
-		}
-
-		var parentAccountInfo tables.TableAccountInfo
-		if accountCellOutpoint != "" {
-			parentAccountInfo = tables.TableAccountInfo{
-				BlockNumber:    req.BlockNumber,
-				BlockTimestamp: req.BlockTimestamp,
-				Outpoint:       accountCellOutpoint,
-				AccountId:      parentAccountId,
-			}
-		}
-
-		var accountInfos []tables.TableAccountInfo
-		var subAccountIds []string
-		for _, v := range createBuilderMap {
-			ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccountData.Lock.Args)
-			if err != nil {
-				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
-				return
-			}
-
-			accountInfos = append(accountInfos, tables.TableAccountInfo{
-				BlockNumber:          req.BlockNumber,
-				BlockTimestamp:       req.BlockTimestamp,
-				Outpoint:             common.OutPoint2String(req.TxHash, 0),
-				AccountId:            v.SubAccountData.AccountId,
-				ParentAccountId:      parentAccountId,
-				Account:              v.Account,
-				OwnerChainType:       ownerHex.ChainType,
-				Owner:                ownerHex.AddressHex,
-				OwnerAlgorithmId:     ownerHex.DasAlgorithmId,
-				ManagerChainType:     managerHex.ChainType,
-				Manager:              managerHex.AddressHex,
-				ManagerAlgorithmId:   managerHex.DasAlgorithmId,
-				Status:               tables.AccountStatus(v.SubAccountData.Status),
-				EnableSubAccount:     tables.EnableSubAccount(v.SubAccountData.EnableSubAccount),
-				RenewSubAccountPrice: v.SubAccountData.RenewSubAccountPrice,
-				Nonce:                v.SubAccountData.Nonce,
-				RegisteredAt:         v.SubAccountData.RegisteredAt,
-				ExpiredAt:            v.SubAccountData.ExpiredAt,
-			})
-			subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
-		}
-		if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
-			resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
+		default:
+			resp.Err = fmt.Errorf("unknow sub-action [%s]", v.Action)
 			return
 		}
 	}
+	if err := b.actionUpdateSubAccountForCreate(req, createBuilderMap); err != nil {
+		resp.Err = fmt.Errorf("create err: %s", err.Error())
+		return
+	}
 
-	//edit
-	for _, builder := range builderMap {
+	if err := b.actionUpdateSubAccountForEdit(req, createBuilderMap); err != nil {
+		resp.Err = fmt.Errorf("edit err: %s", err.Error())
+		return
+	}
+
+	return
+}
+
+func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandleReq, createBuilderMap map[string]*witness.SubAccountNew) error {
+	if len(createBuilderMap) == 0 {
+		return nil
+	}
+
+	// check sub-account config custom-script-args or not
+	contractSub, err := core.GetDasContractInfo(common.DASContractNameSubAccountCellType)
+	if err != nil {
+		return fmt.Errorf("GetDasContractInfo err: %s", err.Error())
+	}
+
+	var parentAccountId string
+	for _, v := range req.Tx.Outputs {
+		if v.Type != nil && contractSub.IsSameTypeId(v.Type.CodeHash) {
+			parentAccountId = common.Bytes2Hex(v.Type.Args)
+		}
+	}
+
+	var parentAccountInfo tables.TableAccountInfo
+	var accountInfos []tables.TableAccountInfo
+	var subAccountIds []string
+	for _, v := range createBuilderMap {
+		ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccountData.Lock.Args)
+		if err != nil {
+			return fmt.Errorf("ArgsToHex err: %s", err.Error())
+		}
+
+		accountInfos = append(accountInfos, tables.TableAccountInfo{
+			BlockNumber:          req.BlockNumber,
+			BlockTimestamp:       req.BlockTimestamp,
+			Outpoint:             common.OutPoint2String(req.TxHash, 0),
+			AccountId:            v.SubAccountData.AccountId,
+			ParentAccountId:      parentAccountId,
+			Account:              v.Account,
+			OwnerChainType:       ownerHex.ChainType,
+			Owner:                ownerHex.AddressHex,
+			OwnerAlgorithmId:     ownerHex.DasAlgorithmId,
+			ManagerChainType:     managerHex.ChainType,
+			Manager:              managerHex.AddressHex,
+			ManagerAlgorithmId:   managerHex.DasAlgorithmId,
+			Status:               tables.AccountStatus(v.SubAccountData.Status),
+			EnableSubAccount:     tables.EnableSubAccount(v.SubAccountData.EnableSubAccount),
+			RenewSubAccountPrice: v.SubAccountData.RenewSubAccountPrice,
+			Nonce:                v.SubAccountData.Nonce,
+			RegisteredAt:         v.SubAccountData.RegisteredAt,
+			ExpiredAt:            v.SubAccountData.ExpiredAt,
+		})
+		subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
+	}
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
+		return fmt.Errorf("CreateSubAccount err: %s", err.Error())
+	}
+
+	return nil
+}
+
+func (b *BlockParser) actionUpdateSubAccountForEdit(req *FuncTransactionHandleReq, editBuilderMap map[string]*witness.SubAccountNew) error {
+	if len(editBuilderMap) == 0 {
+		return nil
+	}
+	for _, builder := range editBuilderMap {
 		accountInfo := tables.TableAccountInfo{
 			BlockNumber:    req.BlockNumber,
 			BlockTimestamp: req.BlockTimestamp,
@@ -148,12 +152,11 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 			Nonce:          builder.CurrentSubAccountData.Nonce,
 		}
 
-		switch string(builder.EditKey) {
+		switch builder.EditKey {
 		case common.EditKeyOwner:
 			ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(builder.EditLockArgs)
 			if err != nil {
-				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
-				return
+				return fmt.Errorf("ArgsToHex err: %s", err.Error())
 			}
 			accountInfo.OwnerAlgorithmId = ownerHex.DasAlgorithmId
 			accountInfo.OwnerChainType = ownerHex.ChainType
@@ -162,21 +165,18 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 			accountInfo.ManagerChainType = managerHex.ChainType
 			accountInfo.Manager = managerHex.AddressHex
 			if err = b.DbDao.EditOwnerSubAccount(accountInfo); err != nil {
-				resp.Err = fmt.Errorf("EditOwnerSubAccount err: %s", err.Error())
-				return
+				return fmt.Errorf("EditOwnerSubAccount err: %s", err.Error())
 			}
 		case common.EditKeyManager:
 			_, managerHex, err := b.DasCore.Daf().ArgsToHex(builder.EditLockArgs)
 			if err != nil {
-				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
-				return
+				return fmt.Errorf("ArgsToHex err: %s", err.Error())
 			}
 			accountInfo.ManagerAlgorithmId = managerHex.DasAlgorithmId
 			accountInfo.ManagerChainType = managerHex.ChainType
 			accountInfo.Manager = managerHex.AddressHex
 			if err = b.DbDao.EditManagerSubAccount(accountInfo); err != nil {
-				resp.Err = fmt.Errorf("EditManagerSubAccount err: %s", err.Error())
-				return
+				return fmt.Errorf("EditManagerSubAccount err: %s", err.Error())
 			}
 		case common.EditKeyRecords:
 			var recordsInfos []tables.TableRecordsInfo
@@ -192,13 +192,12 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 					Ttl:             strconv.FormatUint(uint64(v.TTL), 10),
 				})
 			}
-			if err = b.DbDao.EditRecordsSubAccount(accountInfo, recordsInfos); err != nil {
-				resp.Err = fmt.Errorf("EditRecordsSubAccount err: %s", err.Error())
-				return
+			if err := b.DbDao.EditRecordsSubAccount(accountInfo, recordsInfos); err != nil {
+				return fmt.Errorf("EditRecordsSubAccount err: %s", err.Error())
 			}
 		}
 	}
-	return
+	return nil
 }
 
 func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
@@ -304,64 +303,9 @@ func (b *BlockParser) ActionEditSubAccount(req *FuncTransactionHandleReq) (resp 
 		return
 	}
 
-	for _, builder := range builderMap {
-		accountInfo := tables.TableAccountInfo{
-			BlockNumber:    req.BlockNumber,
-			BlockTimestamp: req.BlockTimestamp,
-			Outpoint:       common.OutPoint2String(req.TxHash, 0),
-			AccountId:      builder.SubAccountData.AccountId,
-			Nonce:          builder.CurrentSubAccountData.Nonce,
-		}
-
-		switch builder.EditKey {
-		case common.EditKeyOwner:
-			ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(builder.EditLockArgs)
-			if err != nil {
-				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
-				return
-			}
-			accountInfo.OwnerAlgorithmId = ownerHex.DasAlgorithmId
-			accountInfo.OwnerChainType = ownerHex.ChainType
-			accountInfo.Owner = ownerHex.AddressHex
-			accountInfo.ManagerAlgorithmId = managerHex.DasAlgorithmId
-			accountInfo.ManagerChainType = managerHex.ChainType
-			accountInfo.Manager = managerHex.AddressHex
-			if err = b.DbDao.EditOwnerSubAccount(accountInfo); err != nil {
-				resp.Err = fmt.Errorf("EditOwnerSubAccount err: %s", err.Error())
-				return
-			}
-		case common.EditKeyManager:
-			_, managerHex, err := b.DasCore.Daf().ArgsToHex(builder.EditLockArgs)
-			if err != nil {
-				resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
-				return
-			}
-			accountInfo.ManagerAlgorithmId = managerHex.DasAlgorithmId
-			accountInfo.ManagerChainType = managerHex.ChainType
-			accountInfo.Manager = managerHex.AddressHex
-			if err = b.DbDao.EditManagerSubAccount(accountInfo); err != nil {
-				resp.Err = fmt.Errorf("EditManagerSubAccount err: %s", err.Error())
-				return
-			}
-		case common.EditKeyRecords:
-			var recordsInfos []tables.TableRecordsInfo
-			for _, v := range builder.EditRecords {
-				recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
-					AccountId:       builder.SubAccountData.AccountId,
-					ParentAccountId: common.Bytes2Hex(req.Tx.Outputs[0].Type.Args),
-					Account:         builder.Account,
-					Key:             v.Key,
-					Type:            v.Type,
-					Label:           v.Label,
-					Value:           v.Value,
-					Ttl:             strconv.FormatUint(uint64(v.TTL), 10),
-				})
-			}
-			if err = b.DbDao.EditRecordsSubAccount(accountInfo, recordsInfos); err != nil {
-				resp.Err = fmt.Errorf("EditRecordsSubAccount err: %s", err.Error())
-				return
-			}
-		}
+	if err := b.actionUpdateSubAccountForEdit(req, builderMap); err != nil {
+		resp.Err = fmt.Errorf("edit err: %s", err.Error())
+		return
 	}
 
 	return

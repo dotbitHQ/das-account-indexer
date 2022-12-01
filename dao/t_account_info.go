@@ -90,14 +90,8 @@ func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.T
 			}
 		}
 		if len(accountInfos) > 0 {
-			if err := tx.Clauses(clause.OnConflict{
-				DoUpdates: clause.AssignmentColumns([]string{
-					"block_number", "block_timestamp", "outpoint",
-					"owner_chain_type", "owner", "owner_algorithm_id",
-					"manager_chain_type", "manager", "manager_algorithm_id",
-					"registered_at", "expired_at", "status",
-					"enable_sub_account", "renew_sub_account_price", "nonce",
-				}),
+			if err := tx.Clauses(clause.Insert{
+				Modifier: "IGNORE",
 			}).Create(&accountInfos).Error; err != nil {
 				return err
 			}

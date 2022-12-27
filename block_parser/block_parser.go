@@ -247,9 +247,7 @@ func (b *BlockParser) checkContractVersion() error {
 		defaultVersion, chainVersion, err := b.DasCore.CheckContractVersion(v)
 		if err != nil {
 			if err == core.ErrContractMajorVersionDiff {
-				log.Error("chain version is[%s],service version is[%s],please upgrade service.", chainVersion, defaultVersion)
-				//log.Fatal("checkContractVersion:", defaultVersion, chainVersion)
-				//b.ctx.Done()
+				log.Errorf("contract[%s] version diff, please upgrade service. chain[%s], service[%s].", v, chainVersion, defaultVersion)
 				return err
 			}
 			return fmt.Errorf("CheckContractVersion err: %s", err.Error())

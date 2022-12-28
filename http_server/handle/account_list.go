@@ -12,6 +12,7 @@ import (
 
 type ReqAccountList struct {
 	core.ChainTypeAddress
+	Role string `json:"role"` // owner,manager
 }
 
 type RespAccountList struct {
@@ -77,7 +78,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 
 	log.Info("doAccountList:", res.ChainType, res.AddressHex)
 
-	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.AddressHex)
+	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.AddressHex, req.Role)
 	if err != nil {
 		log.Error("FindAccountListByAddress err:", err.Error(), req.KeyInfo)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")

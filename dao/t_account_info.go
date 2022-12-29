@@ -66,6 +66,11 @@ func (d *DbDao) FindAccountInfoByAccountId(accountId string) (accountInfo tables
 	return
 }
 
+func (d *DbDao) FindAccountInfoListByAccountIds(accountIds []string) (list []tables.TableAccountInfo, err error) {
+	err = d.db.Where(" account_id IN(?) ", accountIds).Find(&list).Error
+	return
+}
+
 func (d *DbDao) FindAccountListByAddress(chainType common.ChainType, address string) (list []tables.TableAccountInfo, err error) {
 	err = d.db.Where(" owner_chain_type=? AND owner=? ", chainType, address).Find(&list).Error
 	return

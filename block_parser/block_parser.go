@@ -30,6 +30,7 @@ type BlockParser struct {
 	ConcurrencyNum       uint64
 	ConfirmNum           uint64
 	Ctx                  context.Context
+	Cancel               context.CancelFunc
 	Wg                   *sync.WaitGroup
 
 	errCountHandle int
@@ -247,7 +248,11 @@ func (b *BlockParser) checkContractVersion() error {
 		defaultVersion, chainVersion, err := b.DasCore.CheckContractVersion(v)
 		if err != nil {
 			if err == core.ErrContractMajorVersionDiff {
-				log.Errorf("contract[%s] version diff, please upgrade service. chain[%s], service[%s].", v, chainVersion, defaultVersion)
+				log.Errorf("contract[%s] version diff, chain[%s], service[%s].", v, chainVersion, defaultVersion)
+				log.Error("Please update the service. [https://github.com/dotbitHQ/das-account-indexer]")
+				if b.Cancel != nil {
+					b.Cancel()
+				}
 				return err
 			}
 			return fmt.Errorf("CheckContractVersion err: %s", err.Error())

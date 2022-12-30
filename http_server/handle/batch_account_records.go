@@ -117,8 +117,9 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 			resp.List[i].ErrMsg = "Account does not exist"
 		} else if acc.Status == tables.AccountStatusOnLock {
 			resp.List[i].ErrMsg = "Account cross-chain"
+		} else {
+			okIds = append(okIds, v.AccountId)
 		}
-		okIds = append(okIds, v.AccountId)
 	}
 	if len(okIds) == 0 {
 		return nil

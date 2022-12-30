@@ -122,6 +122,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 		}
 	}
 	if len(okIds) == 0 {
+		apiResp.ApiRespOK(resp)
 		return nil
 	}
 

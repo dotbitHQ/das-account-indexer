@@ -53,7 +53,8 @@ This service can query all data, but it is recommended that developers setup the
   "errmsg": "",
   "data": {
     "is_latest_block_number": true,
-    "current_block_number": 6088191
+    "current_block_number": 6088191,
+    "chain": "testnet" //mainnet
   }
 }
 ```
@@ -186,7 +187,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
     "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
     "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
     "key": "" // address
-  }
+  },
+  "role": "owner" // owner,manager
 }
 ```
 

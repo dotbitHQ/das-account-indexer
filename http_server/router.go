@@ -28,8 +28,8 @@ func (h *HttpServer) initRouter() {
 			v1Indexer.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
 			v1Indexer.POST("/sub/account/list", cacheHandle, h.H.SubAccountList)
 
-			v1Indexer.POST("/batch/account/records", cacheHandle, h.H.BatchAccountRecords)
-			v1Indexer.POST("/batch/reverse/record", cacheHandle, h.H.BatchReverseRecord)
+			//v1Indexer.POST("/batch/account/records", cacheHandle, h.H.BatchAccountRecords)
+			//v1Indexer.POST("/batch/reverse/record", cacheHandle, h.H.BatchReverseRecord)
 		}
 		v2Indexer := h.engineIndexer.Group("v2")
 		{

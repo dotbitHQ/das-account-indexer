@@ -72,7 +72,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	resp.List = make([]BatchReverseRecord, 0)
 
 	if count := len(req.BatchKeyInfo); count == 0 || count > 20 {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "Invalid number of accounts")
+		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "Invalid number of key info")
 		return nil
 	}
 

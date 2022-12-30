@@ -142,7 +142,9 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 		})
 	}
 	for i, v := range resp.List {
-		resp.List[i].Records = mapRecords[v.AccountId]
+		if rs, ok := mapRecords[v.AccountId]; ok {
+			resp.List[i].Records = rs
+		}
 	}
 
 	apiResp.ApiRespOK(resp)

@@ -4,6 +4,7 @@ import (
 	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
+	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
 	"github.com/gin-gonic/gin"
@@ -21,8 +22,9 @@ type RespBatchReverseRecord struct {
 }
 
 type BatchReverseRecord struct {
-	Account string `json:"account"`
-	ErrMsg  string `json:"err_msg"`
+	Account      string `json:"account"`
+	AccountAlias string `json:"account_alias"`
+	ErrMsg       string `json:"err_msg"`
 }
 
 func (h *HttpHandle) JsonRpcBatchReverseRecord(p json.RawMessage, apiResp *code.ApiResp) {
@@ -89,7 +91,10 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 
 	// get reverse
 	for _, v := range listKeyInfo {
-		account, errMsg := h.checkReverse(v.ChainType, v.AddressHex)
+		account, errMsg := h.checkReverse(v.ChainType, v.AddressHex, apiResp)
+		if apiResp.ErrNo != code.ApiCodeSuccess {
+			return nil
+		}
 		resp.List = append(resp.List, BatchReverseRecord{
 			Account: account,
 			ErrMsg:  errMsg,
@@ -100,10 +105,11 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	return nil
 }
 
-func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string) (account, errMsg string) {
+func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string, apiResp *code.ApiResp) (account, errMsg string) {
 	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
 	if err != nil {
-		errMsg = "find reverse record err"
+		log.Error("FindLatestReverseRecord err: ", err.Error(), addressHex)
+		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
 		return
 	} else if reverse.Id == 0 {
 		errMsg = "reverse does not exit"
@@ -113,13 +119,14 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string)
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(reverse.Account))
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
-		errMsg = "find reverse record account err"
+		log.Error("FindAccountInfoByAccountId err: ", err.Error(), reverse.Account)
+		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
 		return
 	} else if accountInfo.Id == 0 {
-		errMsg = "reverse account does not exit"
+		errMsg = fmt.Sprintf("reverse account[%s] does not exit", reverse.Account)
 		return
 	} else if accountInfo.Status == tables.AccountStatusOnLock {
-		errMsg = "reverse account cross-chain"
+		errMsg = fmt.Sprintf("reverse account[%s] cross-chain", reverse.Account)
 		return
 	}
 
@@ -130,8 +137,8 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string)
 	} else {
 		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, addressHex)
 		if err != nil {
-			account = ""
-			errMsg = "find reverse account record err"
+			log.Error("FindRecordByAccountIdAddressValue err: ", err.Error(), accountInfo.Account, addressHex)
+			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse account record err")
 			return
 		} else if record.Id > 0 {
 			account = accountInfo.Account

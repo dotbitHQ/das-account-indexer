@@ -24,6 +24,7 @@ type BatchAccountRecord struct {
 	Account   string       `json:"account"`
 	AccountId string       `json:"account_id"`
 	Records   []DataRecord `json:"records"`
+	ErrMsg    string       `json:"err_msg"`
 }
 
 func (h *HttpHandle) JsonRpcBatchAccountRecords(p json.RawMessage, apiResp *code.ApiResp) {
@@ -109,14 +110,12 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 
 	// check accounts
 	var okIds []string
-	for _, v := range resp.List {
+	for i, v := range resp.List {
 		acc, ok := mapAcc[v.AccountId]
 		if !ok {
-			apiResp.ApiRespErr(code.ApiCodeAccountNotExist, fmt.Sprintf("account[%s] does not exist", v.Account))
-			return nil
+			resp.List[i].ErrMsg = fmt.Sprintf("account[%s] does not exist", v.Account)
 		} else if acc.Status == tables.AccountStatusOnLock {
-			apiResp.ApiRespErr(code.ApiCodeAccountOnLock, fmt.Sprintf("account[%s] cross-chain", v.Account))
-			return nil
+			resp.List[i].ErrMsg = fmt.Sprintf("account[%s] cross-chain", v.Account)
 		} else {
 			okIds = append(okIds, v.AccountId)
 		}

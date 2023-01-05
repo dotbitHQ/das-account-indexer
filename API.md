@@ -6,6 +6,8 @@
     * [Get Account Records Info](#get-account-records-info) 
     * [Get Account Records Info V2](#get-account-records-info-v2)
     * [Get Sub-Account List](#get-sub-account-list)
+    * [Get Batch Account Records Info](#get-batch-account-records-info)
+    * [Get Batch reverse Record Info](#get-batch-reverse-record-info)
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -114,6 +116,63 @@ or json rpc style:
 
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+```
+
+### Get Batch Reverse Record Info
+* You need to set an alias for it to take effect.
+* [❓How to set an alias](https://app.did.id/alias)
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/batch/reverse/record`
+* param:
+
+```javascript
+{
+  "batch_key_info":[
+    {
+      "type": "blockchain",
+      "key_info": {
+        "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
+        "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+        "key": "" // address
+      }
+    }
+    //...
+  ]
+}
+```
+
+**Response**
+
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "list": [
+      {
+        "account": "",
+        "account_alias": "",
+        "err_msg": ""
+      }
+      //...
+    ]
+  }
+}
+```
+
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/batch/reverse/record -d'{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
 ```
 
 ### Get Account Basic Info
@@ -333,6 +392,61 @@ or json rpc style:
 
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountRecordsV2","params": [{"account":"phone.bit"}]}'
+```
+
+### Get Batch Account Records Info
+
+The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
+
+**Request**
+
+* host: `http://127.0.0.1:8122`
+* path: `/v1/batch/account/records`
+* param:
+
+```json
+{
+  "accounts": ["phone.bit","..."]
+}
+```
+
+**Response**
+* key: https://github.com/dotbitHQ/cell-data-generator/blob/master/data/record_key_namespace.txt
+
+```javascript
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+      "list":[{
+        "account": "phone.bit",
+        "records": [
+          {
+            "key": "address.eth",
+            "label": "Personal account",
+            "value": "0x59724739940777947c56C4f2f2C9211cd5130FEf",
+            "ttl": "300"
+          }
+        // ...
+      ]
+    }
+    // ...
+    ]
+  }
+}
+```
+
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/batch/account/records -d'{"accounts":["phone.bit"]}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchAccountRecords","params": [{"accounts":["phone.bit"]}]}'
 ```
 
 ### Get Sub-Account List

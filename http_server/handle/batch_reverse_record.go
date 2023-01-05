@@ -96,8 +96,9 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 			return nil
 		}
 		resp.List = append(resp.List, BatchReverseRecord{
-			Account: account,
-			ErrMsg:  errMsg,
+			Account:      account,
+			AccountAlias: FormatDotToSharp(account),
+			ErrMsg:       errMsg,
 		})
 	}
 

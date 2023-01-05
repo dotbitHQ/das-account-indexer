@@ -23,7 +23,6 @@ type RespBatchAccountRecords struct {
 type BatchAccountRecord struct {
 	Account   string       `json:"account"`
 	AccountId string       `json:"account_id"`
-	ErrMsg    string       `json:"err_msg"`
 	Records   []DataRecord `json:"records"`
 }
 
@@ -73,7 +72,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	var resp RespBatchAccountRecords
 	resp.List = make([]BatchAccountRecord, 0)
 
-	if count := len(req.Accounts); count == 0 || count > 20 {
+	if count := len(req.Accounts); count == 0 || count > 100 {
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "Invalid number of accounts")
 		return nil
 	}
@@ -91,7 +90,6 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 		resp.List = append(resp.List, BatchAccountRecord{
 			Account:   req.Accounts[i],
 			AccountId: accountId,
-			ErrMsg:    "",
 			Records:   make([]DataRecord, 0),
 		})
 	}
@@ -111,12 +109,14 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 
 	// check accounts
 	var okIds []string
-	for i, v := range resp.List {
+	for _, v := range resp.List {
 		acc, ok := mapAcc[v.AccountId]
 		if !ok {
-			resp.List[i].ErrMsg = "Account does not exist"
+			apiResp.ApiRespErr(code.ApiCodeAccountNotExist, fmt.Sprintf("account[%s] does not exist", v.Account))
+			return nil
 		} else if acc.Status == tables.AccountStatusOnLock {
-			resp.List[i].ErrMsg = "Account cross-chain"
+			apiResp.ApiRespErr(code.ApiCodeAccountOnLock, fmt.Sprintf("account[%s] cross-chain", v.Account))
+			return nil
 		} else {
 			okIds = append(okIds, v.AccountId)
 		}

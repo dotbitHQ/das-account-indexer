@@ -94,7 +94,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
 		return nil
 	} else if accountInfo.Status == tables.AccountStatusOnLock {
-		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account on lock")
+		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account cross-chain")
 		return nil
 	}
 

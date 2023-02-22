@@ -22,6 +22,9 @@ type TableReverseInfo struct {
 
 const (
 	TableNameReverseInfo = "t_reverse_info"
+
+	ReverseTypeOld = 0
+	ReverseTypeSmt = 1
 )
 
 func (t *TableReverseInfo) TableName() string {

@@ -2,7 +2,6 @@ package block_parser
 
 import (
 	"das-account-indexer/tables"
-	"das_database/dao"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/witness"
@@ -28,9 +27,8 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 	if err := b.DbDao.Transaction(func(tx *gorm.DB) error {
 		for idx, v := range txReverseSmtRecord {
 			outpoint := common.OutPoint2String(req.TxHash, uint(idx))
-			accountId := common.Bytes2Hex(common.GetAccountIdByAccount(v.NextAccount))
 			algorithmId := common.DasAlgorithmId(v.SignType)
-			reverseInfo := &dao.TableReverseInfo{
+			reverseInfo := &tables.TableReverseInfo{
 				BlockNumber:    req.BlockNumber,
 				BlockTimestamp: req.BlockTimestamp,
 				Outpoint:       outpoint,
@@ -38,12 +36,11 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				ChainType:      algorithmId.ToChainType(),
 				Address:        v.Address,
 				Account:        v.NextAccount,
-				AccountId:      accountId,
-				ReverseType:    dao.ReverseTypeSmt,
+				ReverseType:    tables.ReverseTypeSmt,
 			}
 
 			if v.PrevAccount != "" {
-				if err := tx.Where("address=? and reverse_type=?", v.Address, dao.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
+				if err := tx.Where("address=? and reverse_type=?", v.Address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
 					return err
 				}
 			}

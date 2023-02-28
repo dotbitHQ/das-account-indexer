@@ -34,7 +34,7 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				Outpoint:       outpoint,
 				AlgorithmId:    algorithmId,
 				ChainType:      algorithmId.ToChainType(),
-				Address:        v.Address,
+				Address:        common.Bytes2Hex(v.Address),
 				Account:        v.NextAccount,
 				ReverseType:    tables.ReverseTypeSmt,
 			}

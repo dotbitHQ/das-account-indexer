@@ -28,19 +28,20 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 		for idx, v := range txReverseSmtRecord {
 			outpoint := common.OutPoint2String(req.TxHash, uint(idx))
 			algorithmId := common.DasAlgorithmId(v.SignType)
+			address := common.Bytes2Hex(v.Address)
 			reverseInfo := &tables.TableReverseInfo{
 				BlockNumber:    req.BlockNumber,
 				BlockTimestamp: req.BlockTimestamp,
 				Outpoint:       outpoint,
 				AlgorithmId:    algorithmId,
 				ChainType:      algorithmId.ToChainType(),
-				Address:        common.Bytes2Hex(v.Address),
+				Address:        address,
 				Account:        v.NextAccount,
 				ReverseType:    tables.ReverseTypeSmt,
 			}
 
 			if v.PrevAccount != "" {
-				if err := tx.Where("address=? and reverse_type=?", v.Address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
+				if err := tx.Where("address=? and reverse_type=?", address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
 					return err
 				}
 			}

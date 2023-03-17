@@ -2,6 +2,7 @@ package block_parser
 
 import (
 	"das-account-indexer/tables"
+	"encoding/hex"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/witness"
@@ -27,7 +28,7 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 		for idx, v := range txReverseSmtRecord {
 			outpoint := common.OutPoint2String(req.TxHash, uint(idx))
 			algorithmId := common.DasAlgorithmId(v.SignType)
-			address := common.Bytes2Hex(v.Address)
+			address := hex.EncodeToString(v.Address)
 			reverseInfo := &tables.TableReverseInfo{
 				BlockNumber:    req.BlockNumber,
 				BlockTimestamp: req.BlockTimestamp,

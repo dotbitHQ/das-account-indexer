@@ -39,9 +39,10 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				Account:        v.NextAccount,
 				ReverseType:    tables.ReverseTypeSmt,
 			}
+			addresses := []string{address, common.HexPreFix + address}
 
 			if v.PrevAccount != "" {
-				if err := tx.Where("address=? and reverse_type=?", address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
+				if err := tx.Where("address in (?) and reverse_type=?", addresses, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
 					return err
 				}
 			}

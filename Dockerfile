@@ -29,7 +29,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 WORKDIR /app
 
 COPY --from=build /app/das-indexer /app/das-indexer
-COPY --from=build /app/config/config.yaml /app/config/config.yaml
+COPY --from=build /app/config/config.example.yaml /app/config/config.yaml
 
 EXPOSE 8121 8122 8123
 

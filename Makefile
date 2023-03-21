@@ -34,5 +34,10 @@ indexer_win:
 	mv $(BINARY_NAME) bin/win/
 	@echo "build $(BINARY_NAME) successfully."
 
+docker:
+	docker build --network host -t dotbitteam/das-account-indexer:latest .
+
+docker-publish:
+	docker image push dotbitteam/das-account-indexer:latest
 # default
 default: indexer_linux

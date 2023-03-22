@@ -3,7 +3,7 @@ module das-account-indexer
 go 1.16
 
 require (
-	github.com/dotbitHQ/das-lib v1.0.1-0.20230321033933-9c3f96663bbe
+	github.com/dotbitHQ/das-lib v1.0.1-0.20230322075702-a725ca201ef7
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis v6.15.9+incompatible

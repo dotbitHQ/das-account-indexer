@@ -244,8 +244,13 @@ var contractNames = []common.DasContractName{
 }
 
 func (b *BlockParser) checkContractVersion() error {
+	sysStatus, err := b.DasCore.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsSystemStatus)
+	if err != nil {
+		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
+	}
 	for _, v := range contractNames {
-		defaultVersion, chainVersion, err := b.DasCore.CheckContractVersion(v)
+		defaultVersion, chainVersion, err := b.DasCore.CheckContractVersionV2(sysStatus, v)
+		log.Info("checkContractVersion:", defaultVersion, chainVersion, v)
 		if err != nil {
 			if err == core.ErrContractMajorVersionDiff {
 				log.Errorf("contract[%s] version diff, chain[%s], service[%s].", v, chainVersion, defaultVersion)

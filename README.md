@@ -13,7 +13,7 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 
 * Ubuntu >= 18.04
 * MYSQL >= 8.0
-* go version >= 1.15.0
+* go version >= 1.17.10
 * Redis >= 5.0 (for cache, not necessary)
 * ckb-node + ckb-indexer
 > ckb-node: https://github.com/nervosnetwork/ckb
@@ -21,6 +21,8 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 > ckb-indexer: https://github.com/nervosnetwork/ckb-indexer
 
 > ckb-node and ckb-indexer need to be synchronized to the latest height. 
+
+> If the version of the dependency package is too low, please install `gcc-multilib` (apt install gcc-multilib)
 
 ## Install & Run
 

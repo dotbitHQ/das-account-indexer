@@ -2,7 +2,6 @@ package block_parser
 
 import (
 	"das-account-indexer/tables"
-	"encoding/hex"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/witness"
@@ -28,10 +27,7 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 		for idx, v := range txReverseSmtRecord {
 			outpoint := common.OutPoint2String(req.TxHash, uint(idx))
 			algorithmId := common.DasAlgorithmId(v.SignType)
-			address := hex.EncodeToString(v.Address)
-			if algorithmId == common.DasAlgorithmIdTron {
-				address = common.TronPreFix + address
-			}
+			address := common.FormatAddressPayload(v.Address, algorithmId)
 			reverseInfo := &tables.TableReverseInfo{
 				BlockNumber:    req.BlockNumber,
 				BlockTimestamp: req.BlockTimestamp,
@@ -42,10 +38,8 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				Account:        v.NextAccount,
 				ReverseType:    tables.ReverseTypeSmt,
 			}
-			addresses := []string{address, common.HexPreFix + address}
-
 			if v.PrevAccount != "" {
-				if err := tx.Where("address in (?) and reverse_type=?", addresses, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
+				if err := tx.Where("address=? and reverse_type=?", address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {
 					return err
 				}
 			}

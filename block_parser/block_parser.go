@@ -230,8 +230,8 @@ func (b *BlockParser) parserConcurrencyMode() error {
 
 var contractNames = []common.DasContractName{
 	//common.DasContractNameApplyRegisterCellType,
-	common.DasContractNamePreAccountCellType,
-	common.DasContractNameProposalCellType,
+	//common.DasContractNamePreAccountCellType,
+	//common.DasContractNameProposalCellType,
 	common.DasContractNameConfigCellType,
 	common.DasContractNameAccountCellType,
 	common.DasContractNameAccountSaleCellType,

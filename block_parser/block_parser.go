@@ -116,7 +116,7 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 		log.Info("parsingBlockData txHash:", txHash)
 
 		if builder, err := witness.ActionDataBuilderFromTx(tx); err != nil {
-			log.Warn("ActionDataBuilderFromTx err:", err.Error())
+			//log.Warn("ActionDataBuilderFromTx err:", err.Error())
 		} else {
 			// transaction parse by action
 			req := FuncTransactionHandleReq{

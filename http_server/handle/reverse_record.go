@@ -150,7 +150,12 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	} else if accountInfo.ManagerChainType == res.ChainType && strings.EqualFold(accountInfo.Manager, res.AddressHex) {
 		resp.Account = accountInfo.Account
 	} else {
-		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, res.AddressHex)
+		addrNormal, err := h.DasCore.Daf().HexToNormal(*res)
+		if err != nil {
+			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+			return nil
+		}
+		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, addrNormal.AddressNormal)
 		if err != nil {
 			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account record err")

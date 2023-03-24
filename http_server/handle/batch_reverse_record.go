@@ -90,8 +90,8 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	}
 
 	// get reverse
-	for _, v := range listKeyInfo {
-		account, errMsg := h.checkReverse(v.ChainType, v.AddressHex, apiResp)
+	for i := range listKeyInfo {
+		account, errMsg := h.checkReverse(listKeyInfo[i], apiResp)
 		if apiResp.ErrNo != code.ApiCodeSuccess {
 			return nil
 		}
@@ -106,10 +106,10 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	return nil
 }
 
-func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string, apiResp *code.ApiResp) (account, errMsg string) {
-	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
+func (h *HttpHandle) checkReverse(dasAddrHex *core.DasAddressHex, apiResp *code.ApiResp) (account, errMsg string) {
+	reverse, err := h.DbDao.FindLatestReverseRecord(dasAddrHex.ChainType, dasAddrHex.AddressHex)
 	if err != nil {
-		log.Error("FindLatestReverseRecord err: ", err.Error(), addressHex)
+		log.Error("FindLatestReverseRecord err: ", err.Error(), dasAddrHex.AddressHex)
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
 		return
 	} else if reverse.Id == 0 {
@@ -131,14 +131,19 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string,
 		return
 	}
 
-	if accountInfo.OwnerChainType == chainType && strings.EqualFold(accountInfo.Owner, addressHex) {
+	if accountInfo.OwnerChainType == dasAddrHex.ChainType && strings.EqualFold(accountInfo.Owner, dasAddrHex.AddressHex) {
 		account = accountInfo.Account
-	} else if accountInfo.ManagerChainType == chainType && strings.EqualFold(accountInfo.Manager, addressHex) {
+	} else if accountInfo.ManagerChainType == dasAddrHex.ChainType && strings.EqualFold(accountInfo.Manager, dasAddrHex.AddressHex) {
 		account = accountInfo.Account
 	} else {
-		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, addressHex)
+		addrNormal, err := h.DasCore.Daf().HexToNormal(*dasAddrHex)
 		if err != nil {
-			log.Error("FindRecordByAccountIdAddressValue err: ", err.Error(), accountInfo.Account, addressHex)
+			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+			return
+		}
+		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, addrNormal.AddressNormal)
+		if err != nil {
+			log.Error("FindRecordByAccountIdAddressValue err: ", err.Error(), accountInfo.Account, addrNormal.AddressNormal)
 			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse account record err")
 			return
 		} else if record.Id > 0 {

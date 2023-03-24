@@ -116,7 +116,7 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 		log.Info("parsingBlockData txHash:", txHash)
 
 		if builder, err := witness.ActionDataBuilderFromTx(tx); err != nil {
-			log.Warn("ActionDataBuilderFromTx err:", err.Error())
+			//log.Warn("ActionDataBuilderFromTx err:", err.Error())
 		} else {
 			// transaction parse by action
 			req := FuncTransactionHandleReq{
@@ -230,8 +230,8 @@ func (b *BlockParser) parserConcurrencyMode() error {
 
 var contractNames = []common.DasContractName{
 	//common.DasContractNameApplyRegisterCellType,
-	common.DasContractNamePreAccountCellType,
-	common.DasContractNameProposalCellType,
+	//common.DasContractNamePreAccountCellType,
+	//common.DasContractNameProposalCellType,
 	common.DasContractNameConfigCellType,
 	common.DasContractNameAccountCellType,
 	common.DasContractNameAccountSaleCellType,

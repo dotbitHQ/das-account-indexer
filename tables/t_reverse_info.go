@@ -15,12 +15,16 @@ type TableReverseInfo struct {
 	Address        string                `json:"address" gorm:"column:address;index:k_address;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT ''"`
 	Account        string                `json:"account" gorm:"column:account;index:k_account;type:varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT ''"`
 	Capacity       uint64                `json:"capacity" gorm:"column:capacity;type:bigint(20) NOT NULL DEFAULT '0' COMMENT ''"`
+	ReverseType    uint32                `json:"reverse_type" gorm:"column:reverse_type;type:tinyint(1) NOT NULL DEFAULT '0' COMMENT '0: old reverse type，1：new outpoint struct'"`
 	CreatedAt      time.Time             `json:"created_at" gorm:"column:created_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''"`
 	UpdatedAt      time.Time             `json:"updated_at" gorm:"column:updated_at;type:timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''"`
 }
 
 const (
 	TableNameReverseInfo = "t_reverse_info"
+
+	ReverseTypeOld = 0
+	ReverseTypeSmt = 1
 )
 
 func (t *TableReverseInfo) TableName() string {

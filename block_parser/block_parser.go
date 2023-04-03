@@ -241,6 +241,7 @@ var contractNames = []common.DasContractName{
 	//common.DasContractNameIncomeCellType,
 	common.DasContractNameReverseRecordCellType,
 	//common.DASContractNameEip712LibCellType,
+	common.DasContractNameReverseRecordRootCellType,
 }
 
 func (b *BlockParser) checkContractVersion() error {

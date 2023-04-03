@@ -32,3 +32,7 @@ func NewGormDB(dbMysql config.DbMysql) (*DbDao, error) {
 
 	return &DbDao{db: db}, nil
 }
+
+func (d *DbDao) Transaction(fn func(tx *gorm.DB) error) error {
+	return d.db.Transaction(fn)
+}

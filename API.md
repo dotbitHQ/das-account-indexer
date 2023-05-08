@@ -20,15 +20,12 @@
 
 Please familiarize yourself with the meaning of some common parameters before reading the API list:
 
-| param                                                                                    | description                                                         |
-| :-------------------------                                                               | :------------------------------------------------------------------ |
-| type                                                                                     | Filled with "blockchain" for now                                    |
-| coin\_type <sup>[1](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)</sup> | 60: eth, 195: trx, 9006: bsc, 966: matic                             |
-| chain\_id <sup>[2](https://github.com/ethereum-lists/chains)</sup>                       | 1: eth, 56: bsc, 137: polygon; 5: goerli, 97: bsct, 80001: mumbai   |
-| account                                                                                  | Contains the suffix `.bit` in it                                    |
-| key                                                                                      | Generally refers to the blockchain address for now                  |
-
-_You can provide either `coin_type` or `chain_id`. The `coin_type` will be used, if you provide both._
+| param                                                                                    | description                                        |
+| :-------------------------                                                               |:---------------------------------------------------|
+| type                                                                                     | Filled with "blockchain" for now                   |
+| coin\_type <sup>[1](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)</sup> | 60: eth, 195: trx, 9006: bsc, 966: matic, 3: doge  |
+| account                                                                                  | Contains the suffix `.bit` in it                   |
+| key                                                                                      | Generally refers to the blockchain address for now |
 
 
 #### Full Functional Indexer
@@ -86,8 +83,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
-    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic, 3: doge
     "key": "" // address
   }
 }
@@ -109,13 +105,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}'
+curl -X POST https://indexer-v1.did.id/v1/reverse/record -d'{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_reverseRecord","params": [{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
 ```
 
 ### Get Batch Reverse Record Info
@@ -133,8 +129,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
     {
       "type": "blockchain",
       "key_info": {
-        "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
-        "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+        "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic, 3: doge
         "key": "" // address
       }
     }
@@ -166,13 +161,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/batch/reverse/record -d'{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+curl -X POST https://indexer-v1.did.id/v1/batch/reverse/record -d'{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
 ```
 
 ### Get Account Basic Info
@@ -244,8 +239,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic
-    "chain_id": "", // 1: ETH, 56: BSC, 137: Polygon
+    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic, 3: doge
     "key": "" // address
   },
   "role": "owner" // owner,manager
@@ -272,13 +266,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}'
+curl -X POST https://indexer-v1.did.id/v1/account/list -d'{"type": "blockchain","key_info":{"coin_type": "60","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","chain_id": "1","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountList","params": [{"type": "blockchain","key_info":{"coin_type": "60","key": "0x3a6cab3323833f53754db4202f5741756c436ede"}}]}'
 ```
 
 ### Get Account Records Info

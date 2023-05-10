@@ -339,3 +339,21 @@ func (b *BlockParser) ActionConfigSubAccountCreatingScript(req *FuncTransactionH
 
 	return
 }
+
+func (b *BlockParser) ActionConfigSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+	if isCV, err := isCurrentVersionTx(req.Tx, common.DASContractNameSubAccountCellType); err != nil {
+		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
+		return
+	} else if !isCV {
+		return
+	}
+	log.Info("ActionConfigSubAccount:", req.BlockNumber, req.TxHash)
+
+	dataBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	if err != nil {
+		resp.Err = err
+		return
+	}
+	resp.Err = b.DbDao.UpdateAccountOutpoint(dataBuilder.AccountId, common.OutPoint2String(req.TxHash, 0))
+	return
+}

@@ -15,15 +15,9 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 * MYSQL >= 8.0
 * go version >= 1.17.10
 * Redis >= 5.0 (for cache, not necessary)
-* ckb-node + ckb-indexer
-> ckb-node: https://github.com/nervosnetwork/ckb
-
-> ckb-indexer: https://github.com/nervosnetwork/ckb-indexer
-
-> ckb-node and ckb-indexer need to be synchronized to the latest height. 
-
-> If the version of the dependency package is too low, please install `gcc-multilib` (apt install gcc-multilib)
-
+* [ckb-node](https://github.com/nervosnetwork/ckb) (Must be synced to latest height and add `Indexer` module to ckb.toml)
+* If the version of the dependency package is too low, please install `gcc-multilib` (apt install gcc-multilib)
+* Machine configuration: 4c8g200G
 ## Install & Run
 
 ### Source Compile

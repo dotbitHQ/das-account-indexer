@@ -122,7 +122,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 * host: `indexer-v1.did.id`
 * path: `/v1/batch/reverse/record`
 * param:
-
+  * support up to 100 addresses
 ```javascript
 {
   "batch_key_info":[
@@ -398,10 +398,11 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
 * host: `http://127.0.0.1:8122`
 * path: `/v1/batch/account/records`
 * param:
+  * Support up to 100 accounts
 
 ```json
 {
-  "accounts": ["phone.bit","..."]
+  "accounts": ["phone.bit","..."] 
 }
 ```
 

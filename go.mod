@@ -3,7 +3,7 @@ module das-account-indexer
 go 1.17
 
 require (
-	github.com/dotbitHQ/das-lib v1.0.2-0.20230529040025-76cefa701297
+	github.com/dotbitHQ/das-lib v1.0.2-0.20230531043721-c5d9527d1405
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis v6.15.9+incompatible
@@ -18,11 +18,11 @@ require (
 require (
 	github.com/Andrew-M-C/go.emoji v1.0.1 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
-	github.com/btcsuite/btcd v0.23.0 // indirect
+	github.com/btcsuite/btcd v0.23.3 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect
-	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d // indirect
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
 	github.com/clipperhouse/uax29 v1.12.4 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
@@ -65,7 +65,7 @@ require (
 	go.uber.org/zap v1.18.1 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

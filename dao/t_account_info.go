@@ -247,12 +247,12 @@ func (d *DbDao) DelSubAccounts(subAccIds []string) error {
 		return nil
 	}
 	return d.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Delete(&tables.TableAccountInfo{}).
-			Where("account_id IN(?)", subAccIds).Error; err != nil {
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableAccountInfo{}).Error; err != nil {
 			return err
 		}
-		if err := tx.Delete(&tables.TableRecordsInfo{}).
-			Where("account_id IN(?)", subAccIds).Error; err != nil {
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableRecordsInfo{}).Error; err != nil {
 			return err
 		}
 		return nil

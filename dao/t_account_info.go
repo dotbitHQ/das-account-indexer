@@ -241,3 +241,20 @@ func (d *DbDao) GetSubAccountListCountByParentAccountId(parentAccountId string) 
 	err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=?", parentAccountId).Count(&count).Error
 	return
 }
+
+func (d *DbDao) DelSubAccounts(subAccIds []string) error {
+	if len(subAccIds) == 0 {
+		return nil
+	}
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Delete(&tables.TableAccountInfo{}).
+			Where("account_id IN(?)", subAccIds).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&tables.TableRecordsInfo{}).
+			Where("account_id IN(?)", subAccIds).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}

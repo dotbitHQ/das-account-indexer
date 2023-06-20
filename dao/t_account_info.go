@@ -99,9 +99,7 @@ func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.T
 			}
 		}
 		if len(records) > 0 {
-			if err := tx.Clauses(clause.Insert{
-				Modifier: "IGNORE",
-			}).Create(&records).Error; err != nil {
+			if err := tx.Create(&records).Error; err != nil {
 				return err
 			}
 		}

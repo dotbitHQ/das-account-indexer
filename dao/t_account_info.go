@@ -90,11 +90,18 @@ func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
 }
 
-func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo) error {
+func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo, records []tables.TableRecordsInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if len(subAccountIds) > 0 {
 			if err := tx.Where(" account_id IN(?) ", subAccountIds).
 				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(records) > 0 {
+			if err := tx.Clauses(clause.Insert{
+				Modifier: "IGNORE",
+			}).Create(&records).Error; err != nil {
 				return err
 			}
 		}

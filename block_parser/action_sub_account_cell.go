@@ -126,6 +126,7 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 	var parentAccountInfo tables.TableAccountInfo
 	var accountInfos []tables.TableAccountInfo
 	var subAccountIds []string
+	var records []tables.TableRecordsInfo
 	for _, v := range createBuilderMap {
 		ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccountData.Lock.Args)
 		if err != nil {
@@ -153,8 +154,21 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 			ExpiredAt:            v.SubAccountData.ExpiredAt,
 		})
 		subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
+
+		for _, record := range v.SubAccountData.Records {
+			records = append(records, tables.TableRecordsInfo{
+				AccountId:       v.SubAccountData.AccountId,
+				ParentAccountId: parentAccountId,
+				Account:         v.Account,
+				Key:             record.Key,
+				Type:            record.Type,
+				Label:           record.Label,
+				Value:           record.Value,
+				Ttl:             strconv.FormatUint(uint64(record.TTL), 10),
+			})
+		}
 	}
-	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo, records); err != nil {
 		return fmt.Errorf("CreateSubAccount err: %s", err.Error())
 	}
 
@@ -301,7 +315,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
 	}
 
-	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo, nil); err != nil {
 		resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
 		return
 	}

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
+	"github.com/dotbitHQ/das-lib/molecule"
 	"github.com/dotbitHQ/das-lib/witness"
+	"gorm.io/gorm"
 	"strconv"
 )
 
@@ -58,11 +60,14 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 		return
 	}
 	var createBuilderMap = make(map[string]*witness.SubAccountNew)
+	var renewBuilderMap = make(map[string]*witness.SubAccountNew)
 	var editBuilderMap = make(map[string]*witness.SubAccountNew)
 	for k, v := range builderMap {
 		switch v.Action {
 		case common.SubActionCreate:
 			createBuilderMap[k] = v
+		case common.SubActionRenew:
+			renewBuilderMap[k] = v
 		case common.SubActionEdit:
 			editBuilderMap[k] = v
 		default:
@@ -72,6 +77,11 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 	}
 	if err := b.actionUpdateSubAccountForCreate(req, createBuilderMap); err != nil {
 		resp.Err = fmt.Errorf("create err: %s", err.Error())
+		return
+	}
+
+	if err := b.actionUpdateSubAccountForRenew(req, renewBuilderMap); err != nil {
+		resp.Err = fmt.Errorf("edit err: %s", err.Error())
 		return
 	}
 
@@ -136,6 +146,65 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 		return fmt.Errorf("CreateSubAccount err: %s", err.Error())
 	}
 
+	return nil
+}
+
+func (b *BlockParser)actionUpdateSubAccountForRenew(req *FuncTransactionHandleReq, renewBuilderMap map[string]*witness.SubAccountNew)error  {
+	if len(renewBuilderMap) == 0 {
+		return nil
+	}
+
+	builderConfig, err := b.DasCore.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsSubAccount)
+	if err != nil {
+		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
+	}
+	renewPriceConfig, err := builderConfig.RenewSubAccountPrice()
+	if err != nil {
+		return fmt.Errorf("RenewSubAccountPrice err: %s", err.Error())
+	}
+
+	var accountInfos []tables.TableAccountInfo
+
+	for _, v := range renewBuilderMap {
+		subAcc, err := b.DbDao.FindAccountInfoByAccountId(v.CurrentSubAccountData.AccountId)
+		if err != nil {
+			return err
+		}
+		if subAcc.Id == 0 {
+			return fmt.Errorf("account: [%s] no exist", v.Account)
+		}
+
+		renewPrice := uint64(0)
+		switch v.EditKey {
+		case common.EditKeyManual:
+			renewPrice = (v.CurrentSubAccountData.ExpiredAt - subAcc.ExpiredAt) / uint64(common.OneYearSec) * renewPriceConfig
+		case common.EditKeyCustomRule:
+			renewPrice, err = molecule.Bytes2GoU64(v.EditValue[28:])
+			if err != nil {
+				return err
+			}
+		}
+		accountInfos = append(accountInfos, tables.TableAccountInfo{
+			Id:                   subAcc.Id,
+			BlockNumber:          req.BlockNumber,
+			Outpoint:             common.OutPoint2String(req.TxHash, 0),
+			RenewSubAccountPrice: renewPrice,
+			Nonce:                v.CurrentSubAccountData.Nonce,
+			ExpiredAt:            v.CurrentSubAccountData.ExpiredAt,
+		})
+	}
+
+	if err := b.DbDao.Transaction(func(tx *gorm.DB) error {
+		for i := range accountInfos {
+			accountInfo := accountInfos[i]
+			if err := tx.Where("id=?", accountInfo.Id).Updates(&accountInfo).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		return fmt.Errorf("UpdateSubAccountForRenew err: %s", err.Error())
+	}
 	return nil
 }
 

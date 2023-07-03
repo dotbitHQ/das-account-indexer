@@ -8,6 +8,7 @@
     * [Get Sub-Account List](#get-sub-account-list)
     * [Get Batch Account Records Info](#get-batch-account-records-info)
     * [Get Batch reverse Record Info](#get-batch-reverse-record-info)
+    * [Verify Sub-Account](#verify-sub-account)
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -170,6 +171,49 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
 ```
 
+### Verify Sub-Account
+
+**Request**
+
+* host: `indexer-v1.did.id`
+* path: `/v1/sub/account/verify`
+* param:
+  * account: main account
+  * address: address
+  * verify_type: 0 (verify owner,default) 1 (verify manager)
+
+```json
+{
+  "account": "phone.bit",
+  "address": "0xb77067fd217a8215953380bcb1cae0a1be2def31",
+  "verify_type": 0
+}
+```
+**Response**
+```json
+{
+  "errno": 0,
+  "errmsg": "",
+  "data": {
+    "is_subdid": false
+  }
+}
+```
+```shell
+curl --location 'https://indexer-v1.did.id/v1/sub/account/verify' \
+--header 'Content-Type: application/json' \
+--data '{
+    "account":"phone.bit",
+    "address":"0xb77067fd217a8215953380bcb1cae0a1be2def31",
+    "verify_type":0
+
+}'
+```
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": [{"account":"phone.bit","address":"0xb77067fd217a8215953380bcb1cae0a1be2def31","verify_type":0}]}'
+```
 ### Get Account Basic Info
 
 **Request**

@@ -12,6 +12,7 @@ import (
 
 type ReqSubAccountVerify struct {
 	Account    string `json:"account"`
+	SubAccount string `json:"sub_account"`
 	Address    string `json:"address"`
 	VerifyType uint   `json:"verify_type"`
 }
@@ -64,6 +65,13 @@ func (h *HttpHandle) SubAccountVerify(ctx *gin.Context) {
 func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *code.ApiResp) error {
 	var resp RespSubAccountVerify
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
+	var subAccountId string
+	if req.SubAccount == "" {
+		subAccountId = ""
+	} else {
+		subAccountId = common.Bytes2Hex(common.GetAccountIdByAccount(req.SubAccount))
+	}
+
 	addrHex, err := formatAddress(h.DasCore.Daf(), req.Address)
 	if err != nil {
 		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
@@ -71,7 +79,7 @@ func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *code.
 	}
 	log.Info("formatAddress:", req.Address, addrHex.ChainType, addrHex.AddressHex)
 
-	res, err := h.DbDao.GetSubAccByParentAccountIdOfAddress(accountId, addrHex.AddressHex, req.VerifyType)
+	res, err := h.DbDao.GetSubAccByParentAccountIdOfAddress(accountId, subAccountId, addrHex.AddressHex, req.VerifyType)
 	if err != nil {
 		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
 		return fmt.Errorf("GetSubAccByParentAccountIdOfAddress err: %s", err.Error())

@@ -241,3 +241,13 @@ func (d *DbDao) GetSubAccountListCountByParentAccountId(parentAccountId string) 
 	err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=?", parentAccountId).Count(&count).Error
 	return
 }
+
+func (d *DbDao) GetSubAccByParentAccountIdOfAddress(parentAccountId string, address string, verifyType uint) (count int64, err error) {
+	if verifyType == 0 {
+		err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=? and owner=? ", parentAccountId, address).Count(&count).Error
+		return
+	} else {
+		err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=? and manager=? ", parentAccountId, address).Count(&count).Error
+		return
+	}
+}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	"github.com/dotbitHQ/das-lib/molecule"
 	"github.com/dotbitHQ/das-lib/witness"
 	"gorm.io/gorm"
 	"strconv"
@@ -149,18 +148,9 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 	return nil
 }
 
-func (b *BlockParser)actionUpdateSubAccountForRenew(req *FuncTransactionHandleReq, renewBuilderMap map[string]*witness.SubAccountNew)error  {
+func (b *BlockParser) actionUpdateSubAccountForRenew(req *FuncTransactionHandleReq, renewBuilderMap map[string]*witness.SubAccountNew) error {
 	if len(renewBuilderMap) == 0 {
 		return nil
-	}
-
-	builderConfig, err := b.DasCore.ConfigCellDataBuilderByTypeArgs(common.ConfigCellTypeArgsSubAccount)
-	if err != nil {
-		return fmt.Errorf("ConfigCellDataBuilderByTypeArgs err: %s", err.Error())
-	}
-	renewPriceConfig, err := builderConfig.RenewSubAccountPrice()
-	if err != nil {
-		return fmt.Errorf("RenewSubAccountPrice err: %s", err.Error())
 	}
 
 	var accountInfos []tables.TableAccountInfo
@@ -174,23 +164,12 @@ func (b *BlockParser)actionUpdateSubAccountForRenew(req *FuncTransactionHandleRe
 			return fmt.Errorf("account: [%s] no exist", v.Account)
 		}
 
-		renewPrice := uint64(0)
-		switch v.EditKey {
-		case common.EditKeyManual:
-			renewPrice = (v.CurrentSubAccountData.ExpiredAt - subAcc.ExpiredAt) / uint64(common.OneYearSec) * renewPriceConfig
-		case common.EditKeyCustomRule:
-			renewPrice, err = molecule.Bytes2GoU64(v.EditValue[28:])
-			if err != nil {
-				return err
-			}
-		}
 		accountInfos = append(accountInfos, tables.TableAccountInfo{
-			Id:                   subAcc.Id,
-			BlockNumber:          req.BlockNumber,
-			Outpoint:             common.OutPoint2String(req.TxHash, 0),
-			RenewSubAccountPrice: renewPrice,
-			Nonce:                v.CurrentSubAccountData.Nonce,
-			ExpiredAt:            v.CurrentSubAccountData.ExpiredAt,
+			Id:          subAcc.Id,
+			BlockNumber: req.BlockNumber,
+			Outpoint:    common.OutPoint2String(req.TxHash, 0),
+			Nonce:       v.CurrentSubAccountData.Nonce,
+			ExpiredAt:   v.CurrentSubAccountData.ExpiredAt,
 		})
 	}
 

@@ -187,7 +187,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```json
 {
   "account": "phone.bit",
-  "sub_account":"test01.20230504.bit",
+  "sub_account":"test01.phone.bit",
   "address": "0xb77067fd217a8215953380bcb1cae0a1be2def31",
   "verify_type": 0
 }
@@ -207,6 +207,7 @@ curl --location 'https://indexer-v1.did.id/v1/sub/account/verify' \
 --header 'Content-Type: application/json' \
 --data '{
     "account":"phone.bit",
+    "sub_account":"a.phone.bit",
     "address":"0xb77067fd217a8215953380bcb1cae0a1be2def31",
     "verify_type":0
 
@@ -215,7 +216,7 @@ curl --location 'https://indexer-v1.did.id/v1/sub/account/verify' \
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": [{"account":"phone.bit","address":"0xb77067fd217a8215953380bcb1cae0a1be2def31","verify_type":0}]}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_subAccountVerify","params": [{"account":"phone.bit","sub_account":"a.phone.bit","address":"0xb77067fd217a8215953380bcb1cae0a1be2def31","verify_type":0}]}'
 ```
 ### Get Account Basic Info
 

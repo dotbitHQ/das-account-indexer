@@ -88,7 +88,7 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	case code.MethodSubAccountList:
 		h.JsonRpcSubAccountList(req.Params, &apiResp)
 	case code.MethodSubAccountVerify:
-		h.JsonRpcAccountInfo(req.Params, &apiResp)
+		h.JsonRpcSubAccountVerify(req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
 		apiResp.ApiRespErr(code.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))

@@ -178,15 +178,24 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 * host: `indexer-v1.did.id`
 * path: `/v1/sub/account/verify`
 * param:
-  * account: main account
-  * sub_account: subaccount
+  * account: main account (Choose one with sub_account)
+  * sub_account: sub account (Choose one with account)
   * address: address
-  * verify_type: 0 (verify owner,default) 1 (verify manager)
-  * 
+  * verify_type: 0 (verify owner, default), 1 (verify manager)
 
+For account and sub_account There are two verification methods:
+1. Verify if you are the owner or manager of a arbitrary sub account of a main account
 ```json
+
 {
   "account": "phone.bit",
+  "address": "0xb77067fd217a8215953380bcb1cae0a1be2def31",
+  "verify_type": 0
+}
+```
+2. Verify if you are the owner or manager of a specific sub account
+```json
+{
   "sub_account":"test01.phone.bit",
   "address": "0xb77067fd217a8215953380bcb1cae0a1be2def31",
   "verify_type": 0

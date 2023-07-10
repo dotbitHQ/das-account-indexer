@@ -75,6 +75,7 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 	}
 	if err := b.actionUpdateSubAccountForRecycle(recycleBuilderMap); err != nil {
 		resp.Err = fmt.Errorf("recycle sub-account err: %s", err.Error())
+		return
 	}
 
 	if err := b.actionUpdateSubAccountForCreate(req, createBuilderMap); err != nil {

@@ -4,7 +4,7 @@ BINARY_NAME=das_account_indexer_server
 
 # update
 update:
-	go mod tidy
+	go mod tidy -compat=1.17
 
 # linux
 indexer_linux:

@@ -90,11 +90,16 @@ func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
 }
 
-func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo) error {
+func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo, records []tables.TableRecordsInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if len(subAccountIds) > 0 {
 			if err := tx.Where(" account_id IN(?) ", subAccountIds).
 				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(records) > 0 {
+			if err := tx.Create(&records).Error; err != nil {
 				return err
 			}
 		}
@@ -259,4 +264,21 @@ func (d *DbDao) GetSubAccByParentAccountIdOfAddress(parentAccountId, subAccountI
 		err = d.db.Model(tables.TableAccountInfo{}).Where(queryField+" =? and manager=? ", queryValue, address).Count(&count).Error
 		return
 	}
+}
+
+func (d *DbDao) DelSubAccounts(subAccIds []string) error {
+	if len(subAccIds) == 0 {
+		return nil
+	}
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableAccountInfo{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }

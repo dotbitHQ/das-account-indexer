@@ -61,6 +61,7 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 	var createBuilderMap = make(map[string]*witness.SubAccountNew)
 	var renewBuilderMap = make(map[string]*witness.SubAccountNew)
 	var editBuilderMap = make(map[string]*witness.SubAccountNew)
+	var recycleBuilderMap = make(map[string]*witness.SubAccountNew)
 	for k, v := range builderMap {
 		switch v.Action {
 		case common.SubActionCreate:
@@ -69,13 +70,20 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 			renewBuilderMap[k] = v
 		case common.SubActionEdit:
 			editBuilderMap[k] = v
+		case common.SubActionRecycle:
+			recycleBuilderMap[k] = v
 		default:
 			resp.Err = fmt.Errorf("unknow sub-action [%s]", v.Action)
 			return
 		}
 	}
+	if err := b.actionUpdateSubAccountForRecycle(recycleBuilderMap); err != nil {
+		resp.Err = fmt.Errorf("recycle sub-account err: %s", err.Error())
+		return
+	}
+
 	if err := b.actionUpdateSubAccountForCreate(req, createBuilderMap); err != nil {
-		resp.Err = fmt.Errorf("create err: %s", err.Error())
+		resp.Err = fmt.Errorf("create sub-account err: %s", err.Error())
 		return
 	}
 
@@ -85,11 +93,26 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 	}
 
 	if err := b.actionUpdateSubAccountForEdit(req, editBuilderMap); err != nil {
-		resp.Err = fmt.Errorf("edit err: %s", err.Error())
+		resp.Err = fmt.Errorf("edit sub-account err: %s", err.Error())
 		return
 	}
 
 	return
+}
+
+func (b *BlockParser) actionUpdateSubAccountForRecycle(recycleBuilderMap map[string]*witness.SubAccountNew) error {
+	if len(recycleBuilderMap) == 0 {
+		return nil
+	}
+	var subAccIds []string
+	for _, builder := range recycleBuilderMap {
+		subAccIds = append(subAccIds, builder.SubAccountData.AccountId)
+	}
+	if err := b.DbDao.DelSubAccounts(subAccIds); err != nil {
+		return fmt.Errorf("DelSubAccounts err: %s", err.Error())
+	}
+
+	return nil
 }
 
 func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandleReq, createBuilderMap map[string]*witness.SubAccountNew) error {
@@ -113,6 +136,7 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 	var parentAccountInfo tables.TableAccountInfo
 	var accountInfos []tables.TableAccountInfo
 	var subAccountIds []string
+	var records []tables.TableRecordsInfo
 	for _, v := range createBuilderMap {
 		ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(v.SubAccountData.Lock.Args)
 		if err != nil {
@@ -140,8 +164,21 @@ func (b *BlockParser) actionUpdateSubAccountForCreate(req *FuncTransactionHandle
 			ExpiredAt:            v.SubAccountData.ExpiredAt,
 		})
 		subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
+
+		for _, record := range v.SubAccountData.Records {
+			records = append(records, tables.TableRecordsInfo{
+				AccountId:       v.SubAccountData.AccountId,
+				ParentAccountId: parentAccountId,
+				Account:         v.Account,
+				Key:             record.Key,
+				Type:            record.Type,
+				Label:           record.Label,
+				Value:           record.Value,
+				Ttl:             strconv.FormatUint(uint64(record.TTL), 10),
+			})
+		}
 	}
-	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo, records); err != nil {
 		return fmt.Errorf("CreateSubAccount err: %s", err.Error())
 	}
 
@@ -327,7 +364,7 @@ func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (res
 		subAccountIds = append(subAccountIds, v.SubAccountData.AccountId)
 	}
 
-	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo); err != nil {
+	if err = b.DbDao.CreateSubAccount(subAccountIds, accountInfos, parentAccountInfo, nil); err != nil {
 		resp.Err = fmt.Errorf("CreateSubAccount err: %s", err.Error())
 		return
 	}

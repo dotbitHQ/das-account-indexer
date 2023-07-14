@@ -114,16 +114,18 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	resp.OutPoint = common.String2OutPointStruct(accountInfo.Outpoint)
 
 	ownerHex := core.DasAddressHex{
-		DasAlgorithmId: accountInfo.OwnerAlgorithmId,
-		AddressHex:     accountInfo.Owner,
-		IsMulti:        false,
-		ChainType:      accountInfo.OwnerChainType,
+		DasAlgorithmId:    accountInfo.OwnerAlgorithmId,
+		DasSubAlgorithmId: accountInfo.OwnerSubAid,
+		AddressHex:        accountInfo.Owner,
+		IsMulti:           false,
+		ChainType:         accountInfo.OwnerChainType,
 	}
 	managerHex := core.DasAddressHex{
-		DasAlgorithmId: accountInfo.ManagerAlgorithmId,
-		AddressHex:     accountInfo.Manager,
-		IsMulti:        false,
-		ChainType:      accountInfo.ManagerChainType,
+		DasAlgorithmId:    accountInfo.ManagerAlgorithmId,
+		DasSubAlgorithmId: accountInfo.ManagerSubAid,
+		AddressHex:        accountInfo.Manager,
+		IsMulti:           false,
+		ChainType:         accountInfo.ManagerChainType,
 	}
 	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 	if err != nil {

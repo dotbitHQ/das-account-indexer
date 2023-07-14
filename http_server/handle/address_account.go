@@ -85,16 +85,18 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 	var mapAccountIndex = make(map[string]int)
 	for i, v := range list {
 		ownerHex := core.DasAddressHex{
-			DasAlgorithmId: v.OwnerAlgorithmId,
-			AddressHex:     v.Owner,
-			IsMulti:        false,
-			ChainType:      v.OwnerChainType,
+			DasAlgorithmId:    v.OwnerAlgorithmId,
+			DasSubAlgorithmId: v.OwnerSubAid,
+			AddressHex:        v.Owner,
+			IsMulti:           false,
+			ChainType:         v.OwnerChainType,
 		}
 		managerHex := core.DasAddressHex{
-			DasAlgorithmId: v.ManagerAlgorithmId,
-			AddressHex:     v.Manager,
-			IsMulti:        false,
-			ChainType:      v.ManagerChainType,
+			DasAlgorithmId:    v.ManagerAlgorithmId,
+			DasSubAlgorithmId: v.ManagerSubAid,
+			AddressHex:        v.Manager,
+			IsMulti:           false,
+			ChainType:         v.ManagerChainType,
 		}
 		dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 		if err != nil {

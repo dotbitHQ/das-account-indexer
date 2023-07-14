@@ -25,18 +25,20 @@ type RespAccountInfo struct {
 }
 
 type AccountInfo struct {
-	Account            string                `json:"account"`
-	AccountAlias       string                `json:"account_alias"`
-	AccountIdHex       string                `json:"account_id_hex"`
-	NextAccountIdHex   string                `json:"next_account_id_hex"`
-	CreateAtUnix       uint64                `json:"create_at_unix"`
-	ExpiredAtUnix      uint64                `json:"expired_at_unix"`
-	Status             tables.AccountStatus  `json:"status"`
-	DasLockArgHex      string                `json:"das_lock_arg_hex"`
-	OwnerAlgorithmId   common.DasAlgorithmId `json:"owner_algorithm_id"`
-	OwnerKey           string                `json:"owner_key"`
-	ManagerAlgorithmId common.DasAlgorithmId `json:"manager_algorithm_id"`
-	ManagerKey         string                `json:"manager_key"`
+	Account            string                   `json:"account"`
+	AccountAlias       string                   `json:"account_alias"`
+	AccountIdHex       string                   `json:"account_id_hex"`
+	NextAccountIdHex   string                   `json:"next_account_id_hex"`
+	CreateAtUnix       uint64                   `json:"create_at_unix"`
+	ExpiredAtUnix      uint64                   `json:"expired_at_unix"`
+	Status             tables.AccountStatus     `json:"status"`
+	DasLockArgHex      string                   `json:"das_lock_arg_hex"`
+	OwnerAlgorithmId   common.DasAlgorithmId    `json:"owner_algorithm_id"`
+	OwnerSubAid        common.DasSubAlgorithmId `json:"owner_sub_aid"`
+	OwnerKey           string                   `json:"owner_key"`
+	ManagerAlgorithmId common.DasAlgorithmId    `json:"manager_algorithm_id"`
+	ManagerSubAid      common.DasSubAlgorithmId `json:"manager_sub_aid"`
+	ManagerKey         string                   `json:"manager_key"`
 }
 
 func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *code.ApiResp) {
@@ -107,16 +109,18 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 
 	resp.OutPoint = common.String2OutPointStruct(accountInfo.Outpoint)
 	ownerHex := core.DasAddressHex{
-		DasAlgorithmId: accountInfo.OwnerAlgorithmId,
-		AddressHex:     accountInfo.Owner,
-		IsMulti:        false,
-		ChainType:      accountInfo.OwnerChainType,
+		DasAlgorithmId:    accountInfo.OwnerAlgorithmId,
+		DasSubAlgorithmId: accountInfo.OwnerSubAid,
+		AddressHex:        accountInfo.Owner,
+		IsMulti:           false,
+		ChainType:         accountInfo.OwnerChainType,
 	}
 	managerHex := core.DasAddressHex{
-		DasAlgorithmId: accountInfo.ManagerAlgorithmId,
-		AddressHex:     accountInfo.Manager,
-		IsMulti:        false,
-		ChainType:      accountInfo.ManagerChainType,
+		DasAlgorithmId:    accountInfo.ManagerAlgorithmId,
+		DasSubAlgorithmId: accountInfo.ManagerSubAid,
+		AddressHex:        accountInfo.Manager,
+		IsMulti:           false,
+		ChainType:         accountInfo.ManagerChainType,
 	}
 	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 	if err != nil {
@@ -143,8 +147,10 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		Status:             accountInfo.Status,
 		DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
 		OwnerAlgorithmId:   accountInfo.OwnerAlgorithmId,
+		OwnerSubAid:        accountInfo.OwnerSubAid,
 		OwnerKey:           ownerNormal.AddressNormal,
 		ManagerAlgorithmId: accountInfo.ManagerAlgorithmId,
+		ManagerSubAid:      accountInfo.ManagerSubAid,
 		ManagerKey:         managerNormal.AddressNormal,
 	}
 

@@ -27,6 +27,7 @@ func (b *BlockParser) ActionDeclareReverseRecord(req *FuncTransactionHandleReq) 
 		BlockTimestamp: req.BlockTimestamp,
 		Outpoint:       common.OutPoint2String(req.TxHash, 0),
 		AlgorithmId:    ownerHex.DasAlgorithmId,
+		SubAlgorithmId: ownerHex.DasSubAlgorithmId,
 		ChainType:      ownerHex.ChainType,
 		Address:        ownerHex.AddressHex,
 		Account:        account,

@@ -26,14 +26,16 @@ type RespSubAccountList struct {
 }
 
 type SubAccountInfo struct {
-	Account            string                `json:"account"`
-	AccountIdHex       string                `json:"account_id_hex"`
-	CreateAtUnix       uint64                `json:"create_at_unix"`
-	ExpiredAtUnix      uint64                `json:"expired_at_unix"`
-	OwnerAlgorithmId   common.DasAlgorithmId `json:"owner_algorithm_id"`
-	OwnerKey           string                `json:"owner_key"`
-	ManagerAlgorithmId common.DasAlgorithmId `json:"manager_algorithm_id"`
-	ManagerKey         string                `json:"manager_key"`
+	Account            string                   `json:"account"`
+	AccountIdHex       string                   `json:"account_id_hex"`
+	CreateAtUnix       uint64                   `json:"create_at_unix"`
+	ExpiredAtUnix      uint64                   `json:"expired_at_unix"`
+	OwnerAlgorithmId   common.DasAlgorithmId    `json:"owner_algorithm_id"`
+	OwnerSubAid        common.DasSubAlgorithmId `json:"owner_sub_aid"`
+	OwnerKey           string                   `json:"owner_key"`
+	ManagerAlgorithmId common.DasAlgorithmId    `json:"manager_algorithm_id"`
+	ManagerSubAid      common.DasSubAlgorithmId `json:"manager_sub_aid"`
+	ManagerKey         string                   `json:"manager_key"`
 }
 
 func (h *HttpHandle) JsonRpcSubAccountList(p json.RawMessage, apiResp *code.ApiResp) {
@@ -106,16 +108,18 @@ func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *code.ApiR
 		}
 		for _, v := range list {
 			ownerHex := core.DasAddressHex{
-				DasAlgorithmId: v.OwnerAlgorithmId,
-				AddressHex:     v.Owner,
-				IsMulti:        false,
-				ChainType:      v.OwnerChainType,
+				DasAlgorithmId:    v.OwnerAlgorithmId,
+				DasSubAlgorithmId: v.OwnerSubAid,
+				AddressHex:        v.Owner,
+				IsMulti:           false,
+				ChainType:         v.OwnerChainType,
 			}
 			managerHex := core.DasAddressHex{
-				DasAlgorithmId: v.ManagerAlgorithmId,
-				AddressHex:     v.Manager,
-				IsMulti:        false,
-				ChainType:      v.ManagerChainType,
+				DasAlgorithmId:    v.ManagerAlgorithmId,
+				DasSubAlgorithmId: v.ManagerSubAid,
+				AddressHex:        v.Manager,
+				IsMulti:           false,
+				ChainType:         v.ManagerChainType,
 			}
 			ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
 			if err != nil {
@@ -133,8 +137,10 @@ func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *code.ApiR
 				CreateAtUnix:       v.RegisteredAt,
 				ExpiredAtUnix:      v.ExpiredAt,
 				OwnerAlgorithmId:   v.OwnerAlgorithmId,
+				OwnerSubAid:        v.OwnerSubAid,
 				OwnerKey:           ownerNormal.AddressNormal,
 				ManagerAlgorithmId: v.ManagerAlgorithmId,
+				ManagerSubAid:      v.ManagerSubAid,
 				ManagerKey:         managerNormal.AddressNormal,
 			})
 		}

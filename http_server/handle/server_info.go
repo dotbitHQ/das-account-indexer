@@ -2,9 +2,9 @@ package handle
 
 import (
 	"das-account-indexer/block_parser"
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"github.com/dotbitHQ/das-lib/common"
+	code "github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

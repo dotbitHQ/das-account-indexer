@@ -1,8 +1,8 @@
 package http_server
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -43,7 +43,7 @@ func (h *HttpServer) initRouter() {
 func respHandle(c *gin.Context, res string, err error) {
 	if err != nil {
 		log.Error("respHandle err:", err.Error())
-		c.AbortWithStatusJSON(http.StatusOK, code.ApiRespErr(code.ApiCodeError500, err.Error()))
+		c.AbortWithStatusJSON(http.StatusOK, http_api.ApiRespErr(http_api.ApiCodeError500, err.Error()))
 	} else if res != "" {
 		var respMap map[string]interface{}
 		_ = json.Unmarshal([]byte(res), &respMap)

@@ -3,6 +3,7 @@ package handle
 import (
 	"das-account-indexer/http_server/code"
 	"fmt"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -10,9 +11,9 @@ import (
 
 func (h *HttpHandle) Query(ctx *gin.Context) {
 	var (
-		req      code.JsonRequest
-		resp     code.JsonResponse
-		apiResp  code.ApiResp
+		req      http_api.JsonRequest
+		resp     http_api.JsonResponse
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -20,7 +21,7 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		log.Error("ShouldBindJSON err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -37,7 +38,7 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 		h.JsonRpcAddressAccount(req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
-		apiResp.ApiRespErr(code.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
+		apiResp.ApiRespErr(http_api.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
 	}
 
 	ctx.JSON(http.StatusOK, resp)
@@ -46,9 +47,9 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 
 func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	var (
-		req      code.JsonRequest
-		resp     code.JsonResponse
-		apiResp  code.ApiResp
+		req      http_api.JsonRequest
+		resp     http_api.JsonResponse
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -56,7 +57,7 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		log.Error("ShouldBindJSON err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -91,7 +92,7 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		h.JsonRpcSubAccountVerify(req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
-		apiResp.ApiRespErr(code.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
+		apiResp.ApiRespErr(http_api.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
 	}
 
 	ctx.JSON(http.StatusOK, resp)
@@ -100,9 +101,9 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 
 func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 	var (
-		req      code.JsonRequest
-		resp     code.JsonResponse
-		apiResp  code.ApiResp
+		req      http_api.JsonRequest
+		resp     http_api.JsonResponse
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -110,7 +111,7 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		log.Error("ShouldBindJSON err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -129,7 +130,7 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 		h.JsonRpcReverseRecord(req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
-		apiResp.ApiRespErr(code.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
+		apiResp.ApiRespErr(http_api.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
 	}
 
 	ctx.JSON(http.StatusOK, resp)

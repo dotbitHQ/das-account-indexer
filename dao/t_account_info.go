@@ -90,11 +90,16 @@ func (d *DbDao) EnableSubAccount(accountInfo tables.TableAccountInfo) error {
 		Where("account_id = ?", accountInfo.AccountId).Updates(accountInfo).Error
 }
 
-func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo) error {
+func (d *DbDao) CreateSubAccount(subAccountIds []string, accountInfos []tables.TableAccountInfo, parentAccountInfo tables.TableAccountInfo, records []tables.TableRecordsInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if len(subAccountIds) > 0 {
 			if err := tx.Where(" account_id IN(?) ", subAccountIds).
 				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(records) > 0 {
+			if err := tx.Create(&records).Error; err != nil {
 				return err
 			}
 		}
@@ -240,4 +245,40 @@ func (d *DbDao) GetSubAccountListByParentAccountId(parentAccountId string, limit
 func (d *DbDao) GetSubAccountListCountByParentAccountId(parentAccountId string) (count int64, err error) {
 	err = d.db.Model(tables.TableAccountInfo{}).Where("parent_account_id=?", parentAccountId).Count(&count).Error
 	return
+}
+
+func (d *DbDao) GetSubAccByParentAccountIdOfAddress(parentAccountId, subAccountId, address string, verifyType uint) (count int64, err error) {
+	var queryField string
+	var queryValue string
+	if subAccountId != "" {
+		queryField = "account_id"
+		queryValue = subAccountId
+	} else {
+		queryField = "parent_account_id"
+		queryValue = parentAccountId
+	}
+	if verifyType == 0 {
+		err = d.db.Model(tables.TableAccountInfo{}).Where(queryField+" =? and owner=? ", queryValue, address).Count(&count).Error
+		return
+	} else {
+		err = d.db.Model(tables.TableAccountInfo{}).Where(queryField+" =? and manager=? ", queryValue, address).Count(&count).Error
+		return
+	}
+}
+
+func (d *DbDao) DelSubAccounts(subAccIds []string) error {
+	if len(subAccIds) == 0 {
+		return nil
+	}
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableAccountInfo{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("account_id IN(?)", subAccIds).
+			Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }

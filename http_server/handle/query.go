@@ -88,6 +88,8 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		h.JsonRpcBatchReverseRecord(req.Params, &apiResp)
 	case code.MethodSubAccountList:
 		h.JsonRpcSubAccountList(req.Params, &apiResp)
+	case code.MethodSubAccountVerify:
+		h.JsonRpcSubAccountVerify(req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
 		apiResp.ApiRespErr(http_api.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))

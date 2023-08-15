@@ -2,6 +2,7 @@ package dao
 
 import (
 	"das-account-indexer/tables"
+	"errors"
 	"github.com/dotbitHQ/das-lib/common"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -283,3 +284,19 @@ func (d *DbDao) GetSubAccByParentAccountIdOfAddress(parentAccountId, subAccountI
 }
 
 
+
+func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		for _, account := range accounts {
+			accId, ok := account["account_id"]
+			if !ok {
+				return errors.New("account_id is not exist")
+			}
+			if err := tx.Model(&tables.TableAccountInfo{}).Where("account_id=?", accId).
+				Updates(account).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}

@@ -62,6 +62,7 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 	var renewBuilderMap = make(map[string]*witness.SubAccountNew)
 	var editBuilderMap = make(map[string]*witness.SubAccountNew)
 	var recycleBuilderMap = make(map[string]*witness.SubAccountNew)
+	var approvalBuilderMap = make(map[string]*witness.SubAccountNew)
 	for k, v := range builderMap {
 		switch v.Action {
 		case common.SubActionCreate:
@@ -72,6 +73,9 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 			editBuilderMap[k] = v
 		case common.SubActionRecycle:
 			recycleBuilderMap[k] = v
+		case common.SubActionCreateApproval, common.SubActionDelayApproval,
+			common.SubActionRevokeApproval, common.SubActionFullfillApproval:
+			approvalBuilderMap[k] = v
 		default:
 			resp.Err = fmt.Errorf("unknow sub-action [%s]", v.Action)
 			return
@@ -97,6 +101,10 @@ func (b *BlockParser) ActionUpdateSubAccount(req *FuncTransactionHandleReq) (res
 		return
 	}
 
+	if err := b.actionUpdateSubAccountForApproval(req, approvalBuilderMap); err != nil {
+		resp.Err = fmt.Errorf("edit sub-account err: %s", err.Error())
+		return
+	}
 	return
 }
 
@@ -283,6 +291,51 @@ func (b *BlockParser) actionUpdateSubAccountForEdit(req *FuncTransactionHandleRe
 		}
 	}
 	return nil
+}
+
+func (b *BlockParser) actionUpdateSubAccountForApproval(req *FuncTransactionHandleReq, approvalBuilderMap map[string]*witness.SubAccountNew) error {
+	if len(approvalBuilderMap) == 0 {
+		return nil
+	}
+
+	var accounts []map[string]interface{}
+
+	for _, builder := range approvalBuilderMap {
+		accountInfo := map[string]interface{}{
+			"block_number":    req.BlockNumber,
+			"block_timestamp": req.BlockTimestamp,
+			"outpoint":        common.OutPoint2String(req.TxHash, 0),
+			"account_id":      builder.SubAccountData.AccountId,
+			"nonce":           builder.CurrentSubAccountData.Nonce,
+		}
+
+		switch builder.Action {
+		case common.SubActionCreateApproval:
+			accountInfo["status"] = tables.AccountStatusApproval
+		case common.SubActionRevokeApproval:
+			accountInfo["status"] = tables.AccountStatusNormal
+		case common.SubActionFullfillApproval:
+			approval := builder.CurrentSubAccountData.AccountApproval
+			switch approval.Action {
+			case witness.AccountApprovalActionTransfer:
+				owner, manager, err := b.DasCore.Daf().ScriptToHex(approval.Params.Transfer.ToLock)
+				if err != nil {
+					return err
+				}
+				accountInfo["status"] = tables.AccountStatusNormal
+				accountInfo["owner"] = owner.AddressHex
+				accountInfo["owner_chain_type"] = owner.ChainType
+				accountInfo["owner_algorithm_id"] = owner.DasAlgorithmId
+				accountInfo["manager"] = manager.AddressHex
+				accountInfo["manager_chain_type"] = manager.ChainType
+				accountInfo["manager_algorithm_id"] = manager.DasAlgorithmId
+			default:
+				return fmt.Errorf("unknow approval action [%s]", approval.Action)
+			}
+		}
+		accounts = append(accounts, accountInfo)
+	}
+	return b.DbDao.UpdateAccounts(accounts)
 }
 
 func (b *BlockParser) ActionCreateSubAccount(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {

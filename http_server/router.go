@@ -25,6 +25,7 @@ func (h *HttpServer) initRouter() {
 			v1Indexer.POST("/account/info", cacheHandle, h.H.AccountInfo)
 			v1Indexer.POST("/account/list", cacheHandle, h.H.AccountList)
 			v1Indexer.POST("/account/records", cacheHandle, h.H.AccountRecords)
+			v1Indexer.POST("/account/reverse/address", cacheHandle, h.H.AccountReverseAddress)
 			v1Indexer.POST("/reverse/record", cacheHandle, h.H.ReverseRecord)
 			v1Indexer.POST("/sub/account/list", cacheHandle, h.H.SubAccountList)
 			v1Indexer.POST("/sub/account/verify", cacheHandle, h.H.SubAccountVerify)

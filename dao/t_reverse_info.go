@@ -46,3 +46,8 @@ func (d *DbDao) FindLatestReverseRecord(chainType common.ChainType, address stri
 	err = d.db.Where(" chain_type=? AND address=? ", chainType, address).Order(" block_number DESC,outpoint DESC ").Limit(1).Find(&r).Error
 	return
 }
+
+func (d *DbDao) GetReverseListByAccount(account string) (list []tables.TableReverseInfo, err error) {
+	err = d.db.Where("account=?", account).Find(&list).Order("id DESC").Limit(100).Error
+	return
+}

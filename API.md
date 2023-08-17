@@ -5,6 +5,7 @@
     * [Get Account List](#get-account-list)  
     * [Get Account Records Info](#get-account-records-info) 
     * [Get Account Records Info V2](#get-account-records-info-v2)
+    * [Get Valid Reverse Addresses](#Get-Valid-Reverse-Addresses)
     * [Get Sub-Account List](#get-sub-account-list)
     * [Get Batch Account Records Info](#get-batch-account-records-info)
     * [Get Batch reverse Record Info](#get-batch-reverse-record-info)
@@ -502,6 +503,58 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchAccountRecords","params": [{"accounts":["phone.bit"]}]}'
 ```
 
+### Get Valid Reverse Addresses
+**Request**
+
+* host: `http://127.0.0.1:8122`
+* path: `/v1/account/reverse/address`
+* param:
+
+```javascript
+{
+  "account": "20230725.bit"
+}
+```
+
+**Response**
+  * coin_type: 60-evm, 195-tron, 3-doge, 309-ckb
+
+```javascript
+{
+  "errno":0, 
+  "errmsg":"",
+  "data":{
+  "list":[
+    {
+      "type":"blockchain",
+      "key_info":{
+        "coin_type":"60",
+        "key":"0x15a33588908cf8edb27d1abe3852bf287abd3891"
+      }
+    },
+    {
+      "type":"blockchain",
+      "key_info":{
+        "coin_type":"195",
+        "key":"TQoLh9evwUmZKxpD1uhFttsZk3EBs8BksV"
+      }
+    }
+  ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/account/reverse/address -d'{"account":"20230725.bit"}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountReverseAddress","params": [{"account":"20230725.bit"}]}'
+```
 ### Get Sub-Account List
 
 **Request**

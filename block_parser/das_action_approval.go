@@ -64,7 +64,7 @@ func (b *BlockParser) ActionRevokeApproval(req *FuncTransactionHandleReq) (resp 
 	}
 	log.Info("DasActionRevokeApproval:", req.BlockNumber, req.TxHash)
 
-	accBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	accBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeOld)
 	if err != nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
@@ -88,7 +88,7 @@ func (b *BlockParser) ActionFulfillApproval(req *FuncTransactionHandleReq) (resp
 	}
 	log.Info("DasActionFulfillApproval:", req.BlockNumber, req.TxHash)
 
-	accBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	accBuilder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeOld)
 	if err != nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return

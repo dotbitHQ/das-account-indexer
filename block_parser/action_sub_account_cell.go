@@ -312,6 +312,7 @@ func (b *BlockParser) actionUpdateSubAccountForApproval(req *FuncTransactionHand
 			"outpoint":        common.OutPoint2String(req.TxHash, 0),
 			"account_id":      builder.SubAccountData.AccountId,
 			"nonce":           builder.CurrentSubAccountData.Nonce,
+			"action":          builder.Action,
 		}
 
 		switch builder.Action {

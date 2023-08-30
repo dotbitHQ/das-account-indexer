@@ -291,9 +291,18 @@ func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
 			if !ok {
 				return errors.New("account_id is not exist")
 			}
+			action := account["action"]
+			delete(account, "action")
+
 			if err := tx.Model(&tables.TableAccountInfo{}).Where("account_id=?", accId).
 				Updates(account).Error; err != nil {
 				return err
+			}
+
+			if action == common.SubActionFullfillApproval {
+				if err := tx.Where("account_id = ?", accId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+					return err
+				}
 			}
 		}
 		return nil

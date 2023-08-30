@@ -23,6 +23,7 @@ func (b *BlockParser) ActionCreateApproval(req *FuncTransactionHandleReq) (resp 
 		return
 	}
 	resp.Err = b.DbDao.UpdateAccounts([]map[string]interface{}{{
+		"action":       common.SubActionCreateApproval,
 		"account_id":   accBuilder.AccountId,
 		"outpoint":     common.OutPoint2String(req.TxHash, 0),
 		"block_number": req.BlockNumber,
@@ -47,6 +48,7 @@ func (b *BlockParser) ActionDelayApproval(req *FuncTransactionHandleReq) (resp F
 		return
 	}
 	resp.Err = b.DbDao.UpdateAccounts([]map[string]interface{}{{
+		"action":       common.SubActionDelayApproval,
 		"account_id":   accBuilder.AccountId,
 		"outpoint":     common.OutPoint2String(req.TxHash, 0),
 		"block_number": req.BlockNumber,
@@ -70,6 +72,7 @@ func (b *BlockParser) ActionRevokeApproval(req *FuncTransactionHandleReq) (resp 
 		return
 	}
 	resp.Err = b.DbDao.UpdateAccounts([]map[string]interface{}{{
+		"action":       common.SubActionRevokeApproval,
 		"account_id":   accBuilder.AccountId,
 		"outpoint":     common.OutPoint2String(req.TxHash, 0),
 		"block_number": req.BlockNumber,
@@ -103,7 +106,7 @@ func (b *BlockParser) ActionFulfillApproval(req *FuncTransactionHandleReq) (resp
 			return
 		}
 		resp.Err = b.DbDao.UpdateAccounts([]map[string]interface{}{{
-			"account_id":           accBuilder.AccountId,
+			"action":               common.SubActionFullfillApproval,
 			"outpoint":             common.OutPoint2String(req.TxHash, 0),
 			"block_number":         req.BlockNumber,
 			"status":               tables.AccountStatusNormal,

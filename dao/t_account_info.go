@@ -2,6 +2,7 @@ package dao
 
 import (
 	"das-account-indexer/tables"
+	"errors"
 	"github.com/dotbitHQ/das-lib/common"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -278,6 +279,31 @@ func (d *DbDao) DelSubAccounts(subAccIds []string) error {
 		if err := tx.Where("account_id IN(?)", subAccIds).
 			Delete(&tables.TableRecordsInfo{}).Error; err != nil {
 			return err
+		}
+		return nil
+	})
+}
+
+func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		for _, account := range accounts {
+			accId, ok := account["account_id"]
+			if !ok {
+				return errors.New("account_id is not exist")
+			}
+			action := account["action"]
+			delete(account, "action")
+
+			if err := tx.Model(&tables.TableAccountInfo{}).Where("account_id=?", accId).
+				Updates(account).Error; err != nil {
+				return err
+			}
+
+			if action == common.SubActionFullfillApproval {
+				if err := tx.Where("account_id = ?", accId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	})

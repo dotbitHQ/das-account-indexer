@@ -321,7 +321,7 @@ func (b *BlockParser) actionUpdateSubAccountForApproval(req *FuncTransactionHand
 		case common.SubActionRevokeApproval:
 			accountInfo["status"] = tables.AccountStatusNormal
 		case common.SubActionFullfillApproval:
-			approval := builder.CurrentSubAccountData.AccountApproval
+			approval := builder.SubAccountData.AccountApproval
 			switch approval.Action {
 			case witness.AccountApprovalActionTransfer:
 				owner, manager, err := b.DasCore.Daf().ScriptToHex(approval.Params.Transfer.ToLock)

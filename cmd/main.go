@@ -123,6 +123,30 @@ func runServer(ctx *cli.Context) error {
 	}
 	log.Info("block parser ok")
 
+	builderConfigCell, err := dasCore.ConfigCellDataBuilderByTypeArgsList(
+		common.ConfigCellTypeArgsPreservedAccount00,
+		common.ConfigCellTypeArgsPreservedAccount01,
+		common.ConfigCellTypeArgsPreservedAccount02,
+		common.ConfigCellTypeArgsPreservedAccount03,
+		common.ConfigCellTypeArgsPreservedAccount04,
+		common.ConfigCellTypeArgsPreservedAccount05,
+		common.ConfigCellTypeArgsPreservedAccount06,
+		common.ConfigCellTypeArgsPreservedAccount07,
+		common.ConfigCellTypeArgsPreservedAccount08,
+		common.ConfigCellTypeArgsPreservedAccount09,
+		common.ConfigCellTypeArgsPreservedAccount10,
+		common.ConfigCellTypeArgsPreservedAccount11,
+		common.ConfigCellTypeArgsPreservedAccount12,
+		common.ConfigCellTypeArgsPreservedAccount13,
+		common.ConfigCellTypeArgsPreservedAccount14,
+		common.ConfigCellTypeArgsPreservedAccount15,
+		common.ConfigCellTypeArgsPreservedAccount16,
+		common.ConfigCellTypeArgsPreservedAccount17,
+		common.ConfigCellTypeArgsPreservedAccount18,
+		common.ConfigCellTypeArgsPreservedAccount19,
+		common.ConfigCellTypeArgsUnavailable,
+	)
+
 	// http server
 	hs := &http_server.HttpServer{
 		Ctx: ctxServer,
@@ -130,11 +154,13 @@ func runServer(ctx *cli.Context) error {
 		AddressIndexer: config.Cfg.Server.HttpServerAddrIndexer,
 		//AddressReverse: config.Cfg.Server.HttpServerAddrReverse,
 		H: &handle.HttpHandle{
-			Ctx:           ctxServer,
-			Red:           red,
-			DbDao:         dbDao,
-			DasCore:       dasCore,
-			TxBuilderBase: txBuilderBase,
+			Ctx:                    ctxServer,
+			Red:                    red,
+			DbDao:                  dbDao,
+			DasCore:                dasCore,
+			TxBuilderBase:          txBuilderBase,
+			MapReservedAccounts:    builderConfigCell.ConfigCellPreservedAccountMap,
+			MapUnAvailableAccounts: builderConfigCell.ConfigCellUnavailableAccountMap,
 		},
 	}
 	hs.Run()

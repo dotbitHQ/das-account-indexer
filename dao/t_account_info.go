@@ -308,3 +308,11 @@ func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
 		return nil
 	})
 }
+
+func (d *DbDao) GetAccountIdsByAccIds(accIds []string) (list []string, err error) {
+	err = d.db.Model(&tables.TableAccountInfo{}).Select("account_id").Where("account_id in (?)", accIds).Scan(&list).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = nil
+	}
+	return
+}

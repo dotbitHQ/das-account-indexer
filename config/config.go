@@ -65,6 +65,12 @@ type CfgServer struct {
 			DbNum    int    `json:"db_num" yaml:"db_num"`
 		} `json:"redis" yaml:"redis"`
 	} `json:"cache" yaml:"cache"`
+	Das struct {
+		AccountMinLength     int `json:"account_min_length" yaml:"account_min_length"`
+		AccountMaxLength     int `json:"account_max_length" yaml:"account_max_length"`
+		OpenAccountMinLength int `json:"open_account_min_length" yaml:"open_account_min_length"`
+		OpenAccountMaxLength int `json:"open_account_max_length" yaml:"open_account_max_length"`
+	} `json:"das" yaml:"das"`
 }
 
 type DbMysql struct {

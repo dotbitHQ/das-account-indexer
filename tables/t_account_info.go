@@ -51,3 +51,10 @@ const (
 func (t *TableAccountInfo) TableName() string {
 	return TableNameAccountInfo
 }
+
+func (t *TableAccountInfo) IsExpired() bool {
+	if int64(t.ExpiredAt) <= time.Now().Unix() {
+		return true
+	}
+	return false
+}

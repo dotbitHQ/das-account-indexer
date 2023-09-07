@@ -1,0 +1,28 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+
+jobs:
+  cd:
+    runs-on: sg
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download Artifct
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: CI
+          workflow_conclusion: success
+          run_id: ${{ github.event.workflow_run.id }}
+          run_number: ${{ github.event.workflow_run.run_number }}
+          name: das_account_indexer_server
+      - name: Stop Service
+        run: ssh root@backendtest 'supervisorctl stop das_indexer_svr'
+      - name: Rsync
+        run: rsync -a das_account_indexer_server root@backendtest:/mnt/das/server/das_indexer/das_indexer_server
+      - name: Restart Service
+        run: ssh root@backendtest 'chmod +x /mnt/das/server/das_indexer/das_indexer_server && supervisorctl start das_indexer_svr'

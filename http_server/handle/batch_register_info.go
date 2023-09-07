@@ -1,11 +1,13 @@
 package handle
 
 import (
+	"bytes"
 	"das-account-indexer/config"
-	"das_register_server/http_server/handle"
+	"encoding/binary"
 	"github.com/dotbitHQ/das-lib/common"
 	code "github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/blake2b-simd"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
 	"strings"
@@ -209,7 +211,7 @@ func (h *HttpHandle) checkMainAccount(account string) (ok bool, err error) {
 			if i == 0 {
 				continue
 			}
-			if _, ok := handle.OpenCharTypeMap[accCharStr[i].CharSetName]; !ok {
+			if _, ok := OpenCharTypeMap[accCharStr[i].CharSetName]; !ok {
 				isSameDaoCharType = false
 				break
 			}
@@ -228,7 +230,7 @@ func (h *HttpHandle) checkMainAccount(account string) (ok bool, err error) {
 		}
 		luckyNumber, _ := configRelease.LuckyNumber()
 		log.Info("config release lucky number: ", luckyNumber)
-		if resNum, _ := handle.Blake256AndFourBytesBigEndian([]byte(accountCharStr)); resNum <= luckyNumber {
+		if resNum, _ := Blake256AndFourBytesBigEndian([]byte(accountCharStr)); resNum <= luckyNumber {
 			return true, nil
 		}
 	}
@@ -245,4 +247,39 @@ func (h *HttpHandle) checkSubAccount(account string) (ok bool, err error) {
 		return true, nil
 	}
 	return
+}
+
+var OpenCharTypeMap = map[common.AccountCharType]struct{}{
+	common.AccountCharTypeEmoji: {},
+	common.AccountCharTypeDigit: {},
+	common.AccountCharTypeKo:    {},
+	common.AccountCharTypeTh:    {},
+	//common.AccountCharTypeTr:    {},
+	//common.AccountCharTypeVi:    {},
+}
+
+func Blake256AndFourBytesBigEndian(data []byte) (uint32, error) {
+	bys, err := Blake256(data)
+	if err != nil {
+		return 0, err
+	}
+	bytesBuffer := bytes.NewBuffer(bys[0:4])
+	var res uint32
+	if err = binary.Read(bytesBuffer, binary.BigEndian, &res); err != nil {
+		return 0, err
+	}
+	return res, nil
+}
+
+func Blake256(data []byte) ([]byte, error) {
+	tmpConfig := &blake2b.Config{
+		Size:   32,
+		Person: []byte("2021-07-22 12:00"),
+	}
+	hash, err := blake2b.New(tmpConfig)
+	if err != nil {
+		return nil, err
+	}
+	hash.Write(data)
+	return hash.Sum(nil), nil
 }

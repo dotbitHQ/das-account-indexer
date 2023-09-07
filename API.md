@@ -267,7 +267,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
       "owner_algorithm_id": 5, // 3: eth personal sign, 4: tron sign, 5: eip-712
       "owner_key": "0x59724739940777947c56c4f2f2c9211cd5130fef",
       "manager_algorithm_id": 5,
-      "manager_key": "0x59724739940777947c56c4f2f2c9211cd5130fef"
+      "manager_key": "0x59724739940777947c56c4f2f2c9211cd5130fef", 
+      "enable_sub_account": 0 // 0-disable 1-enable
     }
   }
 }

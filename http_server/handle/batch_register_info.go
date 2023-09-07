@@ -103,69 +103,69 @@ func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *cod
 	return nil
 }
 
-func (h *HttpHandle) checkMainAccount(account string) (ok bool, err error) {
+func (h *HttpHandle) checkMainAccount(account string) (bool, error) {
 	var accLen int
-	_, accLen, err = common.GetDotBitAccountLength(account)
+	_, accLen, err := common.GetDotBitAccountLength(account)
 	if err != nil {
-		return
+		return false, err
 	}
 	if accLen < 4 {
-		return
+		return false, nil
 	}
 	accountName := strings.TrimSuffix(account, common.DasAccountSuffix)
 	if strings.Contains(accountName, ".") {
-		return
+		return false, nil
 	}
 
 	accCharStr, err := common.GetAccountCharSetList(account)
 	if err != nil {
-		return
+		return false, err
 	}
 
 	var accountCharStr string
 	for _, v := range accCharStr {
 		if v.Char == "" {
-			return
+			return false, nil
 		}
 		switch v.CharSetName {
 		case common.AccountCharTypeEmoji:
 			if _, ok := common.CharSetTypeEmojiMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeDigit:
 			if _, ok := common.CharSetTypeDigitMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeEn:
 			if _, ok := common.CharSetTypeEnMap[v.Char]; v.Char != "." && !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeJa:
 			if _, ok := common.CharSetTypeJaMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeRu:
 			if _, ok := common.CharSetTypeRuMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeTr:
 			if _, ok := common.CharSetTypeTrMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeVi:
 			if _, ok := common.CharSetTypeViMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeTh:
 			if _, ok := common.CharSetTypeThMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		case common.AccountCharTypeKo:
 			if _, ok := common.CharSetTypeKoMap[v.Char]; !ok {
-				return
+				return false, nil
 			}
 		default:
-			return
+			return false, nil
 		}
 		accountCharStr += v.Char
 	}
@@ -185,9 +185,8 @@ func (h *HttpHandle) checkMainAccount(account string) (ok bool, err error) {
 	accountName = common.Bytes2Hex(common.Blake2b([]byte(accountName))[:20])
 	_, reserved := h.MapReservedAccounts[accountName]
 	_, unavailable := h.MapUnAvailableAccounts[accountName]
-	ok = !reserved && !unavailable
 	if reserved || unavailable {
-		return
+		return !reserved && !unavailable, nil
 	}
 
 	if accLen >= config.Cfg.Das.AccountMinLength && accLen <= config.Cfg.Das.AccountMaxLength &&
@@ -234,10 +233,10 @@ func (h *HttpHandle) checkMainAccount(account string) (ok bool, err error) {
 			return true, nil
 		}
 	}
-	return
+	return false, nil
 }
 
-func (h *HttpHandle) checkSubAccount(account string) (ok bool, err error) {
+func (h *HttpHandle) checkSubAccount(account string) (bool, error) {
 	parentAccId := common.GetAccountIdByAccount(account)
 	accInfo, err := h.DbDao.GetAccountInfoByAccountId(common.Bytes2Hex(parentAccId))
 	if err != nil {
@@ -246,7 +245,7 @@ func (h *HttpHandle) checkSubAccount(account string) (ok bool, err error) {
 	if accInfo.Id == 0 || accInfo.IsExpired() {
 		return true, nil
 	}
-	return
+	return false, nil
 }
 
 var OpenCharTypeMap = map[common.AccountCharType]struct{}{

@@ -16,6 +16,7 @@ const (
 	MethodAccountRecordsV2      JsonRpcMethod = "das_accountRecordsV2"
 	MethodReverseRecord         JsonRpcMethod = "das_reverseRecord"
 	MethodBatchReverseRecord    JsonRpcMethod = "das_batchReverseRecord"
+	MethodBatchRegisterInfo     JsonRpcMethod = "das_batchRegisterInfo"
 	MethodAccountReverseAddress JsonRpcMethod = "das_accountReverseAddress"
 
 	MethodSubAccountList   JsonRpcMethod = "das_subAccountList"

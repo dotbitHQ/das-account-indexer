@@ -160,6 +160,18 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 }
 ```
 
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/batch/reverse/record -d'{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
+```
+
 ### get-batch-register-info
 
 batch get account register info, currently can only check whether the account can be registered
@@ -207,13 +219,13 @@ batch get account register info, currently can only check whether the account ca
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/batch/reverse/record -d'{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}'
+curl -X POST https://indexer-v1.did.id/v1/batch/register/info -d '{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
+curl -X POST https://indexer-v1.did.id -d '{"jsonrpc": "2.0","id": 1,"method": "das_batchRegisterInfo","params": [{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}]}'
 ```
 
 ### Verify Sub-Account

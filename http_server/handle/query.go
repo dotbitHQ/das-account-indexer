@@ -88,6 +88,8 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		h.JsonRpcReverseRecord(req.Params, &apiResp)
 	case code.MethodBatchReverseRecord:
 		h.JsonRpcBatchReverseRecord(req.Params, &apiResp)
+	case code.MethodBatchRegisterInfo:
+		h.JsonRpcBatchRegisterInfo(req.Params, &apiResp)
 	case code.MethodSubAccountList:
 		h.JsonRpcSubAccountList(req.Params, &apiResp)
 	case code.MethodSubAccountVerify:

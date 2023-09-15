@@ -5,11 +5,13 @@ import (
 	"das-account-indexer/config"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"github.com/dotbitHQ/das-lib/common"
 	code "github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/blake2b-simd"
 	"github.com/scorpiotzh/toolib"
+	"gorm.io/gorm"
 	"net/http"
 	"strings"
 )
@@ -259,7 +261,7 @@ func (h *HttpHandle) checkMainAccount(account string) (bool, error) {
 func (h *HttpHandle) checkSubAccount(account string) (bool, error) {
 	parentAccId := common.GetAccountIdByAccount(account)
 	accInfo, err := h.DbDao.GetAccountInfoByAccountId(common.Bytes2Hex(parentAccId))
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
 	}
 	if accInfo.Id == 0 || accInfo.IsExpired() {

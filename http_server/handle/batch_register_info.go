@@ -259,15 +259,29 @@ func (h *HttpHandle) checkMainAccount(account string) (bool, error) {
 }
 
 func (h *HttpHandle) checkSubAccount(account string) (bool, error) {
-	parentAccId := common.GetAccountIdByAccount(account)
-	accInfo, err := h.DbDao.GetAccountInfoByAccountId(common.Bytes2Hex(parentAccId))
+	parentAcc := account[strings.Index(account, ".")+1:]
+	parentAccId := common.GetAccountIdByAccount(parentAcc)
+	parentAccInfo, err := h.DbDao.GetAccountInfoByAccountId(common.Bytes2Hex(parentAccId))
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, err
 	}
-	if accInfo.Id == 0 || accInfo.IsExpired() {
-		return true, nil
+	if parentAccInfo.Id > 0 {
+		subAccId := common.GetAccountIdByAccount(account)
+		accInfo, err := h.DbDao.GetAccountInfoByAccountId(common.Bytes2Hex(subAccId))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, err
+		}
+		if accInfo.Id == 0 || accInfo.IsExpired() {
+			return true, nil
+		}
+		return false, nil
 	}
-	return false, nil
+
+	ok, err := h.checkMainAccount(parentAcc)
+	if err != nil {
+		return false, err
+	}
+	return ok, nil
 }
 
 var OpenCharTypeMap = map[common.AccountCharType]struct{}{

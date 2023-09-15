@@ -16,11 +16,13 @@ var (
 )
 
 type HttpHandle struct {
-	Ctx           context.Context
-	Red           *redis.Client
-	DbDao         *dao.DbDao
-	DasCore       *core.DasCore
-	TxBuilderBase *txbuilder.DasTxBuilderBase
+	Ctx                    context.Context
+	Red                    *redis.Client
+	DbDao                  *dao.DbDao
+	DasCore                *core.DasCore
+	TxBuilderBase          *txbuilder.DasTxBuilderBase
+	MapReservedAccounts    map[string]struct{}
+	MapUnAvailableAccounts map[string]struct{}
 }
 
 func GetClientIp(ctx *gin.Context) string {

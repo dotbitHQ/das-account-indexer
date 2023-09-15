@@ -198,6 +198,11 @@ func (d *DbDao) GetAccountInfoByParentAccountId(parentAccountId string) (account
 	return
 }
 
+func (d *DbDao) GetAccountInfoByAccountId(accountId string) (accountInfo tables.TableAccountInfo, err error) {
+	err = d.db.Where("account_id=?", accountId).First(&accountInfo).Error
+	return
+}
+
 func (d *DbDao) RecycleExpiredAccount(accountInfo tables.TableAccountInfo, accountId string, enableSubAccount uint8) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Select("block_number", "block_timestamp", "outpoint", "next_account_id").
@@ -307,4 +312,12 @@ func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
 		}
 		return nil
 	})
+}
+
+func (d *DbDao) GetAccountByAccIds(accIds []string) (list []*tables.TableAccountInfo, err error) {
+	err = d.db.Where("account_id in (?)", accIds).Find(&list).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		err = nil
+	}
+	return
 }

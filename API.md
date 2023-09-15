@@ -7,9 +7,10 @@
     * [Get Account Records Info V2](#get-account-records-info-v2)
     * [Get Valid Reverse Addresses](#Get-Valid-Reverse-Addresses)
     * [Get Sub-Account List](#get-sub-account-list)
+    * [Verify Sub-Account](#verify-sub-account)
     * [Get Batch Account Records Info](#get-batch-account-records-info)
     * [Get Batch reverse Record Info](#get-batch-reverse-record-info)
-    * [Verify Sub-Account](#verify-sub-account)
+    * [Get Batch register Info](#get-batch-register-info)
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -159,7 +160,6 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 }
 ```
 
-
 **Usage**
 
 ```shell
@@ -170,6 +170,62 @@ or json rpc style:
 
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
+```
+
+### get-batch-register-info
+
+batch get account register info, currently can only check whether the account can be registered
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/batch/register/info`
+* param:
+  * support up to max 50 account
+```json
+{
+  "batch_account": [
+    "xxxx",
+    "test1",
+    "20230906"
+  ]
+}
+```
+
+**Response**
+
+```json
+{
+  "err_no": 0,
+  "err_msg": "",
+  "data": {
+    "list": [
+      {
+        "account": "xxxx",
+        "can_register": false
+      },
+      {
+        "account": "test1",
+        "can_register": true
+      },
+      {
+        "account": "20230906",
+        "can_register": false
+      }
+    ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/batch/register/info -d '{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d '{"jsonrpc": "2.0","id": 1,"method": "das_batchRegisterInfo","params": [{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}]}'
 ```
 
 ### Verify Sub-Account

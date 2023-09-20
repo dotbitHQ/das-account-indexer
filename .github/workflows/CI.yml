@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - test3
 
 jobs:
   ci:
@@ -20,5 +21,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: das_account_indexer_server
+          name: das_account_indexer_server_${{ github.sha }}
           path: bin/linux/das_account_indexer_server

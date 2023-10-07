@@ -22,6 +22,7 @@ type ReqReverseRecord struct {
 type RespReverseRecord struct {
 	Account      string `json:"account"`
 	AccountAlias string `json:"account_alias"`
+	DisplayName  string `json:"display_name"`
 }
 
 func (h *HttpHandle) JsonRpcReverseRecord(p json.RawMessage, apiResp *code.ApiResp) {
@@ -161,6 +162,7 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	}
 
 	resp.AccountAlias = FormatDotToSharp(resp.Account)
+	resp.DisplayName = FormatDisplayName(resp.Account)
 
 	apiResp.ApiRespOK(resp)
 	return nil
@@ -184,6 +186,14 @@ func FormatSharpToDot(account string) string {
 		indexDot := strings.Index(account, ".")
 
 		return account[indexSharp+1:indexDot] + "." + account[:indexSharp] + ".bit"
+	}
+	return account
+}
+
+func FormatDisplayName(account string) string {
+	countDot := strings.Count(account, ".")
+	if countDot == 2 {
+		account = strings.TrimSuffix(account, common.DasAccountSuffix)
 	}
 	return account
 }

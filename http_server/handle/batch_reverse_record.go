@@ -24,6 +24,7 @@ type RespBatchReverseRecord struct {
 type BatchReverseRecord struct {
 	Account      string `json:"account"`
 	AccountAlias string `json:"account_alias"`
+	DisplayName  string `json:"display_name"`
 	ErrMsg       string `json:"err_msg"`
 }
 
@@ -98,6 +99,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 		resp.List = append(resp.List, BatchReverseRecord{
 			Account:      account,
 			AccountAlias: FormatDotToSharp(account),
+			DisplayName:  FormatDisplayName(account),
 			ErrMsg:       errMsg,
 		})
 	}

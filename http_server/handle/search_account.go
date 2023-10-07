@@ -39,6 +39,7 @@ type AccountData struct {
 	ManagerAddress      string               `json:"manager_address"`
 	ManagerLockArgsHex  string               `json:"manager_lock_args_hex"`
 	Records             []DataRecord         `json:"records"`
+	DisplayName         string               `json:"display_name"`
 }
 
 func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *code.ApiResp) {
@@ -158,6 +159,7 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 		ManagerAddress:      managerNormal.AddressNormal,
 		ManagerLockArgsHex:  common.Bytes2Hex(dasLockArgs[len(dasLockArgs)/2:]),
 		Records:             make([]DataRecord, 0),
+		DisplayName:         FormatDisplayName(accountInfo.Account),
 	}
 
 	// records

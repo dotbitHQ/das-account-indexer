@@ -52,7 +52,7 @@ This service can query all data, but it is recommended that developers setup the
 ```json
 {
   "errno": 0,
-  "errmsg": "",
+  "err_msg": "",
   "data": {
     "is_latest_block_number": true,
     "current_block_number": 6088191,
@@ -97,7 +97,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```json
 {
   "errno": 0,
-  "errmsg": "",
+  "err_msg": "",
   "data": {
     "account": ""
   }
@@ -146,7 +146,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```json
 {
   "errno": 0,
-  "errmsg": "",
+  "err_msg": "",
   "data": {
     "list": [
       {
@@ -261,8 +261,8 @@ For account and sub_account There are two verification methods:
 **Response**
 ```json
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "is_subdid": false
   }
@@ -305,8 +305,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "out_point": {
       "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
@@ -365,8 +365,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno":0,
-  "errmsg":"",
+  "err_no":0,
+  "err_msg":"",
   "data":{
     "account_list":[
       {
@@ -411,8 +411,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "account": "phone.bit",
     "records": [
@@ -468,8 +468,8 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "account": "phone.bit",
     "records": [
@@ -526,8 +526,8 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
       "list":[{
         "account": "phone.bit",
@@ -578,8 +578,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno":0, 
-  "errmsg":"",
+  "err_no":0, 
+  "err_msg":"",
   "data":{
   "list":[
     {
@@ -634,8 +634,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "account": "0x.bit",
     "account_id_hex": "0x35612d221d6c02564c36935f81ec8568b07a39f3",
@@ -688,8 +688,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": {
     "out_point": {
       "tx_hash": "0xabb6b2f502e9d992d00737a260e6cde53ad3f402894b078f60a52e0392a17ec8",
@@ -758,8 +758,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```javascript
 {
-  "errno": 0,
-  "errmsg": "",
+  "err_no": 0,
+  "err_msg": "",
   "data": [
     {
       "out_point": {
@@ -817,8 +817,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ### Error Example
 ```json
 {
-  "errno": 20007,
-  "errmsg": "account not exist",
+  "err_no": 20007,
+  "err_msg": "account not exist",
   "data": null
 }
 ```

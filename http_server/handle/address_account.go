@@ -131,6 +131,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 				ManagerAddress:      managerNormal.AddressNormal,
 				ManagerLockArgsHex:  common.Bytes2Hex(dasLockArgs[len(dasLockArgs)/2:]),
 				Records:             make([]DataRecord, 0),
+				DisplayName:         FormatDisplayName(v.Account),
 			},
 		}
 		resp = append(resp, tmp)

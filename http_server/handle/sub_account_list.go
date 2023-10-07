@@ -36,6 +36,7 @@ type SubAccountInfo struct {
 	ManagerAlgorithmId common.DasAlgorithmId    `json:"manager_algorithm_id"`
 	ManagerSubAid      common.DasSubAlgorithmId `json:"manager_sub_aid"`
 	ManagerKey         string                   `json:"manager_key"`
+	DisplayName        string                   `json:"display_name"`
 }
 
 func (h *HttpHandle) JsonRpcSubAccountList(p json.RawMessage, apiResp *code.ApiResp) {
@@ -142,6 +143,7 @@ func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *code.ApiR
 				ManagerAlgorithmId: v.ManagerAlgorithmId,
 				ManagerSubAid:      v.ManagerSubAid,
 				ManagerKey:         managerNormal.AddressNormal,
+				DisplayName:        FormatDisplayName(v.Account),
 			})
 		}
 	}

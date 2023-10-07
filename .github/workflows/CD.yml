@@ -19,10 +19,20 @@ jobs:
           workflow_conclusion: success
           run_id: ${{ github.event.workflow_run.id }}
           run_number: ${{ github.event.workflow_run.run_number }}
-          name: das_account_indexer_server
-      - name: Stop Service
-        run: ssh root@backendtest 'supervisorctl stop das_indexer_svr'
-      - name: Rsync
-        run: rsync -a das_account_indexer_server root@backendtest:/mnt/das/server/das_indexer/das_indexer_server
-      - name: Restart Service
-        run: ssh root@backendtest 'chmod +x /mnt/das/server/das_indexer/das_indexer_server && supervisorctl start das_indexer_svr'
+          name: das_account_indexer_server_${{ github.event.workflow_run.head_commit.id }}
+      - name: Deploy
+        run: |
+          host_name=""
+          branch="${{ github.event.workflow_run.head_branch }}"
+          if [[ "$branch" == "dev" ]]; then
+            host_name="backendtest"
+          elif [[ "$branch" == "test3" ]]; then
+            host_name="backendtest3"
+          else
+            echo "Skipping build and deploy for branch ${branch}"
+            exit 1
+          fi
+          
+          rsync -a das_account_indexer_server root@"$host_name":/mnt/das/server/das_indexer/das_indexer_server
+          ssh root@"$host_name" 'chmod +x /mnt/das/server/das_indexer/das_indexer_server'
+          ssh root@"$host_name" 'supervisorctl restart das_indexer_svr'

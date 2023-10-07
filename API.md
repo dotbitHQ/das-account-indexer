@@ -51,7 +51,7 @@ This service can query all data, but it is recommended that developers setup the
 
 ```json
 {
-  "errno": 0,
+  "err_no": 0,
   "err_msg": "",
   "data": {
     "is_latest_block_number": true,
@@ -96,7 +96,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```json
 {
-  "errno": 0,
+  "err_no": 0,
   "err_msg": "",
   "data": {
     "account": "",
@@ -147,7 +147,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ```json
 {
-  "errno": 0,
+  "err_no": 0,
   "err_msg": "",
   "data": {
     "list": [

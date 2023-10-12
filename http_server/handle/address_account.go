@@ -1,11 +1,12 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -24,7 +25,7 @@ func (h *HttpHandle) JsonRpcAddressAccount(p json.RawMessage, apiResp *code.ApiR
 		var reqOld []string
 		if err = json.Unmarshal(p, &reqOld); err != nil {
 			log.Error("json.Unmarshal old req err:", err.Error())
-			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+			apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 			return
 		} else if len(reqOld) == 1 {
 			req[0] = ReqAddressAccount{Address: reqOld[0]}
@@ -32,7 +33,7 @@ func (h *HttpHandle) JsonRpcAddressAccount(p json.RawMessage, apiResp *code.ApiR
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -52,7 +53,7 @@ func (h *HttpHandle) AddressAccount(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -70,7 +71,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 
 	addrHex, err := formatAddress(h.DasCore.Daf(), req.Address)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, err.Error())
 		return fmt.Errorf("formatAddress err: %s", err.Error())
 	}
 	log.Info("formatAddress:", req.Address, addrHex.ChainType, addrHex.AddressHex)
@@ -78,7 +79,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 	list, err := h.DbDao.FindAccountListByAddress(addrHex.ChainType, addrHex.AddressHex)
 	if err != nil {
 		log.Error("FindAccountListByAddress err:", err.Error(), req.Address)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account list err")
 		return nil
 	}
 	var accountIds []string
@@ -100,17 +101,17 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 		}
 		dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 		if err != nil {
-			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 			return fmt.Errorf("HexToArgs err: %s", err.Error())
 		}
 		ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
 		if err != nil {
-			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 			return fmt.Errorf("owner HexToNormal err: %s", err.Error())
 		}
 		managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
 		if err != nil {
-			apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 			return fmt.Errorf("manager HexToNormal err: %s", err.Error())
 		}
 		tmp := RespSearchAccount{
@@ -145,7 +146,7 @@ func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiR
 		records, err := h.DbDao.FindRecordsByAccountIds(accountIds)
 		if err != nil {
 			log.Error("FindRecordsByAccounts err:", err.Error(), req.Address)
-			apiResp.ApiRespErr(code.ApiCodeDbError, "find records info err")
+			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records info err")
 			return nil
 		}
 		for _, v := range records {

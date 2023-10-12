@@ -1,12 +1,13 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -33,12 +34,12 @@ func (h *HttpHandle) JsonRpcBatchReverseRecord(p json.RawMessage, apiResp *code.
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -57,7 +58,7 @@ func (h *HttpHandle) BatchReverseRecord(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -75,7 +76,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	resp.List = make([]BatchReverseRecord, 0)
 
 	if count := len(req.BatchKeyInfo); count == 0 || count > 100 {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "Invalid number of key info")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "Invalid number of key info")
 		return nil
 	}
 
@@ -83,7 +84,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	var listKeyInfo []*core.DasAddressHex
 	for i, _ := range req.BatchKeyInfo {
 		res := checkReqKeyInfo(h.DasCore.Daf(), &req.BatchKeyInfo[i], apiResp)
-		if apiResp.ErrNo != code.ApiCodeSuccess {
+		if apiResp.ErrNo != http_api.ApiCodeSuccess {
 			log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 			return nil
 		}
@@ -93,7 +94,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	// get reverse
 	for _, v := range listKeyInfo {
 		account, errMsg := h.checkReverse(v.ChainType, v.AddressHex, apiResp)
-		if apiResp.ErrNo != code.ApiCodeSuccess {
+		if apiResp.ErrNo != http_api.ApiCodeSuccess {
 			return nil
 		}
 		resp.List = append(resp.List, BatchReverseRecord{
@@ -112,7 +113,7 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string,
 	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
 	if err != nil {
 		log.Error("FindLatestReverseRecord err: ", err.Error(), addressHex)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")
 		return
 	} else if reverse.Id == 0 {
 		errMsg = "reverse does not exit"
@@ -123,7 +124,7 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string,
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountId err: ", err.Error(), reverse.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")
 		return
 	} else if accountInfo.Id == 0 {
 		errMsg = fmt.Sprintf("reverse account[%s] does not exit", reverse.Account)
@@ -141,7 +142,7 @@ func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string,
 		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, addressHex)
 		if err != nil {
 			log.Error("FindRecordByAccountIdAddressValue err: ", err.Error(), accountInfo.Account, addressHex)
-			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse account record err")
+			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse account record err")
 			return
 		} else if record.Id > 0 {
 			account = accountInfo.Account

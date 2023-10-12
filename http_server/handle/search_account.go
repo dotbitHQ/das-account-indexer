@@ -1,12 +1,13 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/scorpiotzh/toolib"
@@ -50,7 +51,7 @@ func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *code.ApiRe
 		var reqOld []string
 		if err = json.Unmarshal(p, &reqOld); err != nil {
 			log.Error("json.Unmarshal old req err:", err.Error())
-			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+			apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 			return
 		} else if len(reqOld) == 1 {
 			req[0] = ReqSearchAccount{Account: reqOld[0]}
@@ -58,7 +59,7 @@ func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *code.ApiRe
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is:", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -78,7 +79,7 @@ func (h *HttpHandle) SearchAccount(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -105,10 +106,10 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account info err")
 		return nil
 	} else if accountInfo.Id == 0 {
-		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountNotExist, "account not exist")
 		return nil
 	}
 
@@ -130,17 +131,17 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	}
 	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("HexToArgs err: %s", err.Error())
 	}
 	ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("owner HexToNormal err: %s", err.Error())
 	}
 	managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("manager HexToNormal err: %s", err.Error())
 	}
 	resp.AccountData = AccountData{
@@ -166,7 +167,7 @@ func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiRes
 	list, err := h.DbDao.FindAccountRecordsByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountRecords err:", err.Error(), req.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find records info err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records info err")
 		return nil
 	}
 	for _, v := range list {

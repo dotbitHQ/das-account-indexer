@@ -2,12 +2,13 @@ package handle
 
 import (
 	"das-account-indexer/config"
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -30,12 +31,12 @@ func (h *HttpHandle) JsonRpcReverseRecord(p json.RawMessage, apiResp *code.ApiRe
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -55,7 +56,7 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -70,11 +71,11 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 
 func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, apiResp *code.ApiResp) *core.DasAddressHex {
 	if req.Type != "blockchain" {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
 		return nil
 	}
 	if req.KeyInfo.Key == "" {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "key is invalid")
 		return nil
 	}
 	dasChainType := common.FormatCoinTypeToDasChainType(req.KeyInfo.CoinType)
@@ -84,21 +85,21 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, api
 	if dasChainType == -1 {
 		if strings.HasPrefix(req.KeyInfo.Key, "0x") {
 			if ok, err := regexp.MatchString("^0x[0-9a-fA-F]{40}$", req.KeyInfo.Key); err != nil {
-				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+				apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, err.Error())
 				return nil
 			} else if ok {
 				dasChainType = common.ChainTypeEth
 			} else if ok, err = regexp.MatchString("^0x[0-9a-fA-F]{64}$", req.KeyInfo.Key); err != nil {
-				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+				apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, err.Error())
 				return nil
 			} else if ok {
 				dasChainType = common.ChainTypeMixin
 			} else {
-				apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "key is invalid")
+				apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "key is invalid")
 				return nil
 			}
 		} else {
-			apiResp.ApiRespErr(code.ApiCodeParamsInvalid, fmt.Sprintf("coin_type [%s] and chain_id [%s] is invalid", req.KeyInfo.CoinType, req.KeyInfo.ChainId))
+			apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, fmt.Sprintf("coin_type [%s] and chain_id [%s] is invalid", req.KeyInfo.CoinType, req.KeyInfo.ChainId))
 			return nil
 		}
 	}
@@ -108,7 +109,7 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, api
 		Is712:         true,
 	})
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, err.Error())
 		return nil
 	}
 	return &addrHex
@@ -117,7 +118,7 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, api
 func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) error {
 	var resp RespReverseRecord
 	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ChainTypeAddress, apiResp)
-	if apiResp.ErrNo != code.ApiCodeSuccess {
+	if apiResp.ErrNo != http_api.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil
 	}
@@ -125,7 +126,7 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	reverse, err := h.DbDao.FindLatestReverseRecord(res.ChainType, res.AddressHex)
 	if err != nil {
 		log.Error("FindLatestReverseRecord err:", err.Error(), res.ChainType, res.AddressHex)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")
 		return nil
 	} else if reverse.Id == 0 {
 		apiResp.ApiRespOK(resp)
@@ -136,13 +137,13 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record account err")
 		return nil
 	} else if accountInfo.Id == 0 {
-		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountNotExist, "account not exist")
 		return nil
 	} else if accountInfo.Status == tables.AccountStatusOnLock {
-		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account on lock")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountOnLock, "account on lock")
 		return nil
 	}
 
@@ -154,7 +155,7 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 		record, err := h.DbDao.FindRecordByAccountIdAddressValue(accountInfo.AccountId, res.AddressHex)
 		if err != nil {
 			log.Error("FindRecordByAccountAddressValue err:", err.Error(), res.ChainType, res.AddressHex, reverse.Account)
-			apiResp.ApiRespErr(code.ApiCodeDbError, "find reverse record account record err")
+			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record account record err")
 			return nil
 		} else if record.Id > 0 {
 			resp.Account = accountInfo.Account

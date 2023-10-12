@@ -1,12 +1,13 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/scorpiotzh/toolib"
@@ -48,12 +49,12 @@ func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *code.ApiResp
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is:", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -73,7 +74,7 @@ func (h *HttpHandle) AccountInfo(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -102,10 +103,10 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account info err")
 		return nil
 	} else if accountInfo.Id == 0 {
-		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountNotExist, "account not exist")
 		return nil
 	}
 
@@ -126,17 +127,17 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	}
 	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("HexToArgs err: %s", err.Error())
 	}
 	ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("owner HexToNormal err: %s", err.Error())
 	}
 	managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 		return fmt.Errorf("manager HexToNormal err: %s", err.Error())
 	}
 
@@ -166,7 +167,7 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 func checkAccount(account string, apiResp *code.ApiResp) error {
 	if account == "" || !strings.HasSuffix(account, common.DasAccountSuffix) ||
 		strings.Contains(account, " ") || strings.Contains(account, "_") {
-		apiResp.ApiRespErr(code.ApiCodeAccountFormatInvalid, "account invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountFormatInvalid, "account invalid")
 		return fmt.Errorf("account invalid: [%s]", account)
 	}
 	return nil

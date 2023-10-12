@@ -13,7 +13,7 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  http_api.ApiResp
+		apiResp  code.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -49,7 +49,7 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  http_api.ApiResp
+		apiResp  code.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -107,7 +107,7 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  http_api.ApiResp
+		apiResp  code.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp

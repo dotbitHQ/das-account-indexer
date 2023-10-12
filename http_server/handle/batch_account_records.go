@@ -1,11 +1,12 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -32,12 +33,12 @@ func (h *HttpHandle) JsonRpcBatchAccountRecords(p json.RawMessage, apiResp *code
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -56,7 +57,7 @@ func (h *HttpHandle) BatchAccountRecords(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -74,7 +75,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	resp.List = make([]BatchAccountRecord, 0)
 
 	if count := len(req.Accounts); count == 0 || count > 100 {
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "Invalid number of accounts")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "Invalid number of accounts")
 		return nil
 	}
 
@@ -99,7 +100,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	list, err := h.DbDao.FindAccountInfoListByAccountIds(accountIds)
 	if err != nil {
 		log.Error("FindAccountInfoListByAccountIds err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find accounts err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find accounts err")
 		return nil
 	}
 
@@ -129,7 +130,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	records, err := h.DbDao.FindRecordsByAccountIds(okIds)
 	if err != nil {
 		log.Error("FindRecordsByAccountIds err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find records err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records err")
 		return nil
 	}
 	var mapRecords = make(map[string][]DataRecord)

@@ -1,10 +1,11 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -30,12 +31,12 @@ func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *code.ApiResp
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -54,7 +55,7 @@ func (h *HttpHandle) AccountList(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -72,7 +73,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	resp.AccountList = make([]RespAddressAccount, 0)
 
 	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ChainTypeAddress, apiResp)
-	if apiResp.ErrNo != code.ApiCodeSuccess {
+	if apiResp.ErrNo != http_api.ApiCodeSuccess {
 		log.Error("checkReqReverseRecord:", apiResp.ErrMsg)
 		return nil
 	}
@@ -82,7 +83,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) e
 	list, err := h.DbDao.FindAccountNameListByAddress(res.ChainType, res.AddressHex, req.Role)
 	if err != nil {
 		log.Error("FindAccountListByAddress err:", err.Error(), req.KeyInfo)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find account list err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account list err")
 		return fmt.Errorf("FindAccountListByAddress err: %s", err.Error())
 	}
 

@@ -35,9 +35,9 @@ indexer_win:
 	@echo "build $(BINARY_NAME) successfully."
 
 docker:
-	docker build --network host -t dotbitteam/das-account-indexer:latest .
+	docker build --network host -t admindid/das-account-indexer:latest .
 
 docker-publish:
-	docker image push dotbitteam/das-account-indexer:latest
+	docker image push admindid/das-account-indexer:latest
 # default
 default: indexer_linux

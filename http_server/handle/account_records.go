@@ -1,11 +1,12 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -33,12 +34,12 @@ func (h *HttpHandle) JsonRpcAccountRecords(p json.RawMessage, apiResp *code.ApiR
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -58,7 +59,7 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -88,13 +89,13 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find account info err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account info err")
 		return nil
 	} else if accountInfo.Id == 0 {
-		apiResp.ApiRespErr(code.ApiCodeAccountNotExist, "account not exist")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountNotExist, "account not exist")
 		return nil
 	} else if accountInfo.Status == tables.AccountStatusOnLock {
-		apiResp.ApiRespErr(code.ApiCodeAccountOnLock, "account cross-chain")
+		apiResp.ApiRespErr(http_api.ApiCodeAccountOnLock, "account cross-chain")
 		return nil
 	}
 
@@ -103,7 +104,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 	list, err := h.DbDao.FindAccountRecordsByAccountId(accountId)
 	if err != nil {
 		log.Error("FindAccountRecords err:", err.Error(), req.Account)
-		apiResp.ApiRespErr(code.ApiCodeDbError, "find records info err")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records info err")
 		return nil
 	}
 	for _, v := range list {

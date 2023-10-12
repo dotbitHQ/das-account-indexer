@@ -3,11 +3,12 @@ package handle
 import (
 	"bytes"
 	"das-account-indexer/config"
+	"das-account-indexer/http_server/code"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"github.com/dotbitHQ/das-lib/common"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/blake2b-simd"
 	"github.com/scorpiotzh/toolib"
@@ -39,7 +40,7 @@ func (h *HttpHandle) BatchRegisterInfo(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -56,12 +57,12 @@ func (h *HttpHandle) JsonRpcBatchRegisterInfo(p json.RawMessage, apiResp *code.A
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -77,7 +78,7 @@ func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *cod
 	}
 	existAcc, err := h.DbDao.GetAccountByAccIds(accIds)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeDbError, err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, err.Error())
 		return err
 	}
 	existAccIdsMap := make(map[string]struct{}, len(existAcc))
@@ -104,14 +105,14 @@ func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *cod
 				// main account
 				record.CanRegister, err = h.checkMainAccount(accName)
 				if err != nil {
-					apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+					apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 					return err
 				}
 			case 1:
 				// sub_account
 				record.CanRegister, err = h.checkSubAccount(accName)
 				if err != nil {
-					apiResp.ApiRespErr(code.ApiCodeError500, err.Error())
+					apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
 					return err
 				}
 			}

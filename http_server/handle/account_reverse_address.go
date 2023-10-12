@@ -1,11 +1,12 @@
 package handle
 
 import (
+	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
-	code "github.com/dotbitHQ/das-lib/http_api"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -28,12 +29,12 @@ func (h *HttpHandle) JsonRpcAccountReverseAddress(p json.RawMessage, apiResp *co
 	err := json.Unmarshal(p, &req)
 	if err != nil {
 		log.Error("json.Unmarshal err:", err.Error())
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 	if len(req) != 1 {
 		log.Error("len(req) is :", len(req))
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
 
@@ -52,7 +53,7 @@ func (h *HttpHandle) AccountReverseAddress(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
-		apiResp.ApiRespErr(code.ApiCodeParamsInvalid, "params invalid")
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
@@ -72,16 +73,16 @@ func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiR
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	accInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeDbError, "Failed to get account info")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "Failed to get account info")
 		return fmt.Errorf("FindAccountInfoByAccountId err: %s", err.Error())
 	} else if accInfo.Id == 0 {
-		apiResp.ApiRespErr(code.ApiCodeIndexerAccountNotExist, "Account does not exist")
+		apiResp.ApiRespErr(http_api.ApiCodeIndexerAccountNotExist, "Account does not exist")
 		return nil
 	}
 
 	list, err := h.DbDao.GetReverseListByAccount(req.Account)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeDbError, "Failed to get reverse list")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "Failed to get reverse list")
 		return fmt.Errorf("GetReverseListByAccount err: %s", err.Error())
 	}
 	log.Info("doAccountReverseAddress:", len(list), req.Account, accountId)
@@ -91,7 +92,7 @@ func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiR
 	}
 	records, err := h.DbDao.FindAccountRecordsByAccountId(accountId)
 	if err != nil {
-		apiResp.ApiRespErr(code.ApiCodeDbError, "Failed to get records")
+		apiResp.ApiRespErr(http_api.ApiCodeDbError, "Failed to get records")
 		return fmt.Errorf("FindAccountRecordsByAccountId err: %s", err.Error())
 	}
 	var recordMap = make(map[string]struct{})

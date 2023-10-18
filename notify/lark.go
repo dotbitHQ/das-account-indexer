@@ -1,10 +1,7 @@
 package notify
 
 import (
-	"fmt"
-	"github.com/parnurzeal/gorequest"
-	"net/http"
-	"time"
+	"das-account-indexer/prometheus"
 )
 
 type MsgContent struct {
@@ -27,28 +24,9 @@ type MsgData struct {
 	} `json:"content"`
 }
 
-func SendLarkTextNotify(url, title, text string) error {
-	if url == "" || text == "" {
-		return nil
+func SendLarkErrNotify(title, text string) {
+	if title == "" || text == "" {
+		return
 	}
-	var data MsgData
-	data.Email = ""
-	data.MsgType = "post"
-	data.Content.Post.ZhCn.Title = title
-	data.Content.Post.ZhCn.Content = [][]MsgContent{
-		{
-			MsgContent{
-				Tag:      "text",
-				UnEscape: false,
-				Text:     text,
-			},
-		},
-	}
-	resp, _, errs := gorequest.New().Post(url).Timeout(time.Second * 10).SendStruct(&data).End()
-	if len(errs) > 0 {
-		return fmt.Errorf("errs:%v", errs)
-	} else if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("http code:%d", resp.StatusCode)
-	}
-	return nil
+	prometheus.Tools.Metrics.ErrNotify().WithLabelValues(title, text).Inc()
 }

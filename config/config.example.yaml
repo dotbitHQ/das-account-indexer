@@ -1,8 +1,10 @@
 server:
+  name: "account_indexer"
   net: 1 # 1-mainnet 2-testnet
   #http_server_addr: ":8121"
   http_server_addr_indexer: ":8122"
   #http_server_addr_reverse: ":8123"
+  prometheus_push_gateway: "http://127.0.0.1:9091"
 chain:
   ckb_url: "http://127.0.0.1:8114" # ckb-node rpc https://github.com/nervosnetwork/ckb
   index_url: "http://127.0.0.1:8116" # ckb-indexer rpc https://github.com/nervosnetwork/ckb-indexer

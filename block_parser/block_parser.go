@@ -140,10 +140,7 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 					// notify
 					msg := "> Transaction hash：%s\n> Action：%s\n> Timestamp：%s\n> Error message：%s"
 					msg = fmt.Sprintf(msg, txHash, builder.Action, time.Now().Format("2006-01-02 15:04:05"), resp.Err.Error())
-					err = notify.SendLarkTextNotify(config.Cfg.Notice.LarkErrUrl, "DasAccountIndexer BlockParser", msg)
-					if err != nil {
-						log.Error("SendLarkTextNotify err:", err.Error())
-					}
+					notify.SendLarkErrNotify("DasAccountIndexer BlockParser", msg)
 				}
 
 				return resp.Err

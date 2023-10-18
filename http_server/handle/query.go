@@ -2,11 +2,13 @@ package handle
 
 import (
 	"das-account-indexer/http_server/code"
+	"das-account-indexer/prometheus"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
+	"time"
 )
 
 func (h *HttpHandle) Query(ctx *gin.Context) {
@@ -17,6 +19,11 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
+
+	start := time.Now()
+	defer func() {
+		prometheus.Tools.Metrics.Api().WithLabelValues(req.Method, "200", fmt.Sprint(apiResp.ErrNo), apiResp.ErrMsg).Observe(time.Since(start).Seconds())
+	}()
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -53,6 +60,11 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
+
+	start := time.Now()
+	defer func() {
+		prometheus.Tools.Metrics.Api().WithLabelValues(req.Method, "200", fmt.Sprint(apiResp.ErrNo), apiResp.ErrMsg).Observe(time.Since(start).Seconds())
+	}()
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
@@ -111,6 +123,11 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
+
+	start := time.Now()
+	defer func() {
+		prometheus.Tools.Metrics.Api().WithLabelValues(req.Method, "200", fmt.Sprint(apiResp.ErrNo), apiResp.ErrMsg).Observe(time.Since(start).Seconds())
+	}()
 
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {

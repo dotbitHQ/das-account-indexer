@@ -40,10 +40,12 @@ func AddCfgFileWatcher(configFilePath string) (*fsnotify.Watcher, error) {
 
 type CfgServer struct {
 	Server struct {
+		Name                  string            `json:"name" yaml:"name"`
 		IsUpdate              bool              `json:"is_update" yaml:"is_update"`
 		Net                   common.DasNetType `json:"net" yaml:"net"`
 		HttpServerAddrIndexer string            `json:"http_server_addr_indexer" yaml:"http_server_addr_indexer"`
 		NotExit               bool              `json:"not_exit" yaml:"not_exit"`
+		PrometheusPushGateway string            `json:"prometheus_push_gateway" yaml:"prometheus_push_gateway"`
 	} `json:"server" yaml:"server"`
 	Chain struct {
 		CkbUrl             string `json:"ckb_url" yaml:"ckb_url"`

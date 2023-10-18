@@ -7,6 +7,7 @@ import (
 	"das-account-indexer/dao"
 	"das-account-indexer/http_server"
 	"das-account-indexer/http_server/handle"
+	"das-account-indexer/prometheus"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
@@ -58,6 +59,10 @@ func runServer(ctx *cli.Context) error {
 		return err
 	}
 	// ============= start service =============
+
+	// prometheus
+	prometheus.Init()
+	prometheus.Tools.Run()
 
 	// db
 	dbDao, err := dao.NewGormDB(config.Cfg.DB.Mysql)

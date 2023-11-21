@@ -321,3 +321,25 @@ func (d *DbDao) GetAccountByAccIds(accIds []string) (list []*tables.TableAccount
 	}
 	return
 }
+
+func (d *DbDao) BidExpiredAccountAuction(accountInfo tables.TableAccountInfo, recordsInfos []tables.TableRecordsInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		//update account_info
+		if err := tx.Select("expired_at", "registered_at", "block_number", "outpoint", "owner_chain_type", "owner", "owner_algorithm_id", "owner_sub_aid", "manager_chain_type", "manager", "manager_algorithm_id", "manager_sub_aid").
+			Where("account_id = ?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
+			return err
+		}
+		//delete record
+		if err := tx.Where("account_id=?", accountInfo.AccountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+		//default record
+		if len(recordsInfos) > 0 {
+			if err := tx.Create(&recordsInfos).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}

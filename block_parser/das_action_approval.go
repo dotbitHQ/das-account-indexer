@@ -106,6 +106,7 @@ func (b *BlockParser) ActionFulfillApproval(req *FuncTransactionHandleReq) (resp
 			return
 		}
 		resp.Err = b.DbDao.UpdateAccounts([]map[string]interface{}{{
+			"account_id":           accBuilder.AccountId,
 			"action":               common.SubActionFullfillApproval,
 			"outpoint":             common.OutPoint2String(req.TxHash, 0),
 			"block_number":         req.BlockNumber,

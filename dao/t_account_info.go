@@ -6,6 +6,7 @@ import (
 	"github.com/dotbitHQ/das-lib/common"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"time"
 )
 
 func (d *DbDao) UpdateAccountInfo(account *tables.TableAccountInfo, records []tables.TableRecordsInfo) error {
@@ -73,15 +74,15 @@ func (d *DbDao) FindAccountInfoListByAccountIds(accountIds []string) (list []tab
 }
 
 func (d *DbDao) FindAccountListByAddress(chainType common.ChainType, address string) (list []tables.TableAccountInfo, err error) {
-	err = d.db.Where(" owner_chain_type=? AND owner=? ", chainType, address).Find(&list).Error
+	err = d.db.Where(" owner_chain_type=? AND owner=? and expired_at >= ?", chainType, address, time.Now().Unix()-30*86400).Find(&list).Error
 	return
 }
 
 func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address, role string) (list []tables.TableAccountInfo, err error) {
 	if role == "" || role == "owner" {
-		err = d.db.Select("account").Where(" owner_chain_type=? AND owner=? AND `status`!=? ", chainType, address, tables.AccountStatusOnLock).Find(&list).Error
+		err = d.db.Select("account").Where(" owner_chain_type=? AND owner=? AND `status`!=? and expired_at >= ?", chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-30*86400).Find(&list).Error
 	} else if role == "manager" {
-		err = d.db.Select("account").Where(" manager_chain_type=? AND manager=? AND `status`!=? ", chainType, address, tables.AccountStatusOnLock).Find(&list).Error
+		err = d.db.Select("account").Where(" manager_chain_type=? AND manager=? AND `status`!=? and expired_at >= ?", chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-30*86400).Find(&list).Error
 	}
 	return
 }

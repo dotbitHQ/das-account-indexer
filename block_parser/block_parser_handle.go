@@ -57,6 +57,7 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionDelayApproval] = b.ActionDelayApproval
 	b.MapTransactionHandle[common.DasActionRevokeApproval] = b.ActionRevokeApproval
 	b.MapTransactionHandle[common.DasActionFulfillApproval] = b.ActionFulfillApproval
+	b.MapTransactionHandle[common.DasActionBidExpiredAccountAuction] = b.ActionBidExpiredAccountAuction
 }
 
 func isCurrentVersionTx(tx *types.Transaction, name common.DasContractName) (bool, error) {

@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (b *BlockParser) ActionBidExpiredAccountAuction(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+func (b *BlockParser) ActionBidExpiredAccountAuction(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	if isCV, err := isCurrentVersionTx(req.Tx, common.DasContractNameAccountCellType); err != nil {
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
@@ -46,6 +46,7 @@ func (b *BlockParser) ActionBidExpiredAccountAuction(req FuncTransactionHandleRe
 		ManagerSubAid:      mHex.DasSubAlgorithmId,
 		ExpiredAt:          builder.ExpiredAt,
 		RegisteredAt:       builder.RegisteredAt,
+		Status:             tables.AccountStatus(builder.Status),
 	}
 	log.Info("ActionBidExpiredAccountAuction:", accountInfo)
 

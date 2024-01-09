@@ -304,7 +304,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 ```
 
 **Response**
-  * status: 0-normal, 1-on sale, 3-cross-chain
+  * status: 0-normal, 1-on sale, 3-cross-chain, 4-approval-enable
 
 ```javascript
 {

@@ -377,7 +377,9 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
       {
         "account":"",
         "account_alias":"",
-        "display_name":""
+        "display_name":"",
+        "registered_at": 1666268687, // unix second timestamp
+        "expired_at": 1729340687 // unix second timestamp
       }
       // ...
     ]

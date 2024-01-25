@@ -25,7 +25,7 @@ type RespAddressAccount struct {
 	AccountAlias string `json:"account_alias"`
 	DisplayName  string `json:"display_name"`
 	RegisteredAt uint64 `json:"registered_at"`
-	ExpiredAt    uint64 `json:"expired_at_unix"`
+	ExpiredAt    uint64 `json:"expired_at"`
 }
 
 func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *code.ApiResp) {

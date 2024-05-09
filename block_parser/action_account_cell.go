@@ -115,3 +115,46 @@ func (b *BlockParser) ActionRecycleExpiredAccount(req *FuncTransactionHandleReq)
 
 	return
 }
+
+func (b *BlockParser) ActionAccountUpgrade(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+	if isCV, err := isCurrentVersionTx(req.Tx, common.DasContractNameAccountCellType); err != nil {
+		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
+		return
+	} else if !isCV {
+		log.Warn("not current version account cross chain tx")
+		return
+	}
+	log.Info("ActionAccountCrossChain:", req.BlockNumber, req.TxHash, req.Action)
+
+	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
+	if err != nil {
+		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
+		return
+	}
+	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeOutputs)
+	if err != nil {
+		resp.Err = fmt.Errorf("TxToOneDidEntity err: %s", err.Error())
+		return
+	}
+	didCellArgs := common.Bytes2Hex(req.Tx.Outputs[didEntity.Target.Index].Lock.Args)
+	accountInfo := tables.TableAccountInfo{
+		BlockNumber: req.BlockNumber,
+		Outpoint:    common.OutPoint2String(req.TxHash, 0),
+		AccountId:   builder.AccountId,
+		Status:      tables.AccountStatus(builder.Status),
+	}
+
+	didCellInfo := tables.TableDidCellInfo{
+		BlockNumber: req.BlockNumber,
+		Outpoint:    common.OutPoint2String(req.TxHash, 0),
+		AccountId:   builder.AccountId,
+		Args:        didCellArgs,
+	}
+
+	if err = b.DbDao.AccountUpgrade(accountInfo, didCellInfo); err != nil {
+		log.Error("AccountCrossChain err:", err.Error(), req.TxHash, req.BlockNumber)
+		resp.Err = fmt.Errorf("AccountCrossChain err: %s ", err.Error())
+		return
+	}
+	return
+}

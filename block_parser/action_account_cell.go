@@ -124,13 +124,14 @@ func (b *BlockParser) ActionAccountUpgrade(req FuncTransactionHandleReq) (resp F
 		log.Warn("not current version account cross chain tx")
 		return
 	}
-	log.Info("ActionAccountCrossChain:", req.BlockNumber, req.TxHash, req.Action)
+	log.Info("ActionAccountUpgrade:", req.BlockNumber, req.TxHash, req.Action)
 
 	builder, err := witness.AccountCellDataBuilderFromTx(req.Tx, common.DataTypeNew)
 	if err != nil {
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
 	}
+
 	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeOutputs)
 	if err != nil {
 		resp.Err = fmt.Errorf("TxToOneDidEntity err: %s", err.Error())
@@ -145,14 +146,28 @@ func (b *BlockParser) ActionAccountUpgrade(req FuncTransactionHandleReq) (resp F
 	}
 
 	didCellInfo := tables.TableDidCellInfo{
-		BlockNumber: req.BlockNumber,
-		Outpoint:    common.OutPoint2String(req.TxHash, 0),
-		AccountId:   builder.AccountId,
-		Args:        didCellArgs,
+		BlockNumber:  req.BlockNumber,
+		Outpoint:     common.OutPoint2String(req.TxHash, 0),
+		AccountId:    builder.AccountId,
+		Args:         didCellArgs,
+		LockCodeHash: req.Tx.Outputs[didEntity.Target.Index].Lock.CodeHash.Hex(),
 	}
 
-	if err = b.DbDao.AccountUpgrade(accountInfo, didCellInfo); err != nil {
-		log.Error("AccountCrossChain err:", err.Error(), req.TxHash, req.BlockNumber)
+	var recordsInfos []tables.TableRecordsInfo
+	recordList := didEntity.DidCellWitnessDataV0.Records
+	for _, v := range recordList {
+		recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
+			AccountId: builder.AccountId,
+			Account:   builder.Account,
+			Key:       v.Key,
+			Type:      v.Type,
+			Label:     v.Label,
+			Value:     v.Value,
+			Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
+		})
+	}
+	if err = b.DbDao.AccountUpgrade(accountInfo, didCellInfo, recordsInfos); err != nil {
+		log.Error("AccountUpgrade err:", err.Error(), req.TxHash, req.BlockNumber)
 		resp.Err = fmt.Errorf("AccountCrossChain err: %s ", err.Error())
 		return
 	}

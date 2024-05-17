@@ -13,10 +13,10 @@ func (b *BlockParser) ActionEditDidCellRecords(req FuncTransactionHandleReq) (re
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
 	} else if !isCV {
-		log.Warn("not current version account cross chain tx")
+		log.Warn("not current version edit didcell records tx")
 		return
 	}
-	log.Info("ActionAccountCrossChain:", req.BlockNumber, req.TxHash, req.Action)
+	log.Info("ActionEditDidCellRecords:", req.BlockNumber, req.TxHash, req.Action)
 
 	txDidEntity, err := witness.TxToDidEntity(req.Tx)
 	if err != nil {
@@ -29,9 +29,10 @@ func (b *BlockParser) ActionEditDidCellRecords(req FuncTransactionHandleReq) (re
 		resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
 		return
 	}
-	var recordsInfos []tables.TableRecordsInfo
+
 	account := didCellData.Account
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
+	var recordsInfos []tables.TableRecordsInfo
 	recordList := txDidEntity.Outputs[0].DidCellWitnessDataV0.Records
 	for _, v := range recordList {
 		recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
@@ -44,8 +45,6 @@ func (b *BlockParser) ActionEditDidCellRecords(req FuncTransactionHandleReq) (re
 			Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
 		})
 	}
-	log.Info("ActionEditDidRecords:", account)
-
 	oldDidCellOutpoint := common.OutPointStruct2String(req.Tx.Inputs[txDidEntity.Inputs[0].Target.Index].PreviousOutput)
 	var didCellInfo tables.TableDidCellInfo
 	didCellInfo.AccountId = accountId
@@ -64,10 +63,10 @@ func (b *BlockParser) ActionEditDidCellOwner(req FuncTransactionHandleReq) (resp
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
 	} else if !isCV {
-		log.Warn("not current version account cross chain tx")
+		log.Warn("not current version edit didcell owner")
 		return
 	}
-	log.Info("ActionAccountCrossChain:", req.BlockNumber, req.TxHash, req.Action)
+	log.Info("ActionEditDidCellOwner:", req.BlockNumber, req.TxHash, req.Action)
 	//transfer：获取output里didcell的args
 	//renew：获取input里的didcell的args（更新t_did_cell 的expired_at）
 	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeOutputs)
@@ -84,10 +83,11 @@ func (b *BlockParser) ActionEditDidCellOwner(req FuncTransactionHandleReq) (resp
 	account := didCellData.Account
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
 	didCellInfo := tables.TableDidCellInfo{
-		BlockNumber: req.BlockNumber,
-		Outpoint:    common.OutPoint2String(req.TxHash, 0),
-		AccountId:   accountId,
-		Args:        didCellArgs,
+		BlockNumber:  req.BlockNumber,
+		Outpoint:     common.OutPoint2String(req.TxHash, uint(didEntity.Target.Index)),
+		AccountId:    accountId,
+		Args:         didCellArgs,
+		LockCodeHash: req.Tx.Outputs[didEntity.Target.Index].Lock.CodeHash.Hex(),
 	}
 
 	oldOutpoint := common.OutPointStruct2String(req.Tx.Inputs[0].PreviousOutput)
@@ -99,32 +99,36 @@ func (b *BlockParser) ActionEditDidCellOwner(req FuncTransactionHandleReq) (resp
 }
 
 func (b *BlockParser) ActionDidCellRecycle(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
-	if isCV, err := isCurrentVersionTx(req.Tx, common.DasContractNameDidCellType); err != nil {
-		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
-		return
-	} else if !isCV {
-		log.Warn("not current version account cross chain tx")
-		return
-	}
-	log.Info("ActionAccountCrossChain:", req.BlockNumber, req.TxHash, req.Action)
-	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeOutputs)
+	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeInputs)
 	if err != nil {
 		resp.Err = fmt.Errorf("TxToOneDidEntity err: %s", err.Error())
 		return
 	}
-	var didCellData witness.DidCellData
-	if err := didCellData.BysToObj(req.Tx.OutputsData[didEntity.Target.Index]); err != nil {
+	preTx, err := b.DasCore.Client().GetTransaction(b.Ctx, req.Tx.Inputs[didEntity.Target.Index].PreviousOutput.TxHash)
+	if err != nil {
+		resp.Err = fmt.Errorf("GetTransaction err: %s", err.Error())
+		return
+	}
+
+	if isCV, err := isCurrentVersionTx(preTx.Transaction, common.DasContractNameDidCellType); err != nil {
+		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
+		return
+	} else if !isCV {
+		log.Warn("not current version didcell recycle")
+		return
+	}
+	log.Info("ActionDidCellRecycle:", req.BlockNumber, req.TxHash, req.Action)
+	preTxDidEntity, err := witness.TxToOneDidEntity(preTx.Transaction, witness.SourceTypeOutputs)
+
+	var preDidCellData witness.DidCellData
+	if err := preDidCellData.BysToObj(preTx.Transaction.OutputsData[preTxDidEntity.Target.Index]); err != nil {
 		resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
 		return
 	}
-	didCellArgs := common.Bytes2Hex(req.Tx.Outputs[didEntity.Target.Index].Lock.Args)
-	account := didCellData.Account
+	account := preDidCellData.Account
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
-	var didCellInfo tables.TableDidCellInfo
-	didCellInfo.Args = didCellArgs
-	didCellInfo.AccountId = accountId
 	oldOutpoint := common.OutPointStruct2String(req.Tx.Inputs[0].PreviousOutput)
-	if err := b.DbDao.DidCellRecycle(oldOutpoint); err != nil {
+	if err := b.DbDao.DidCellRecycle(oldOutpoint, accountId); err != nil {
 		log.Error("DidCellRecycle err:", err.Error())
 		resp.Err = fmt.Errorf("DidCellRecycle err: %s", err.Error())
 	}

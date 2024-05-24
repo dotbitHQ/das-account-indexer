@@ -123,12 +123,12 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 			//did cell : edit owner, recycle, edit record
 			if err == witness.ErrNotExistActionData {
 				if didCellAction, err := b.DasCore.TxToDidCellAction(tx); err != nil {
-					log.Error("TxToDidCellAction err :", blockNumber, txHash, err.Error())
+					log.Debug("TxToDidCellAction err :", blockNumber, txHash, err.Error())
 				} else {
 					action = didCellAction
 				}
 			} else {
-				log.Warn("ActionDataBuilderFromTx err:", err.Error())
+				log.Debug("ActionDataBuilderFromTx err:", err.Error())
 			}
 		} else {
 			//das action with did cell (renew didCell, upgrade didCell, transfer accCell to didCell, accCell operate with upgrade)

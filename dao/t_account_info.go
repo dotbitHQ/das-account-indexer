@@ -343,3 +343,33 @@ func (d *DbDao) BidExpiredAccountAuction(accountInfo tables.TableAccountInfo, re
 		return nil
 	})
 }
+
+func (d *DbDao) AccountUpgrade(accountInfo tables.TableAccountInfo, didCellInfo tables.TableDidCellInfo, recordsInfos []tables.TableRecordsInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Select("status", "block_number", "outpoint").
+			Where("account_id = ?", accountInfo.AccountId).
+			Updates(accountInfo).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("account_id = ?", didCellInfo.AccountId).Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+
+		if len(recordsInfos) > 0 {
+			if err := tx.Create(&recordsInfos).Error; err != nil {
+				return err
+			}
+		}
+		if err := tx.Clauses(clause.OnConflict{
+			DoUpdates: clause.AssignmentColumns([]string{
+				"args", "account", "expired_at",
+				"created_at", "updated_at",
+			}),
+		}).Create(&didCellInfo).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}

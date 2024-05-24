@@ -34,6 +34,8 @@ func (h *HttpServer) initRouter() {
 			v1Indexer.POST("/batch/account/records", code.DoMonitorLog(code.MethodBatchAccountRecords), cacheHandle, h.H.BatchAccountRecords)
 			v1Indexer.POST("/batch/reverse/record", code.DoMonitorLog(code.MethodBatchReverseRecord), cacheHandle, h.H.BatchReverseRecord)
 			v1Indexer.POST("/batch/register/info", code.DoMonitorLog(code.MethodBatchRegisterInfo), cacheHandle, h.H.BatchRegisterInfo)
+			v1Indexer.POST("/did/list", code.DoMonitorLog("did_list"), h.H.DidList)               //
+			v1Indexer.POST("/record/list", code.DoMonitorLog("records_list"), h.H.AccountRecords) //
 		}
 		v2Indexer := h.engineIndexer.Group("v2")
 		{

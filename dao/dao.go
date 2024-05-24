@@ -26,6 +26,7 @@ func NewGormDB(dbMysql config.DbMysql) (*DbDao, error) {
 		&tables.TableBlockInfo{},
 		&tables.TableRecordsInfo{},
 		&tables.TableReverseInfo{},
+		&tables.TableDidCellInfo{},
 	); err != nil {
 		return nil, err
 	}

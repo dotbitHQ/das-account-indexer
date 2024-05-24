@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (b *BlockParser) ActionEditDidCellRecords(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+func (b *BlockParser) ActionEditDidCellRecords(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	if isCV, err := isCurrentVersionTx(req.Tx, common.DasContractNameDidCellType); err != nil {
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
@@ -58,7 +58,7 @@ func (b *BlockParser) ActionEditDidCellRecords(req FuncTransactionHandleReq) (re
 	return
 }
 
-func (b *BlockParser) ActionEditDidCellOwner(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+func (b *BlockParser) ActionEditDidCellOwner(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	if isCV, err := isCurrentVersionTx(req.Tx, common.DasContractNameDidCellType); err != nil {
 		resp.Err = fmt.Errorf("isCurrentVersion err: %s", err.Error())
 		return
@@ -98,7 +98,7 @@ func (b *BlockParser) ActionEditDidCellOwner(req FuncTransactionHandleReq) (resp
 	return
 }
 
-func (b *BlockParser) ActionDidCellRecycle(req FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
+func (b *BlockParser) ActionDidCellRecycle(req *FuncTransactionHandleReq) (resp FuncTransactionHandleResp) {
 	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeInputs)
 	if err != nil {
 		resp.Err = fmt.Errorf("TxToOneDidEntity err: %s", err.Error())

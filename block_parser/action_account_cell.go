@@ -22,12 +22,59 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
 	}
+
+	if req.Action == common.DasActionTransferAccount && builder.Status == common.AccountStatusOnUpgrade {
+		txDidEntity, err := witness.TxToDidEntity(req.Tx)
+		if err != nil {
+			resp.Err = fmt.Errorf("witness.TxToDidEntity err: %s", err.Error())
+			return
+		}
+
+		if len(txDidEntity.Inputs) == 0 && len(txDidEntity.Outputs) == 1 {
+			didCellArgs := common.Bytes2Hex(req.Tx.Outputs[txDidEntity.Outputs[0].Target.Index].Lock.Args)
+			accInfo := tables.TableAccountInfo{
+				BlockNumber: req.BlockNumber,
+				Outpoint:    common.OutPoint2String(req.TxHash, uint(builder.Index)),
+				AccountId:   builder.AccountId,
+				Status:      tables.AccountStatus(builder.Status),
+			}
+
+			didCellInfo := tables.TableDidCellInfo{
+				BlockNumber:  req.BlockNumber,
+				Outpoint:     common.OutPoint2String(req.TxHash, uint(txDidEntity.Outputs[0].Target.Index)),
+				AccountId:    builder.AccountId,
+				Account:      builder.Account,
+				Args:         didCellArgs,
+				ExpiredAt:    builder.ExpiredAt,
+				LockCodeHash: req.Tx.Outputs[txDidEntity.Outputs[0].Target.Index].Lock.CodeHash.Hex(),
+			}
+
+			var recordsInfos []tables.TableRecordsInfo
+			recordList := txDidEntity.Outputs[0].DidCellWitnessDataV0.Records
+			for _, v := range recordList {
+				recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
+					AccountId: builder.AccountId,
+					Account:   builder.Account,
+					Key:       v.Key,
+					Type:      v.Type,
+					Label:     v.Label,
+					Value:     v.Value,
+					Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
+				})
+			}
+			if err := b.DbDao.TransferAccountToDid(accInfo, didCellInfo, recordsInfos); err != nil {
+				log.Error("TransferAccountToDid err:", err.Error())
+				resp.Err = fmt.Errorf("TransferAccountToDid err: %s", err.Error())
+			}
+			return
+		}
+	}
+
 	ownerHex, managerHex, err := b.DasCore.Daf().ArgsToHex(req.Tx.Outputs[builder.Index].Lock.Args)
 	if err != nil {
 		resp.Err = fmt.Errorf("ArgsToHex err: %s", err.Error())
 		return
 	}
-
 	accountInfo := tables.TableAccountInfo{
 		BlockNumber:        req.BlockNumber,
 		BlockTimestamp:     req.BlockTimestamp,

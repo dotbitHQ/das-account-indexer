@@ -58,6 +58,11 @@ func (b *BlockParser) registerTransactionHandle() {
 	b.MapTransactionHandle[common.DasActionRevokeApproval] = b.ActionRevokeApproval
 	b.MapTransactionHandle[common.DasActionFulfillApproval] = b.ActionFulfillApproval
 	b.MapTransactionHandle[common.DasActionBidExpiredAccountAuction] = b.ActionBidExpiredAccountAuction
+
+	//did cell
+	b.MapTransactionHandle[common.DidCellActionEditRecords] = b.ActionEditDidCellRecords // edit did cell record
+	b.MapTransactionHandle[common.DidCellActionEditOwner] = b.ActionEditDidCellOwner     // edit did cell owner
+	b.MapTransactionHandle[common.DidCellActionRecycle] = b.ActionDidCellRecycle         //  did cell recycle
 }
 
 func isCurrentVersionTx(tx *types.Transaction, name common.DasContractName) (bool, error) {

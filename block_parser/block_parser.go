@@ -115,31 +115,46 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 		blockTimestamp := block.Header.Timestamp
 		log.Info("parsingBlockData txHash:", txHash)
 
-		if builder, err := witness.ActionDataBuilderFromTx(tx); err != nil {
-			//log.Warn("ActionDataBuilderFromTx err:", err.Error())
+		builder, err := witness.ActionDataBuilderFromTx(tx)
+		action := ""
+		if err != nil {
+			//check didcellaction
+			//did cell : edit owner, recycle, edit record
+			if err == witness.ErrNotExistActionData {
+				if didCellAction, err := b.DasCore.TxToDidCellAction(tx); err != nil {
+					log.Error("TxToDidCellAction err :", blockNumber, txHash, err.Error())
+				} else {
+					action = didCellAction
+				}
+			} else {
+				log.Warn("ActionDataBuilderFromTx err:", err.Error())
+			}
 		} else {
-			// transaction parse by action
+			//das action with did cell (renew didCell, upgrade didCell, transfer accCell to didCell, accCell operate with upgrade)
+			action = builder.Action
+		}
+		if action != "" { // transaction parse by action
 			req := FuncTransactionHandleReq{
 				Tx:             tx,
 				TxHash:         txHash,
 				BlockNumber:    blockNumber,
 				BlockTimestamp: blockTimestamp,
-				Action:         builder.Action,
+				Action:         action,
 			}
-			handle, ok := b.MapTransactionHandle[builder.Action]
+			handle, ok := b.MapTransactionHandle[action]
 			if !ok {
-				log.Info("other handle:", txHash, builder.Action)
+				log.Info("other handle:", txHash, action)
 				handle = b.ActionUpdateAccountInfo
 			}
 			resp := handle(&req)
 			if resp.Err != nil {
-				log.Error("action handle resp:", builder.Action, blockNumber, txHash, resp.Err.Error())
+				log.Error("action handle resp:", action, blockNumber, txHash, resp.Err.Error())
 
 				b.errCountHandle++
 				if b.errCountHandle < 100 {
 					// notify
 					msg := "> Transaction hash：%s\n> Action：%s\n> Timestamp：%s\n> Error message：%s"
-					msg = fmt.Sprintf(msg, txHash, builder.Action, time.Now().Format("2006-01-02 15:04:05"), resp.Err.Error())
+					msg = fmt.Sprintf(msg, txHash, action, time.Now().Format("2006-01-02 15:04:05"), resp.Err.Error())
 					notify.SendLarkErrNotify("DasAccountIndexer BlockParser", msg)
 				}
 

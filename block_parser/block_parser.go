@@ -113,7 +113,8 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 		txHash := tx.Hash.Hex()
 		blockNumber := block.Header.Number
 		blockTimestamp := block.Header.Timestamp
-		log.Info("parsingBlockData txHash:", txHash)
+
+		log.Info("block number: ", blockNumber, " parsingBlockData txHash:", txHash)
 
 		builder, err := witness.ActionDataBuilderFromTx(tx)
 		action := ""

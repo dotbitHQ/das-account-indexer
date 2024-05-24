@@ -22,7 +22,6 @@ func (b *BlockParser) ActionUpdateAccountInfo(req *FuncTransactionHandleReq) (re
 		resp.Err = fmt.Errorf("AccountCellDataBuilderFromTx err: %s", err.Error())
 		return
 	}
-
 	if req.Action == common.DasActionTransferAccount && builder.Status == common.AccountStatusOnUpgrade {
 		txDidEntity, err := witness.TxToDidEntity(req.Tx)
 		if err != nil {

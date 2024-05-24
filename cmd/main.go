@@ -87,7 +87,8 @@ func runServer(ctx *cli.Context) error {
 	// das core
 	env := core.InitEnvOpt(config.Cfg.Server.Net, common.DasContractNameConfigCellType, common.DasContractNameAccountCellType,
 		common.DasContractNameBalanceCellType, common.DasContractNameDispatchCellType,
-		common.DasContractNameReverseRecordCellType, common.DASContractNameSubAccountCellType, common.DasContractNameReverseRecordRootCellType)
+		common.DasContractNameReverseRecordCellType, common.DASContractNameSubAccountCellType, common.DasContractNameReverseRecordRootCellType,
+		common.DasContractNameDidCellType, common.DasContractNameAlwaysSuccess)
 	ops := []core.DasCoreOption{
 		core.WithClient(ckbClient),
 		core.WithDasContractArgs(env.ContractArgs),

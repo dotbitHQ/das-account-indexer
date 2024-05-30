@@ -3,7 +3,6 @@ package dao
 import (
 	"das-account-indexer/tables"
 	"gorm.io/gorm"
-	"time"
 )
 
 func (d *DbDao) CreateDidCellRecordsInfos(outpoint string, didCellInfo tables.TableDidCellInfo, recordsInfos []tables.TableRecordsInfo) error {
@@ -51,14 +50,37 @@ func (d *DbDao) DidCellRecycle(outpoint, accountId string) error {
 	})
 }
 
-func (d *DbDao) QueryDidCell(args string, didType tables.DidCellStatus) (didList []tables.TableDidCellInfo, err error) {
+func (d *DbDao) QueryDidCell(args string, didType tables.DidCellStatus, limit, offset int) (didList []tables.TableDidCellInfo, err error) {
 	sql := d.db.Where(" args= ?", args)
+	timestamp := tables.GetDidCellRecycleExpiredAt()
 	if didType == tables.DidCellStatusNormal {
-		sql.Where("expired_at > ", time.Now().Unix())
+		sql.Where("expired_at > ", timestamp)
 	} else if didType == tables.DidCellStatusExpired {
-		sql.Where("expired_at <= ", time.Now().Unix())
+		sql.Where("expired_at <= ", timestamp)
 	}
-	err = sql.Find(&didList).Error
+	if limit > 0 {
+		err = sql.Limit(limit).Offset(offset).Find(&didList).Error
+	} else {
+		err = sql.Find(&didList).Error
+	}
+	return
+}
+
+func (d *DbDao) QueryDidCellTotal(args string, didType tables.DidCellStatus) (count int64, err error) {
+	sql := d.db.Model(tables.TableDidCellInfo{}).Where(" args= ?", args)
+	timestamp := tables.GetDidCellRecycleExpiredAt()
+	if didType == tables.DidCellStatusNormal {
+		sql.Where("expired_at > ", timestamp)
+	} else if didType == tables.DidCellStatusExpired {
+		sql.Where("expired_at <= ", timestamp)
+	}
+	err = sql.Count(&count).Error
+	return
+}
+
+func (d *DbDao) GetDidCellByAccountId(accountId string) (info tables.TableDidCellInfo, err error) {
+	err = d.db.Where("account_id=?", accountId).
+		Order("expired_at DESC").Limit(1).Find(&info).Error
 	return
 }
 

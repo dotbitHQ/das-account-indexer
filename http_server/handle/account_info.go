@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"das-account-indexer/config"
 	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
@@ -9,6 +10,7 @@ import (
 	"github.com/dotbitHQ/das-lib/core"
 	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
+	"github.com/nervosnetwork/ckb-sdk-go/address"
 	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
@@ -111,53 +113,85 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	}
 
 	resp.OutPoint = common.String2OutPointStruct(accountInfo.Outpoint)
-	ownerHex := core.DasAddressHex{
-		DasAlgorithmId:    accountInfo.OwnerAlgorithmId,
-		DasSubAlgorithmId: accountInfo.OwnerSubAid,
-		AddressHex:        accountInfo.Owner,
-		IsMulti:           false,
-		ChainType:         accountInfo.OwnerChainType,
-	}
-	managerHex := core.DasAddressHex{
-		DasAlgorithmId:    accountInfo.ManagerAlgorithmId,
-		DasSubAlgorithmId: accountInfo.ManagerSubAid,
-		AddressHex:        accountInfo.Manager,
-		IsMulti:           false,
-		ChainType:         accountInfo.ManagerChainType,
-	}
-	dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
-	if err != nil {
-		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
-		return fmt.Errorf("HexToArgs err: %s", err.Error())
-	}
-	ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
-	if err != nil {
-		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
-		return fmt.Errorf("owner HexToNormal err: %s", err.Error())
-	}
-	managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
-	if err != nil {
-		apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
-		return fmt.Errorf("manager HexToNormal err: %s", err.Error())
-	}
-
 	resp.AccountInfo = AccountInfo{
-		Account:            accountInfo.Account,
-		AccountAlias:       FormatDotToSharp(accountInfo.Account),
-		AccountIdHex:       accountInfo.AccountId,
-		NextAccountIdHex:   accountInfo.NextAccountId,
-		CreateAtUnix:       accountInfo.RegisteredAt,
-		ExpiredAtUnix:      accountInfo.ExpiredAt,
-		Status:             accountInfo.Status,
-		DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
-		OwnerAlgorithmId:   accountInfo.OwnerAlgorithmId,
-		OwnerSubAid:        accountInfo.OwnerSubAid,
-		OwnerKey:           ownerNormal.AddressNormal,
+		Account:          accountInfo.Account,
+		AccountAlias:     FormatDotToSharp(accountInfo.Account),
+		AccountIdHex:     accountInfo.AccountId,
+		NextAccountIdHex: accountInfo.NextAccountId,
+		CreateAtUnix:     accountInfo.RegisteredAt,
+		ExpiredAtUnix:    accountInfo.ExpiredAt,
+		Status:           accountInfo.Status,
+		//DasLockArgHex:      common.Bytes2Hex(dasLockArgs),
+		//OwnerAlgorithmId: accountInfo.OwnerAlgorithmId,
+		//OwnerSubAid:      accountInfo.OwnerSubAid,
+		//OwnerKey:           ownerNormal.AddressNormal,
 		ManagerAlgorithmId: accountInfo.ManagerAlgorithmId,
 		ManagerSubAid:      accountInfo.ManagerSubAid,
-		ManagerKey:         managerNormal.AddressNormal,
-		EnableSubAccount:   accountInfo.EnableSubAccount,
-		DisplayName:        FormatDisplayName(accountInfo.Account),
+		//ManagerKey:         managerNormal.AddressNormal,
+		EnableSubAccount: accountInfo.EnableSubAccount,
+		DisplayName:      FormatDisplayName(accountInfo.Account),
+	}
+
+	if accountInfo.Status == tables.AccountStatusOnLock {
+		didCell, err := h.DbDao.GetDidCellByAccountId(accountId)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find did cell info err")
+			return fmt.Errorf("GetDidCellByAccountId err: %s", err.Error())
+		} else if didCell.Id == 0 {
+			apiResp.ApiRespErr(http_api.ApiCodeAccountNotExist, "did cell not exist")
+			return nil
+		}
+
+		mode := address.Mainnet
+		if config.Cfg.Server.Net != common.DasNetTypeMainNet {
+			mode = address.Testnet
+		}
+		addrOwner, err := didCell.ToAnyLockAddr(mode)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeError500, "Failed to get did cell addr")
+			return fmt.Errorf("ConvertScriptToAddress err: %s", err.Error())
+		}
+		resp.AccountInfo.OwnerKey = addrOwner
+		resp.AccountInfo.OwnerAlgorithmId = common.DasAlgorithmIdAnyLock
+		resp.AccountInfo.ManagerKey = addrOwner
+		resp.AccountInfo.ManagerAlgorithmId = common.DasAlgorithmIdAnyLock
+	} else {
+		ownerHex := core.DasAddressHex{
+			DasAlgorithmId:    accountInfo.OwnerAlgorithmId,
+			DasSubAlgorithmId: accountInfo.OwnerSubAid,
+			AddressHex:        accountInfo.Owner,
+			IsMulti:           false,
+			ChainType:         accountInfo.OwnerChainType,
+		}
+		managerHex := core.DasAddressHex{
+			DasAlgorithmId:    accountInfo.ManagerAlgorithmId,
+			DasSubAlgorithmId: accountInfo.ManagerSubAid,
+			AddressHex:        accountInfo.Manager,
+			IsMulti:           false,
+			ChainType:         accountInfo.ManagerChainType,
+		}
+		dasLockArgs, err := h.DasCore.Daf().HexToArgs(ownerHex, managerHex)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
+			return fmt.Errorf("HexToArgs err: %s", err.Error())
+		}
+		ownerNormal, err := h.DasCore.Daf().HexToNormal(ownerHex)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
+			return fmt.Errorf("owner HexToNormal err: %s", err.Error())
+		}
+		managerNormal, err := h.DasCore.Daf().HexToNormal(managerHex)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeError500, err.Error())
+			return fmt.Errorf("manager HexToNormal err: %s", err.Error())
+		}
+		resp.AccountInfo.DasLockArgHex = common.Bytes2Hex(dasLockArgs)
+		resp.AccountInfo.OwnerAlgorithmId = accountInfo.OwnerAlgorithmId
+		resp.AccountInfo.OwnerSubAid = accountInfo.OwnerSubAid
+		resp.AccountInfo.OwnerKey = ownerNormal.AddressNormal
+		resp.AccountInfo.ManagerKey = managerNormal.AddressNormal
+		resp.AccountInfo.ManagerAlgorithmId = accountInfo.ManagerAlgorithmId
+		resp.AccountInfo.ManagerSubAid = accountInfo.ManagerSubAid
 	}
 
 	apiResp.ApiRespOK(resp)

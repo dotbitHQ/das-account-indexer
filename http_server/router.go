@@ -20,8 +20,8 @@ func (h *HttpServer) initRouter() {
 		h.engineIndexer.POST("", cacheHandle, h.H.QueryIndexer)
 		v1Indexer := h.engineIndexer.Group("v1")
 		{
-			v1Indexer.POST("/search/account", code.DoMonitorLog(code.MethodSearchAccount), cacheHandle, h.H.SearchAccount)
-			v1Indexer.POST("/address/account", code.DoMonitorLog(code.MethodAddressAccount), cacheHandle, h.H.AddressAccount)
+			//v1Indexer.POST("/search/account", code.DoMonitorLog(code.MethodSearchAccount), cacheHandle, h.H.SearchAccount)
+			//v1Indexer.POST("/address/account", code.DoMonitorLog(code.MethodAddressAccount), cacheHandle, h.H.AddressAccount)
 			v1Indexer.POST("/server/info", code.DoMonitorLog(code.MethodServerInfo), cacheHandle, h.H.ServerInfo)
 			v1Indexer.POST("/account/info", code.DoMonitorLog(code.MethodAccountInfo), cacheHandle, h.H.AccountInfo)
 			v1Indexer.POST("/account/list", code.DoMonitorLog(code.MethodAccountList), cacheHandle, h.H.AccountList)

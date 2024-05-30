@@ -41,6 +41,7 @@ const (
 	AccountStatusOnAuction AccountStatus = 2
 	AccountStatusOnLock    AccountStatus = 3
 	AccountStatusApproval  AccountStatus = 4
+	AccountStatusOnUpgrade AccountStatus = 153
 
 	AccountEnableStatusOff EnableSubAccount = 0
 	AccountEnableStatusOn  EnableSubAccount = 1

@@ -346,6 +346,9 @@ func (d *DbDao) UpdateAccounts(accounts []map[string]interface{}) error {
 }
 
 func (d *DbDao) GetAccountByAccIds(accIds []string) (list []*tables.TableAccountInfo, err error) {
+	if len(accIds) == 0 {
+		return
+	}
 	err = d.db.Where("account_id in (?)", accIds).Find(&list).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		err = nil

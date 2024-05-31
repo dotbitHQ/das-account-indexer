@@ -33,10 +33,11 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				BlockTimestamp: req.BlockTimestamp,
 				Outpoint:       outpoint,
 				AlgorithmId:    algorithmId,
-				ChainType:      algorithmId.ToChainType(),
-				Address:        address,
-				Account:        v.NextAccount,
-				ReverseType:    tables.ReverseTypeSmt,
+				//SubAlgorithmId:
+				ChainType:   algorithmId.ToChainType(),
+				Address:     address,
+				Account:     v.NextAccount,
+				ReverseType: tables.ReverseTypeSmt,
 			}
 			if v.PrevAccount != "" {
 				if err := tx.Where("address=? and reverse_type=?", address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {

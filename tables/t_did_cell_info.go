@@ -1,6 +1,10 @@
 package tables
 
 import (
+	"fmt"
+	"github.com/dotbitHQ/das-lib/common"
+	"github.com/nervosnetwork/ckb-sdk-go/address"
+	"github.com/nervosnetwork/ckb-sdk-go/types"
 	"time"
 )
 
@@ -37,4 +41,20 @@ func (t *TableDidCellInfo) IsExpired() bool {
 		return true
 	}
 	return false
+}
+
+func GetDidCellRecycleExpiredAt() uint64 {
+	return uint64(time.Now().Add(-time.Hour * 24 * 30 * 3).Unix())
+}
+
+func (t *TableDidCellInfo) ToAnyLockAddr(mode address.Mode) (string, error) {
+	addrOwner, err := address.ConvertScriptToAddress(mode, &types.Script{
+		CodeHash: types.HexToHash(t.LockCodeHash),
+		HashType: types.HashTypeType,
+		Args:     common.Hex2Bytes(t.Args),
+	})
+	if err != nil {
+		return "", fmt.Errorf("ConvertScriptToAddress err: %s", err.Error())
+	}
+	return addrOwner, nil
 }

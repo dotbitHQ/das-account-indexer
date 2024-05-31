@@ -110,7 +110,7 @@ func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiR
 		}
 		addrNormal, err := h.DasCore.Daf().HexToNormal(core.DasAddressHex{
 			DasAlgorithmId:    v.AlgorithmId,
-			DasSubAlgorithmId: 0,
+			DasSubAlgorithmId: v.SubAlgorithmId,
 			AddressHex:        v.Address,
 			AddressPayload:    nil,
 			IsMulti:           false,

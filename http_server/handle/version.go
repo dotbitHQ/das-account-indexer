@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
@@ -16,7 +15,7 @@ type RespVersion struct {
 	Version string `json:"version"`
 }
 
-func (h *HttpHandle) JsonRpcVersion(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcVersion(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqVersion
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -39,7 +38,7 @@ func (h *HttpHandle) Version(ctx *gin.Context) {
 	var (
 		funcName = "Version"
 		req      ReqVersion
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -58,7 +57,7 @@ func (h *HttpHandle) Version(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doVersion(req *ReqVersion, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doVersion(req *ReqVersion, apiResp *http_api.ApiResp) error {
 	var resp RespVersion
 	resp.Version = "v2.0.1"
 	apiResp.ApiRespOK(resp)

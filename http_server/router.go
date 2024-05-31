@@ -28,11 +28,13 @@ func (h *HttpServer) initRouter() {
 			v1Indexer.POST("/account/records", code.DoMonitorLog(code.MethodAccountRecords), cacheHandle, h.H.AccountRecords)
 			v1Indexer.POST("/account/reverse/address", code.DoMonitorLog(code.MethodAccountReverseAddress), cacheHandle, h.H.AccountReverseAddress)
 			v1Indexer.POST("/reverse/record", code.DoMonitorLog(code.MethodReverseRecord), cacheHandle, h.H.ReverseRecord)
+			v1Indexer.POST("/v2/reverse/record", code.DoMonitorLog(code.MethodReverseRecord), cacheHandle, h.H.ReverseRecordV2)
 			v1Indexer.POST("/sub/account/list", code.DoMonitorLog(code.MethodSubAccountList), cacheHandle, h.H.SubAccountList)
 			v1Indexer.POST("/sub/account/verify", code.DoMonitorLog(code.MethodSubAccountVerify), cacheHandle, h.H.SubAccountVerify)
 
 			v1Indexer.POST("/batch/account/records", code.DoMonitorLog(code.MethodBatchAccountRecords), cacheHandle, h.H.BatchAccountRecords)
 			v1Indexer.POST("/batch/reverse/record", code.DoMonitorLog(code.MethodBatchReverseRecord), cacheHandle, h.H.BatchReverseRecord)
+			v1Indexer.POST("/v1/batch/reverse/record", code.DoMonitorLog(code.MethodBatchReverseRecord), cacheHandle, h.H.BatchReverseRecordV2)
 			v1Indexer.POST("/batch/register/info", code.DoMonitorLog(code.MethodBatchRegisterInfo), cacheHandle, h.H.BatchRegisterInfo)
 			v1Indexer.POST("/did/list", code.DoMonitorLog("did_list"), h.H.DidList)               //
 			v1Indexer.POST("/record/list", code.DoMonitorLog("records_list"), h.H.AccountRecords) //

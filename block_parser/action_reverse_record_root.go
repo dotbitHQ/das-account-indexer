@@ -28,6 +28,14 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 			outpoint := common.OutPoint2String(req.TxHash, uint(idx))
 			algorithmId := common.DasAlgorithmId(v.SignType)
 			address := common.FormatAddressPayload(v.Address, algorithmId)
+			p2shP2wpkh, err := v.GetP2SHP2WPKH(b.DasCore.NetType())
+			if err != nil {
+				log.Error("GetP2SHP2WPKH err: %s", err.Error())
+			}
+			p2tr, err := v.GetP2TR(b.DasCore.NetType())
+			if err != nil {
+				log.Error("GetP2TR err: %s", err.Error())
+			}
 			reverseInfo := &tables.TableReverseInfo{
 				BlockNumber:    req.BlockNumber,
 				BlockTimestamp: req.BlockTimestamp,
@@ -38,6 +46,8 @@ func (b *BlockParser) ActionReverseRecordRoot(req *FuncTransactionHandleReq) (re
 				Address:     address,
 				Account:     v.NextAccount,
 				ReverseType: tables.ReverseTypeSmt,
+				P2shP2wpkh:  p2shP2wpkh,
+				P2tr:        p2tr,
 			}
 			if v.PrevAccount != "" {
 				if err := tx.Where("address=? and reverse_type=?", address, tables.ReverseTypeSmt).Delete(&tables.TableReverseInfo{}).Error; err != nil {

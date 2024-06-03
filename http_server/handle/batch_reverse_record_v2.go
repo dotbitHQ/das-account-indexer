@@ -83,22 +83,43 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 
 	// check params
 	var listKeyInfo []*core.DasAddressHex
+	var listBtcAddr []string
 	for _, v := range req.BatchKeyInfo {
 		addrHex, err := v.FormatChainTypeAddress(config.Cfg.Server.Net, false)
 		if err != nil {
 			log.Warn("FormatChainTypeAddress err: %s", err.Error())
 			listKeyInfo = append(listKeyInfo, nil)
+			listBtcAddr = append(listBtcAddr, "")
 			continue
-		} else if addrHex.DasAlgorithmId == common.DasAlgorithmIdAnyLock {
+		}
+		switch addrHex.DasAlgorithmId {
+		case common.DasAlgorithmIdAnyLock:
 			anyLockAddrHex, err := addrHex.FormatAnyLock()
 			if err != nil {
 				log.Warn("FormatAnyLock err: %s", err.Error())
 				listKeyInfo = append(listKeyInfo, nil)
+				listBtcAddr = append(listBtcAddr, "")
 				continue
 			}
 			listKeyInfo = append(listKeyInfo, anyLockAddrHex)
-		} else {
+			listBtcAddr = append(listBtcAddr, "")
+		case common.DasAlgorithmIdEth, common.DasAlgorithmIdTron,
+			common.DasAlgorithmIdDogeChain, common.DasAlgorithmIdWebauthn:
 			listKeyInfo = append(listKeyInfo, addrHex)
+			listBtcAddr = append(listBtcAddr, "")
+		case common.DasAlgorithmIdBitcoin:
+			log.Info("doReverseInfoV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
+			switch addrHex.DasSubAlgorithmId {
+			case common.DasSubAlgorithmIdBitcoinP2PKH, common.DasSubAlgorithmIdBitcoinP2WPKH:
+				listKeyInfo = append(listKeyInfo, addrHex)
+				listBtcAddr = append(listBtcAddr, "")
+			default:
+				listKeyInfo = append(listKeyInfo, addrHex)
+				listBtcAddr = append(listBtcAddr, v.KeyInfo.Key)
+			}
+		default:
+			listKeyInfo = append(listKeyInfo, nil)
+			listBtcAddr = append(listBtcAddr, "")
 		}
 	}
 
@@ -108,7 +129,7 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 		if v == nil {
 			tmp.ErrMsg = "address is invalid"
 		} else {
-			account, errMsg := h.checkReverseV2(v.ChainType, v.AddressHex, req.BatchKeyInfo[i].KeyInfo.Key, apiResp)
+			account, errMsg := h.checkReverseV2(v.ChainType, v.AddressHex, req.BatchKeyInfo[i].KeyInfo.Key, listBtcAddr[i], apiResp)
 			if apiResp.ErrNo != http_api.ApiCodeSuccess {
 				return nil
 			}
@@ -126,9 +147,9 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 	return nil
 }
 
-func (h *HttpHandle) checkReverseV2(chainType common.ChainType, addressHex, reqKey string, apiResp *http_api.ApiResp) (account, errMsg string) {
+func (h *HttpHandle) checkReverseV2(chainType common.ChainType, addressHex, reqKey, btcAddr string, apiResp *http_api.ApiResp) (account, errMsg string) {
 	// reverse
-	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
+	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex, btcAddr)
 	if err != nil {
 		log.Error("FindAccountInfoByAccountId err: ", err.Error(), reverse.Account)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")
@@ -136,6 +157,10 @@ func (h *HttpHandle) checkReverseV2(chainType common.ChainType, addressHex, reqK
 	} else if reverse.Id == 0 {
 		errMsg = "reverse does not exit"
 		return
+	}
+
+	if btcAddr != "" {
+		addressHex = reverse.Address
 	}
 
 	// check account
@@ -165,7 +190,7 @@ func (h *HttpHandle) checkReverseV2(chainType common.ChainType, addressHex, reqK
 		owner = accountInfo.Owner
 		manager = accountInfo.Manager
 	}
-	log.Info("owner manager:", owner, manager)
+	log.Info("owner manager:", owner, manager, addressHex)
 
 	if strings.EqualFold(addressHex, owner) || strings.EqualFold(addressHex, manager) {
 		account = accountInfo.Account

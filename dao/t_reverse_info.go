@@ -42,8 +42,16 @@ func (d *DbDao) DeleteReverseInfo(outpoints []string) error {
 	return d.db.Where(" outpoint IN (?) ", outpoints).Delete(&tables.TableReverseInfo{}).Error
 }
 
-func (d *DbDao) FindLatestReverseRecord(chainType common.ChainType, address string) (r tables.TableReverseInfo, err error) {
-	err = d.db.Where(" chain_type=? AND address=? ", chainType, address).Order(" block_number DESC,outpoint DESC ").Limit(1).Find(&r).Error
+func (d *DbDao) FindLatestReverseRecord(chainType common.ChainType, address, btcAddr string) (r tables.TableReverseInfo, err error) {
+	if btcAddr != "" {
+		err = d.db.Where("chain_type=? AND (p2sh_p2wpkh=? OR p2tr=?)",
+			chainType, btcAddr, btcAddr).
+			Order(" block_number DESC, outpoint DESC ").Limit(1).Find(&r).Error
+	} else {
+		err = d.db.Where(" chain_type=? AND address=? ", chainType, address).
+			Order(" block_number DESC,outpoint DESC ").Limit(1).Find(&r).Error
+	}
+
 	return
 }
 

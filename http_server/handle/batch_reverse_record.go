@@ -110,7 +110,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 }
 
 func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string, apiResp *code.ApiResp) (account, errMsg string) {
-	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
+	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex, "")
 	if err != nil {
 		log.Error("FindLatestReverseRecord err: ", err.Error(), addressHex)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")

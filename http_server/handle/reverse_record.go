@@ -123,7 +123,7 @@ func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiRes
 		return nil
 	}
 
-	reverse, err := h.DbDao.FindLatestReverseRecord(res.ChainType, res.AddressHex)
+	reverse, err := h.DbDao.FindLatestReverseRecord(res.ChainType, res.AddressHex, "")
 	if err != nil {
 		log.Error("FindLatestReverseRecord err:", err.Error(), res.ChainType, res.AddressHex)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")

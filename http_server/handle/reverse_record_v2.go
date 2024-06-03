@@ -71,13 +71,17 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 	var resp RespReverseRecordV2
 	var chainType common.ChainType
 	var addressHex string
+	var btcAddr string
 
 	addrHex, err := req.FormatChainTypeAddress(h.DasCore.NetType(), false)
 	if err != nil {
 		log.Error("FormatChainTypeAddress err:", req.KeyInfo.Key)
-		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
-		return err
-	} else if addrHex.DasAlgorithmId == common.DasAlgorithmIdAnyLock {
+		apiResp.ApiRespOK(resp)
+		return nil
+	}
+
+	switch addrHex.DasAlgorithmId {
+	case common.DasAlgorithmIdAnyLock:
 		res, err := addrHex.FormatAnyLock()
 		if err != nil {
 			log.Error("addrHex.FormatAnyLock err: %s", err.Error())
@@ -86,20 +90,40 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 		}
 		chainType = res.ChainType
 		addressHex = res.AddressHex
-	} else {
+	case common.DasAlgorithmIdEth, common.DasAlgorithmIdTron,
+		common.DasAlgorithmIdDogeChain, common.DasAlgorithmIdWebauthn:
 		chainType = addrHex.ChainType
 		addressHex = addrHex.AddressHex
+	case common.DasAlgorithmIdBitcoin:
+		log.Info("doReverseRecordV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
+		switch addrHex.DasSubAlgorithmId {
+		case common.DasSubAlgorithmIdBitcoinP2PKH, common.DasSubAlgorithmIdBitcoinP2WPKH:
+			chainType = addrHex.ChainType
+			addressHex = addrHex.AddressHex
+		default:
+			chainType = addrHex.ChainType
+			addressHex = addrHex.AddressHex
+			btcAddr = req.KeyInfo.Key
+		}
+	default:
+		log.Error("default address invalid")
+		apiResp.ApiRespOK(resp)
+		return nil
 	}
-	log.Info("doReverseInfoV2:", chainType, addressHex, req.KeyInfo.Key)
+
+	log.Info("doReverseRecordV2:", chainType, addressHex, req.KeyInfo.Key, btcAddr)
 
 	// reverse
-	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex)
+	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex, btcAddr)
 	if err != nil {
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find reverse record err")
 		return fmt.Errorf("FindLatestReverseRecord err: %s", err.Error())
 	} else if reverse.Id == 0 {
 		apiResp.ApiRespOK(resp)
 		return nil
+	}
+	if btcAddr != "" {
+		addressHex = reverse.Address
 	}
 
 	// check account

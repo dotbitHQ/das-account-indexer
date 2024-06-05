@@ -24,13 +24,27 @@ func (b *BlockParser) ActionEditDidCellRecords(req *FuncTransactionHandleReq) (r
 		return
 	}
 
-	var didCellData witness.DidCellData
-	if err := didCellData.BysToObj(req.Tx.OutputsData[txDidEntity.Outputs[0].Target.Index]); err != nil {
-		resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//var didCellData witness.DidCellData
+	//if err := didCellData.BysToObj(req.Tx.OutputsData[txDidEntity.Outputs[0].Target.Index]); err != nil {
+	//	resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//	return
+	//}
+	sporeData, didCellData, err := witness.BysToDidCellData(req.Tx.OutputsData[txDidEntity.Outputs[0].Target.Index])
+	if err != nil {
+		resp.Err = fmt.Errorf("witness.BysToDidCellData err: %s", err.Error())
 		return
 	}
-
-	account := didCellData.Account
+	account := ""
+	if sporeData != nil {
+		didCellDataLV, err := sporeData.ContentToDidCellDataLV()
+		if err != nil {
+			resp.Err = fmt.Errorf("sporeData.ContentToDidCellDataLV err: %s", err.Error())
+			return
+		}
+		account = didCellDataLV.Account
+	} else if didCellData != nil {
+		account = didCellData.Account
+	}
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
 	var recordsInfos []tables.TableRecordsInfo
 	recordList := txDidEntity.Outputs[0].DidCellWitnessDataV0.Records
@@ -67,20 +81,35 @@ func (b *BlockParser) ActionEditDidCellOwner(req *FuncTransactionHandleReq) (res
 		return
 	}
 	log.Info("ActionEditDidCellOwner:", req.BlockNumber, req.TxHash, req.Action)
-	//transfer：获取output里didcell的args
-	//renew：获取input里的didcell的args（更新t_did_cell 的expired_at）
+
 	didEntity, err := witness.TxToOneDidEntity(req.Tx, witness.SourceTypeOutputs)
 	if err != nil {
 		resp.Err = fmt.Errorf("TxToOneDidEntity err: %s", err.Error())
 		return
 	}
-	var didCellData witness.DidCellData
-	if err := didCellData.BysToObj(req.Tx.OutputsData[didEntity.Target.Index]); err != nil {
-		resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//var didCellData witness.DidCellData
+	//if err := didCellData.BysToObj(req.Tx.OutputsData[didEntity.Target.Index]); err != nil {
+	//	resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//	return
+	//}
+	sporeData, didCellData, err := witness.BysToDidCellData(req.Tx.OutputsData[didEntity.Target.Index])
+	if err != nil {
+		resp.Err = fmt.Errorf("witness.BysToDidCellData err: %s", err.Error())
 		return
 	}
+	account := ""
+	if sporeData != nil {
+		didCellDataLV, err := sporeData.ContentToDidCellDataLV()
+		if err != nil {
+			resp.Err = fmt.Errorf("sporeData.ContentToDidCellDataLV err: %s", err.Error())
+			return
+		}
+		account = didCellDataLV.Account
+	} else if didCellData != nil {
+		account = didCellData.Account
+	}
+
 	didCellArgs := common.Bytes2Hex(req.Tx.Outputs[didEntity.Target.Index].Lock.Args)
-	account := didCellData.Account
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
 	didCellInfo := tables.TableDidCellInfo{
 		BlockNumber:  req.BlockNumber,
@@ -120,12 +149,29 @@ func (b *BlockParser) ActionDidCellRecycle(req *FuncTransactionHandleReq) (resp 
 	log.Info("ActionDidCellRecycle:", req.BlockNumber, req.TxHash, req.Action)
 	preTxDidEntity, err := witness.TxToOneDidEntity(preTx.Transaction, witness.SourceTypeOutputs)
 
-	var preDidCellData witness.DidCellData
-	if err := preDidCellData.BysToObj(preTx.Transaction.OutputsData[preTxDidEntity.Target.Index]); err != nil {
-		resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//var preDidCellData witness.DidCellData
+	//if err := preDidCellData.BysToObj(preTx.Transaction.OutputsData[preTxDidEntity.Target.Index]); err != nil {
+	//	resp.Err = fmt.Errorf("didCellData.BysToObj err: %s", err.Error())
+	//	return
+	//}
+
+	sporeData, didCellData, err := witness.BysToDidCellData(preTx.Transaction.OutputsData[preTxDidEntity.Target.Index])
+	if err != nil {
+		resp.Err = fmt.Errorf("witness.BysToDidCellData err: %s", err.Error())
 		return
 	}
-	account := preDidCellData.Account
+	account := ""
+	if sporeData != nil {
+		didCellDataLV, err := sporeData.ContentToDidCellDataLV()
+		if err != nil {
+			resp.Err = fmt.Errorf("sporeData.ContentToDidCellDataLV err: %s", err.Error())
+			return
+		}
+		account = didCellDataLV.Account
+	} else if didCellData != nil {
+		account = didCellData.Account
+	}
+
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(account))
 	oldOutpoint := common.OutPointStruct2String(req.Tx.Inputs[0].PreviousOutput)
 	if err := b.DbDao.DidCellRecycle(oldOutpoint, accountId); err != nil {

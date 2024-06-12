@@ -117,9 +117,8 @@ func (b *BlockParser) ActionDidCellRecycle(req *FuncTransactionHandleReq) (resp 
 		return
 	}
 	log.Info("ActionDidCellRecycle:", req.BlockNumber, req.TxHash, req.Action)
-	preTxDidEntity, err := witness.TxToOneDidEntity(preTx.Transaction, witness.SourceTypeOutputs)
 
-	account, _, err := witness.GetAccountAndExpireFromDidCellData(preTx.Transaction.OutputsData[preTxDidEntity.Target.Index])
+	account, _, err := witness.GetAccountAndExpireFromDidCellData(preTx.Transaction.OutputsData[req.Tx.Inputs[didEntity.Target.Index].PreviousOutput.Index])
 	if err != nil {
 		resp.Err = fmt.Errorf("witness.GetAccountAndExpireFromDidCellData err: %s", err.Error())
 		return

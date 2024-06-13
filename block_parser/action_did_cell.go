@@ -89,8 +89,22 @@ func (b *BlockParser) ActionEditDidCellOwner(req *FuncTransactionHandleReq) (res
 		LockCodeHash: req.Tx.Outputs[didEntity.Target.Index].Lock.CodeHash.Hex(),
 	}
 
+	var recordsInfos []tables.TableRecordsInfo
+	recordList := didEntity.DidCellWitnessDataV0.Records
+	for _, v := range recordList {
+		recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
+			AccountId: accountId,
+			Account:   account,
+			Key:       v.Key,
+			Type:      v.Type,
+			Label:     v.Label,
+			Value:     v.Value,
+			Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
+		})
+	}
+
 	oldOutpoint := common.OutPointStruct2String(req.Tx.Inputs[0].PreviousOutput)
-	if err := b.DbDao.EditDidCellOwner(oldOutpoint, didCellInfo); err != nil {
+	if err := b.DbDao.EditDidCellOwner(oldOutpoint, didCellInfo, recordsInfos); err != nil {
 		log.Error("EditDidCellOwner err:", err.Error())
 		resp.Err = fmt.Errorf("EditDidCellOwner err: %s", err.Error())
 	}

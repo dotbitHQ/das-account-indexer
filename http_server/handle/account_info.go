@@ -132,7 +132,7 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 		DisplayName:      FormatDisplayName(accountInfo.Account),
 	}
 
-	if accountInfo.Status == tables.AccountStatusOnLock {
+	if accountInfo.Status == tables.AccountStatusOnUpgrade {
 		didCell, err := h.DbDao.GetDidCellByAccountId(accountId)
 		if err != nil {
 			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find did cell info err")

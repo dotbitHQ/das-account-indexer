@@ -1,16 +1,18 @@
 * [API List](#api-list)
     * [Get Server Info](#get-server-info)
-    * [Get Reverse Record Info](#get-reverse-record-info)
-    * [Get Account Basic Info](#get-account-basic-info)
-    * [Get Account List](#get-account-list)  
-    * [Get Account Records Info](#get-account-records-info) 
-    * [Get Account Records Info V2](#get-account-records-info-v2)
+    * [Get Account Info](#get-account-info)
+    * [Get Account List](#get-account-list)
+    * [Get Account Records Info](#get-account-records-info)
     * [Get Valid Reverse Addresses](#Get-Valid-Reverse-Addresses)
+    * [Get Reverse Record Info](#get-reverse-record-info)
     * [Get Sub-Account List](#get-sub-account-list)
     * [Verify Sub-Account](#verify-sub-account)
     * [Get Batch Account Records Info](#get-batch-account-records-info)
-    * [Get Batch reverse Record Info](#get-batch-reverse-record-info)
+    * [Get Batch Reverse Record Info](#Get-Batch-Reverse-Record-Info)
     * [Get Batch register Info](#get-batch-register-info)
+    * [Get Did List](#get-didcell-list)
+    * [Get Account Records Info V2](#get-account-records-info-v2)
+
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
     * [<em>Get Related Accounts By Owner Address</em>](#get-related-accounts-by-owner-address-deprecated)
@@ -56,7 +58,7 @@ This service can query all data, but it is recommended that developers setup the
   "data": {
     "is_latest_block_number": true,
     "current_block_number": 6088191,
-    "chain": "testnet" //mainnet
+    "chain": "testnet" 
   }
 }
 ```
@@ -73,21 +75,48 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_serverInfo","params": []}'
 ```
 
+### Get Account Info
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/account/info`
+* param: none
+
+**Response**
+
+```json
+{
+  "err_no": 0,
+  "err_msg": "",
+  "data": {
+    "account": "",
+    "account_id": ""
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/account/info -d'{"account":"","account_id":""}'
+```
+
+
 ### Get Reverse Record Info
 * You need to set an alias for it to take effect.
-* [❓How to set an alias](https://app.did.id/alias)
+* [How to set an alias](https://app.did.id/alias)
 
 **Request**
 * host: `indexer-v1.did.id`
 * path: `/v1/reverse/record`
 * param:
 
-```javascript
+```json
 {
   "type": "blockchain",
   "key_info": {
-    "coin_type": "", // 60: ETH, 195: TRX, 9006: BNB, 966: Matic, 3: doge
-    "key": "" // address
+    "coin_type": "",
+    "key": ""
   }
 }
 ```
@@ -121,14 +150,14 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 ### Get Batch Reverse Record Info
 * You need to set an alias for it to take effect.
-* [❓How to set an alias](https://app.did.id/alias)
+* [How to set an alias](https://app.did.id/alias)
 
 **Request**
 * host: `indexer-v1.did.id`
 * path: `/v1/batch/reverse/record`
 * param:
   * support up to 100 addresses
-```javascript
+```json
 {
   "batch_key_info":[
     {
@@ -138,7 +167,6 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
         "key": "" // address
       }
     }
-    //...
   ]
 }
 ```
@@ -175,7 +203,7 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_batchReverseRecord","params": [{"batch_key_info":[{"type": "blockchain","key_info":{"coin_type": "60","key": "0x9176acd39a3a9ae99dcb3922757f8af4f94cdf3c"}}]}]}'
 ```
 
-### get-batch-register-info
+### Get Batch register Info
 
 batch get account register info, currently can only check whether the account can be registered
 
@@ -230,6 +258,98 @@ or json rpc style:
 ```shell
 curl -X POST https://indexer-v1.did.id -d '{"jsonrpc": "2.0","id": 1,"method": "das_batchRegisterInfo","params": [{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}]}'
 ```
+
+### Get Did List
+
+batch get account register info, currently can only check whether the account can be registered
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/did/list`
+* param:
+  * support up to max 50 account
+```json
+{
+  "type": "blockchain",
+  "key_info": {
+    "coin_type": "", 
+    "key": ""
+  },
+  "page": 1,
+  "size": 10,
+  "did_type": 1
+}
+```
+
+**Response**
+
+```json
+{
+  "err_no": 0,
+  "err_msg": "",
+  "data": {
+    "list": [
+      {
+        "outpoint": "",
+        "account_id": "",
+        "account": "",
+        "args": "",
+        "expired_at": 0,
+        "did_cell_status": 1
+      }
+    ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/did/list -d '{"type": "blockchain","key_info": {"coin_type": "", "key": ""},"page": 1,"size": 10,"did_type": 1}'
+```
+
+### Get Record List
+
+batch get account register info, currently can only check whether the account can be registered
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/record/list`
+* param:
+  * support up to max 50 account
+```json
+{
+  "account": ""
+}
+```
+
+**Response**
+
+```json
+{
+  "err_no": 0,
+  "err_msg": "",
+  "data": {
+    "account": "",
+    "records": [
+      {
+        "key":"",
+        "label": "",
+        "value": "",
+        "ttl": ""
+      }
+    ]
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/record/list -d '{"account": ""}'
+```
+
+
 
 ### Verify Sub-Account
 
@@ -306,7 +426,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Response**
   * status: 0-normal, 1-on sale, 3-cross-chain, 4-approval-enable
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
@@ -354,8 +474,8 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 * host: `indexer-v1.did.id`
 * path: `/v1/account/list`
 * param:
-
-```javascript
+  
+```json
 {
   "type": "blockchain",
   "key_info": {
@@ -368,21 +488,21 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 **Response**
 
-```javascript
+```json
 {
   "err_no":0,
   "err_msg":"",
   "data":{
-    "account_list":[
+    "account_list": [
       {
         "account":"",
         "account_alias":"",
         "display_name":"",
-        "registered_at": 1666268687, // unix second timestamp
-        "expired_at": 1729340687 // unix second timestamp
+        "registered_at": 1666268687,
+        "expired_at": 1729340687
       }
-      // ...
-    ]
+    ],
+    "total":1
   }
 }
 ```
@@ -418,7 +538,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Response**
 * key: https://github.com/dotbitHQ/cell-data-generator/blob/master/data/record_key_namespace.txt
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
@@ -475,7 +595,7 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
 **Response**
 * key: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
@@ -533,13 +653,14 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
 **Response**
 * key: https://github.com/dotbitHQ/cell-data-generator/blob/master/data/record_key_namespace.txt
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
   "data": {
       "list":[{
         "account": "phone.bit",
+        "account_id": "",
         "records": [
           {
             "key": "address.eth",
@@ -547,10 +668,8 @@ The return field [key] from [SLIP-0044](https://github.com/satoshilabs/slips/blo
             "value": "0x59724739940777947c56C4f2f2C9211cd5130FEf",
             "ttl": "300"
           }
-        // ...
       ]
     }
-    // ...
     ]
   }
 }
@@ -576,7 +695,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 * path: `/v1/account/reverse/address`
 * param:
 
-```javascript
+```json
 {
   "account": "20230725.bit"
 }
@@ -585,7 +704,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Response**
   * coin_type: 60-evm, 195-tron, 3-doge, 309-ckb
 
-```javascript
+```json
 {
   "err_no":0, 
   "err_msg":"",
@@ -621,6 +740,9 @@ or json rpc style:
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_accountReverseAddress","params": [{"account":"20230725.bit"}]}'
 ```
+
+
+
 ### Get Sub-Account List
 
 **Request**
@@ -629,7 +751,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 * path: `/v1/sub/account/list`
 * param:
 
-```javascript
+```json
 {
   "account": "0x.bit",
   "page": 1,
@@ -641,7 +763,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
 * enable_sub_account: 0-unenabled, 1-enabled
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
@@ -657,8 +779,10 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
         "create_at_unix": 0,
         "expired_at_unix": 0,
         "owner_algorithm_id": 5,// 3: eth personal sign, 4: tron sign, 5: eip-712
+        "owner_sub_aid": 0,
         "owner_key": "0x...",
         "manager_algorithm_id": 5,
+        "manager_sub_aid": 0,
         "manager_key": "0x...",
         "display_name":""
       }
@@ -696,7 +820,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
  _**Response**_
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",
@@ -768,7 +892,7 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 
  _**Response**_
 
-```javascript
+```json
 {
   "err_no": 0,
   "err_msg": "",

@@ -3,6 +3,7 @@ package dao
 import (
 	"das-account-indexer/tables"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func (d *DbDao) CreateDidCellRecordsInfos(outpoint string, didCellInfo tables.TableDidCellInfo, recordsInfos []tables.TableRecordsInfo) error {
@@ -52,6 +53,52 @@ func (d *DbDao) DidCellRecycle(outpoint, accountId string) error {
 			return err
 		}
 		if err := tx.Where("outpoint = ? ", outpoint).Delete(&tables.TableDidCellInfo{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (d *DbDao) DidCellUpdateList(oldOutpointList []string, list []tables.TableDidCellInfo, accountIds []string, records []tables.TableRecordsInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if len(oldOutpointList) > 0 {
+			if err := tx.Where("outpoint IN(?) ", oldOutpointList).
+				Delete(&tables.TableDidCellInfo{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(list) > 0 {
+			if err := tx.Clauses(clause.Insert{
+				Modifier: "IGNORE",
+			}).Create(&list).Error; err != nil {
+				return err
+			}
+		}
+		if len(accountIds) > 0 {
+			if err := tx.Where("account_id IN(?)", accountIds).
+				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+
+		if len(records) > 0 {
+			if err := tx.Create(&records).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (d *DbDao) DidCellRecycleList(oldOutpointList []string, accountIds []string) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("account_id IN(?)", accountIds).
+			Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("outpoint IN(?) ", oldOutpointList).
+			Delete(&tables.TableDidCellInfo{}).Error; err != nil {
 			return err
 		}
 		return nil

@@ -1,26 +1,44 @@
 server:
   name: "account_indexer"
-  net: 1 # 1-mainnet 2-testnet
-  #http_server_addr: ":8121"
+  net: 2 # 1-mainnet 2-testnet
+  #http_server_addr: ":8121" # api addr
   http_server_addr_indexer: ":8122"
   #http_server_addr_reverse: ":8123"
-  prometheus_push_gateway: "http://127.0.0.1:9091"
+  prometheus_push_gateway: ""
 chain:
-  ckb_url: "http://127.0.0.1:8114" # ckb-node rpc https://github.com/nervosnetwork/ckb
-  index_url: "http://127.0.0.1:8116" # ckb-indexer rpc https://github.com/nervosnetwork/ckb-indexer
-  current_block_number: 4872287 # 4872287: mainnet 1927285: testnet
+  ckb_url: "" #"https://testnet.ckb.dev/"
+  index_url: "" #"https://testnet.ckb.dev/indexer"
+  current_block_number: 4872287
   confirm_num: 4
-  concurrency_num: 100
+  concurrency_num: 200
+notice:
+  lark_err_url: ""
 db:
   mysql:
-    addr: "127.0.0.1:3306" # 172.17.0.1: docker 182.17.0.1: docker-compose
-    user: "root"
-    password: "123456"
-    db_name: "das_account_indexer"
+    addr: ""
+    user: ""
+    password: ""
+    db_name: ""
     max_open_conn: 100
     max_idle_conn: 50
 cache:
   redis:
-    addr: "127.0.0.1:6379" # 172.17.0.1: docker 182.17.0.1: docker-compose
+    addr: ""
     password: ""
-    db_num: 0
+    db_num: 17
+das_lib:
+  thq_code_hash: ""
+  das_contract_args: ""
+  das_contract_code_hash: ""
+  map_das_contract:
+    "config-cell-type": ""
+    "account-cell-type": ""
+    "balance-cell-type": ""
+    "das-lock": ""
+    "reverse-record-cell-type": ""
+    "sub-account-cell-type": ""
+das:
+  account_min_length: 4
+  account_max_length: 42
+  open_account_min_length: 4
+  open_account_max_length: 9

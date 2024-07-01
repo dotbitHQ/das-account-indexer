@@ -25,12 +25,12 @@
 
 Please familiarize yourself with the meaning of some common parameters before reading the API list:
 
-| param                                                                                    | description                                        |
-| :-------------------------                                                               |:---------------------------------------------------|
-| type                                                                                     | Filled with "blockchain" for now                   |
-| coin\_type <sup>[1](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)</sup> | 60: eth, 195: trx, 9006: bsc, 966: matic, 3: doge  |
-| account                                                                                  | Contains the suffix `.bit` in it                   |
-| key                                                                                      | Generally refers to the blockchain address for now |
+| param                                                                        | description                                        |
+|:-----------------------------------------------------------------------------|:---------------------------------------------------|
+| type                                                                         | Filled with "blockchain" for now                   |
+| [coin_type](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)   | 60: eth, 195: trx, 9006: bsc, 966: matic, 3: doge  |
+| account                                                                      | Contains the suffix `.bit` in it                   |
+| key                                                                          | Generally refers to the blockchain address for now |
 
 
 #### Full Functional Indexer

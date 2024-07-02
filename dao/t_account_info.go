@@ -35,6 +35,44 @@ func (d *DbDao) UpdateAccountInfo(account *tables.TableAccountInfo, records []ta
 	})
 }
 
+func (d *DbDao) DidCellUpdateListWithAccountCell(oldOutpointList []string, list []tables.TableDidCellInfo, accountIds []string, records []tables.TableRecordsInfo, accInfo tables.TableAccountInfo) error {
+	return d.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Select("block_number", "outpoint", "status", "expired_at").
+			Where("account_id = ?", accInfo.AccountId).
+			Updates(accInfo).Error; err != nil {
+			return err
+		}
+
+		if len(oldOutpointList) > 0 {
+			if err := tx.Where("outpoint IN(?) ", oldOutpointList).
+				Delete(&tables.TableDidCellInfo{}).Error; err != nil {
+				return err
+			}
+		}
+		if len(list) > 0 {
+			if err := tx.Clauses(clause.Insert{
+				Modifier: "IGNORE",
+			}).Create(&list).Error; err != nil {
+				return err
+			}
+		}
+		if len(accountIds) > 0 {
+			if err := tx.Where("account_id IN(?)", accountIds).
+				Delete(&tables.TableRecordsInfo{}).Error; err != nil {
+				return err
+			}
+		}
+
+		if len(records) > 0 {
+			if err := tx.Create(&records).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
 func (d *DbDao) TransferAccountToDid(accountInfo tables.TableAccountInfo, didCellInfo tables.TableDidCellInfo, recordsInfos []tables.TableRecordsInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Select("block_number", "outpoint", "status").

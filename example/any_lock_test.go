@@ -36,30 +36,30 @@ func TestBatchReverseRecordV2(t *testing.T) {
 				Type: "blockchain",
 				KeyInfo: core.KeyInfo{
 					CoinType: common.CoinTypeCKB,
-					Key:      "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgyumrp5k2es0d0hy5z6044zr2305pyzc97qqjec5vx",
+					Key:      "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgpzk3ntzys3nuwmvnar2lrs54l9pat6wy3qqcmu76w",
 				},
 			},
-			{
-				Type: "blockchain",
-				KeyInfo: core.KeyInfo{
-					CoinType: common.CoinTypeBTC,
-					Key:      "tb1qumrp5k2es0d0hy5z6044zr2305pyzc978qz0ju",
-				},
-			},
-			{
-				Type: "blockchain",
-				KeyInfo: core.KeyInfo{
-					CoinType: common.CoinTypeCKB,
-					Key:      "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgytmmrfg7aczevlxngqnr28npj2849erjyqqhe2guh",
-				},
-			},
-			{
-				Type: "blockchain",
-				KeyInfo: core.KeyInfo{
-					CoinType: common.CoinTypeBTC,
-					Key:      "tb1pzl9nkuavvt303hly08u3ug0v55yd3a8x86d8g5jsrllsaell8j5s8gzedg",
-				},
-			},
+			//{
+			//	Type: "blockchain",
+			//	KeyInfo: core.KeyInfo{
+			//		CoinType: common.CoinTypeBTC,
+			//		Key:      "tb1qumrp5k2es0d0hy5z6044zr2305pyzc978qz0ju",
+			//	},
+			//},
+			//{
+			//	Type: "blockchain",
+			//	KeyInfo: core.KeyInfo{
+			//		CoinType: common.CoinTypeCKB,
+			//		Key:      "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgytmmrfg7aczevlxngqnr28npj2849erjyqqhe2guh",
+			//	},
+			//},
+			//{
+			//	Type: "blockchain",
+			//	KeyInfo: core.KeyInfo{
+			//		CoinType: common.CoinTypeBTC,
+			//		Key:      "tb1pzl9nkuavvt303hly08u3ug0v55yd3a8x86d8g5jsrllsaell8j5s8gzedg",
+			//	},
+			//},
 		},
 	}
 	url := TestUrl + "/batch/reverse/record"

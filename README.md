@@ -13,7 +13,7 @@ This repo introduces a simple server, which provided some APIs for search DAS ac
 
 * Ubuntu >= 18.04
 * MYSQL >= 8.0
-* go version >= 1.17.10
+* go version >= 1.21.3
 * Redis >= 5.0 (for cache, not necessary)
 * [ckb-node](https://github.com/nervosnetwork/ckb) (Must be synced to latest height and add `Indexer` module to ckb.toml)
 * If the version of the dependency package is too low, please install `gcc-multilib` (apt install gcc-multilib)
@@ -71,6 +71,6 @@ docker run -dp 8122:8122 -v $PWD/config/config.yaml:/app/config/config.yaml --na
 
 ## Others
 
-* [What is DAS](https://github.com/dotbitHQ/das-contracts/blob/master/docs/en/Overview-of-DAS.md)
-* [What is a DAS transaction on CKB](https://github.com/dotbitHQ/das-contracts/blob/master/docs/en/Data-Structure-and-Protocol/Transaction-Structure.md)
+* [What is DAS](https://github.com/dotbitHQ/did-contracts/blob/docs/docs/en/design/Overview-of-DAS.md)
+* [What is a DAS transaction on CKB](https://github.com/dotbitHQ/did-contracts/blob/docs/docs/en/developer/Transaction-Structure.md)
 * [How to install MySQL8.0](https://github.com/dotbitHQ/das-database/wiki/How-To-Install-MySQL-8.0)

@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/http_api"
@@ -10,7 +9,7 @@ import (
 	"net/http"
 )
 
-func (h *HttpHandle) JsonRpcAccountRecordsV2(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAccountRecordsV2(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAccountRecords
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -33,7 +32,7 @@ func (h *HttpHandle) AccountRecordsV2(ctx *gin.Context) {
 	var (
 		funcName = "AccountRecordsV2"
 		req      ReqAccountRecords
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)

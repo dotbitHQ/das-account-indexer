@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
@@ -17,7 +16,7 @@ type ReqAddressAccount struct {
 	Address string `json:"address"`
 }
 
-func (h *HttpHandle) JsonRpcAddressAccount(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAddressAccount(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAddressAccount
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -46,7 +45,7 @@ func (h *HttpHandle) AddressAccount(ctx *gin.Context) {
 	var (
 		funcName = "AddressAccount"
 		req      ReqAddressAccount
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -66,7 +65,7 @@ func (h *HttpHandle) AddressAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doAddressAccount(req *ReqAddressAccount, apiResp *http_api.ApiResp) error {
 	var resp = make([]RespSearchAccount, 0)
 
 	addrHex, err := formatAddress(h.DasCore.Daf(), req.Address)

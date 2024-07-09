@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -29,7 +28,7 @@ type BatchReverseRecord struct {
 	ErrMsg       string `json:"err_msg"`
 }
 
-func (h *HttpHandle) JsonRpcBatchReverseRecord(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcBatchReverseRecord(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqBatchReverseRecord
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -52,7 +51,7 @@ func (h *HttpHandle) BatchReverseRecord(ctx *gin.Context) {
 	var (
 		funcName = "BatchReverseRecord"
 		req      ReqBatchReverseRecord
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -71,7 +70,7 @@ func (h *HttpHandle) BatchReverseRecord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *http_api.ApiResp) error {
 	var resp RespBatchReverseRecord
 	resp.List = make([]BatchReverseRecord, 0)
 
@@ -109,7 +108,7 @@ func (h *HttpHandle) doBatchReverseRecord(req *ReqBatchReverseRecord, apiResp *c
 	return nil
 }
 
-func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string, apiResp *code.ApiResp) (account, errMsg string) {
+func (h *HttpHandle) checkReverse(chainType common.ChainType, addressHex string, apiResp *http_api.ApiResp) (account, errMsg string) {
 	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex, "")
 	if err != nil {
 		log.Error("FindLatestReverseRecord err: ", err.Error(), addressHex)

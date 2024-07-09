@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
@@ -24,7 +23,7 @@ type RespAccountReverseAddress struct {
 type AccountReverseAddress struct {
 }
 
-func (h *HttpHandle) JsonRpcAccountReverseAddress(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAccountReverseAddress(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAccountReverseAddress
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -47,7 +46,7 @@ func (h *HttpHandle) AccountReverseAddress(ctx *gin.Context) {
 	var (
 		funcName = "AccountReverseAddress"
 		req      ReqAccountReverseAddress
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -66,7 +65,7 @@ func (h *HttpHandle) AccountReverseAddress(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiResp *http_api.ApiResp) error {
 	var resp RespAccountReverseAddress
 	resp.List = make([]core.ChainTypeAddress, 0)
 

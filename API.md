@@ -10,7 +10,7 @@
     * [Get Batch Account Records Info](#get-batch-account-records-info)
     * [Get Batch Reverse Record Info](#Get-Batch-Reverse-Record-Info)
     * [Get Batch register Info](#get-batch-register-info)
-    * [Get Did List](#get-didcell-list)
+    * [Get Did Cell List](#get-did-cell-list)
     * [Get Account Records Info V2](#get-account-records-info-v2)
 
 * [<em>Deprecated API List</em>](#deprecated-api-list)
@@ -259,15 +259,15 @@ or json rpc style:
 curl -X POST https://indexer-v1.did.id -d '{"jsonrpc": "2.0","id": 1,"method": "das_batchRegisterInfo","params": [{"batch_account": ["xxxxx", "test1.bit", "20230906.bit"]}]}'
 ```
 
-### Get Did List
+### Get Did Cell List
 
-batch get account register info, currently can only check whether the account can be registered
+batch get .bit DOBs 
 
 **Request**
 * host: `indexer-v1.did.id`
 * path: `/v1/did/list`
 * param:
-  * support up to max 50 account
+  * did_type: 
 ```json
 {
   "type": "blockchain",

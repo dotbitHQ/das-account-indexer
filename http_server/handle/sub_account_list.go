@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -40,7 +39,7 @@ type SubAccountInfo struct {
 	DisplayName        string                   `json:"display_name"`
 }
 
-func (h *HttpHandle) JsonRpcSubAccountList(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcSubAccountList(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqSubAccountList
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -63,7 +62,7 @@ func (h *HttpHandle) SubAccountList(ctx *gin.Context) {
 	var (
 		funcName = "SubAccountList"
 		req      ReqSubAccountList
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -82,7 +81,7 @@ func (h *HttpHandle) SubAccountList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *http_api.ApiResp) error {
 	var resp RespSubAccountList
 	resp.SubAccountList = make([]SubAccountInfo, 0)
 

@@ -3,6 +3,7 @@ package handle
 import (
 	"context"
 	"das-account-indexer/tables"
+	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
@@ -30,6 +31,25 @@ type DidData struct {
 	Args          string               `json:"args"`
 	ExpiredAt     uint64               `json:"expired_at"`
 	DidCellStatus tables.DidCellStatus `json:"did_cell_status"`
+}
+
+func (h *HttpHandle) JsonRpcDidList(ctx *gin.Context, p json.RawMessage, apiResp *http_api.ApiResp) {
+	var req []ReqDidList
+	err := json.Unmarshal(p, &req)
+	if err != nil {
+		log.Error("json.Unmarshal err:", err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
+		return
+	}
+	if len(req) != 1 {
+		log.Error("len(req) is :", len(req))
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
+		return
+	}
+
+	if err = h.doDidList(ctx, &req[0], apiResp); err != nil {
+		log.Error("doDidList err:", err.Error())
+	}
 }
 
 func (h *HttpHandle) DidList(ctx *gin.Context) {

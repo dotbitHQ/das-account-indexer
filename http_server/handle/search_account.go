@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -43,7 +42,7 @@ type AccountData struct {
 	DisplayName         string               `json:"display_name"`
 }
 
-func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcSearchAccount(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqSearchAccount
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -72,7 +71,7 @@ func (h *HttpHandle) SearchAccount(ctx *gin.Context) {
 	var (
 		funcName = "SearchAccount"
 		req      ReqSearchAccount
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -92,7 +91,7 @@ func (h *HttpHandle) SearchAccount(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doSearchAccount(req *ReqSearchAccount, apiResp *http_api.ApiResp) error {
 	var resp RespSearchAccount
 
 	req.Account = strings.TrimSpace(req.Account)

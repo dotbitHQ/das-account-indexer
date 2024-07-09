@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
@@ -22,7 +21,7 @@ type RespSubAccountVerify struct {
 	IsSubdid bool `json:"is_subdid"`
 }
 
-func (h *HttpHandle) JsonRpcSubAccountVerify(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcSubAccountVerify(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqSubAccountVerify
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -44,7 +43,7 @@ func (h *HttpHandle) SubAccountVerify(ctx *gin.Context) {
 	var (
 		funcName = "SubAccountList"
 		req      ReqSubAccountVerify
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -63,7 +62,7 @@ func (h *HttpHandle) SubAccountVerify(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *http_api.ApiResp) error {
 	var resp RespSubAccountVerify
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	var subAccountId string

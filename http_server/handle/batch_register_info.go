@@ -3,7 +3,6 @@ package handle
 import (
 	"bytes"
 	"das-account-indexer/config"
-	"das-account-indexer/http_server/code"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -34,7 +33,7 @@ func (h *HttpHandle) BatchRegisterInfo(ctx *gin.Context) {
 	var (
 		funcName = "BatchRegisterInfo"
 		req      ReqBatchRegisterInfo
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -52,7 +51,7 @@ func (h *HttpHandle) BatchRegisterInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) JsonRpcBatchRegisterInfo(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcBatchRegisterInfo(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqBatchRegisterInfo
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -71,7 +70,7 @@ func (h *HttpHandle) JsonRpcBatchRegisterInfo(p json.RawMessage, apiResp *code.A
 	}
 }
 
-func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *http_api.ApiResp) error {
 	accIds := make([]string, 0, len(req.BatchAccount))
 	for _, v := range req.BatchAccount {
 		accIds = append(accIds, common.Bytes2Hex(common.GetAccountIdByAccount(v)))

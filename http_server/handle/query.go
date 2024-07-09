@@ -15,7 +15,7 @@ func (h *HttpHandle) Query(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -56,7 +56,7 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp
@@ -106,6 +106,8 @@ func (h *HttpHandle) QueryIndexer(ctx *gin.Context) {
 		h.JsonRpcSubAccountList(req.Params, &apiResp)
 	case code.MethodSubAccountVerify:
 		h.JsonRpcSubAccountVerify(req.Params, &apiResp)
+	case code.MethodDidCellList:
+		h.JsonRpcDidList(ctx, req.Params, &apiResp)
 	default:
 		log.Error("method not exist:", req.Method)
 		apiResp.ApiRespErr(http_api.ApiCodeMethodNotExist, fmt.Sprintf("method [%s] not exits", req.Method))
@@ -119,7 +121,7 @@ func (h *HttpHandle) QueryReverse(ctx *gin.Context) {
 	var (
 		req      http_api.JsonRequest
 		resp     http_api.JsonResponse
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		clientIp = GetClientIp(ctx)
 	)
 	resp.Result = &apiResp

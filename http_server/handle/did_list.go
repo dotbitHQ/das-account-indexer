@@ -25,12 +25,10 @@ type RespDidList struct {
 }
 
 type DidData struct {
-	Outpoint      string               `json:"outpoint"`
-	AccountId     string               `json:"account_id"`
-	Account       string               `json:"account"`
-	Args          string               `json:"args"`
-	ExpiredAt     uint64               `json:"expired_at"`
-	DidCellStatus tables.DidCellStatus `json:"did_cell_status"`
+	Outpoint  string `json:"outpoint"`
+	AccountId string `json:"account_id"`
+	Account   string `json:"account"`
+	ExpiredAt uint64 `json:"expired_at"`
 }
 
 func (h *HttpHandle) JsonRpcDidList(ctx *gin.Context, p json.RawMessage, apiResp *http_api.ApiResp) {
@@ -97,12 +95,10 @@ func (h *HttpHandle) doDidList(ctx context.Context, req *ReqDidList, apiResp *ht
 	}
 	for _, v := range res {
 		temp := DidData{
-			Outpoint:      v.Outpoint,
-			Account:       v.Account,
-			AccountId:     v.AccountId,
-			Args:          v.Args,
-			ExpiredAt:     v.ExpiredAt,
-			DidCellStatus: req.DidType,
+			Outpoint:  v.Outpoint,
+			Account:   v.Account,
+			AccountId: v.AccountId,
+			ExpiredAt: v.ExpiredAt,
 		}
 		data = append(data, temp)
 	}

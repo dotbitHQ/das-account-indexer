@@ -267,7 +267,7 @@ batch get .bit DOBs
 * host: `indexer-v1.did.id`
 * path: `/v1/did/list`
 * param:
-  * did_type: 
+  * did_type: 0-all DOBs, 1-normal DOBs, 2-recyclable DOBs
 ```json
 {
   "type": "blockchain",
@@ -293,9 +293,7 @@ batch get .bit DOBs
         "outpoint": "",
         "account_id": "",
         "account": "",
-        "args": "",
-        "expired_at": 0,
-        "did_cell_status": 1
+        "expired_at": 0
       }
     ]
   }
@@ -306,6 +304,12 @@ batch get .bit DOBs
 
 ```shell
 curl -X POST https://indexer-v1.did.id/v1/did/list -d '{"type": "blockchain","key_info": {"coin_type": "", "key": ""},"page": 1,"size": 10,"did_type": 1}'
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d '{"jsonrpc": "2.0","id": 1,"method": "das_didCellList","params": [{"type": "blockchain","key_info": {"coin_type": "", "key": ""},"page": 1,"size": 10,"did_type": 1}]}'
 ```
 
 ### Get Record List

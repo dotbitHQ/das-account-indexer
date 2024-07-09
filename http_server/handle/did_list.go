@@ -3,6 +3,7 @@ package handle
 import (
 	"context"
 	"das-account-indexer/tables"
+	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
@@ -24,12 +25,29 @@ type RespDidList struct {
 }
 
 type DidData struct {
-	Outpoint      string               `json:"outpoint"`
-	AccountId     string               `json:"account_id"`
-	Account       string               `json:"account"`
-	Args          string               `json:"args"`
-	ExpiredAt     uint64               `json:"expired_at"`
-	DidCellStatus tables.DidCellStatus `json:"did_cell_status"`
+	Outpoint  string `json:"outpoint"`
+	AccountId string `json:"account_id"`
+	Account   string `json:"account"`
+	ExpiredAt uint64 `json:"expired_at"`
+}
+
+func (h *HttpHandle) JsonRpcDidList(ctx *gin.Context, p json.RawMessage, apiResp *http_api.ApiResp) {
+	var req []ReqDidList
+	err := json.Unmarshal(p, &req)
+	if err != nil {
+		log.Error("json.Unmarshal err:", err.Error())
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
+		return
+	}
+	if len(req) != 1 {
+		log.Error("len(req) is :", len(req))
+		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
+		return
+	}
+
+	if err = h.doDidList(ctx, &req[0], apiResp); err != nil {
+		log.Error("doDidList err:", err.Error())
+	}
 }
 
 func (h *HttpHandle) DidList(ctx *gin.Context) {
@@ -77,12 +95,10 @@ func (h *HttpHandle) doDidList(ctx context.Context, req *ReqDidList, apiResp *ht
 	}
 	for _, v := range res {
 		temp := DidData{
-			Outpoint:      v.Outpoint,
-			Account:       v.Account,
-			AccountId:     v.AccountId,
-			Args:          v.Args,
-			ExpiredAt:     v.ExpiredAt,
-			DidCellStatus: req.DidType,
+			Outpoint:  v.Outpoint,
+			Account:   v.Account,
+			AccountId: v.AccountId,
+			ExpiredAt: v.ExpiredAt,
 		}
 		data = append(data, temp)
 	}

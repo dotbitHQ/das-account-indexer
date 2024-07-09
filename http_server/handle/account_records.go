@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -29,7 +28,7 @@ type DataRecord struct {
 	TTL   string `json:"ttl"`
 }
 
-func (h *HttpHandle) JsonRpcAccountRecords(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAccountRecords(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAccountRecords
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -52,7 +51,7 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 	var (
 		funcName = "AccountRecords"
 		req      ReqAccountRecords
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -74,7 +73,7 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 
 type ConvertRecordsFunc func(string) string
 
-func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiResp, convertRecordsFunc ConvertRecordsFunc) error {
+func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *http_api.ApiResp, convertRecordsFunc ConvertRecordsFunc) error {
 	var resp RespAccountRecords
 	resp.Records = make([]DataRecord, 0)
 

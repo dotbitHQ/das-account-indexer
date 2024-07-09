@@ -2,7 +2,6 @@ package handle
 
 import (
 	"das-account-indexer/config"
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -46,7 +45,7 @@ type AccountInfo struct {
 	DisplayName        string                   `json:"display_name"`
 }
 
-func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAccountInfo
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -69,7 +68,7 @@ func (h *HttpHandle) AccountInfo(ctx *gin.Context) {
 	var (
 		funcName = "AccountInfo"
 		req      ReqAccountInfo
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -89,7 +88,7 @@ func (h *HttpHandle) AccountInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *http_api.ApiResp) error {
 	var resp RespAccountInfo
 
 	accountId := req.AccountId
@@ -198,7 +197,7 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *code.ApiResp) e
 	return nil
 }
 
-func checkAccount(account string, apiResp *code.ApiResp) error {
+func checkAccount(account string, apiResp *http_api.ApiResp) error {
 	if account == "" || !strings.HasSuffix(account, common.DasAccountSuffix) ||
 		strings.Contains(account, " ") || strings.Contains(account, "_") {
 		apiResp.ApiRespErr(http_api.ApiCodeAccountFormatInvalid, "account invalid")

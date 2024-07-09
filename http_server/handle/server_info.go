@@ -2,9 +2,9 @@ package handle
 
 import (
 	"das-account-indexer/block_parser"
-	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"github.com/dotbitHQ/das-lib/common"
+	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,7 +15,7 @@ type RespServerInfo struct {
 	Chain               string `json:"chain"`
 }
 
-func (h *HttpHandle) JsonRpcServerInfo(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcServerInfo(p json.RawMessage, apiResp *http_api.ApiResp) {
 	if err := h.doServerInfo(apiResp); err != nil {
 		log.Error("doServerInfo err:", err.Error())
 	}
@@ -24,7 +24,7 @@ func (h *HttpHandle) JsonRpcServerInfo(p json.RawMessage, apiResp *code.ApiResp)
 func (h *HttpHandle) ServerInfo(ctx *gin.Context) {
 	var (
 		funcName = "ServerInfo"
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -38,7 +38,7 @@ func (h *HttpHandle) ServerInfo(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doServerInfo(apiResp *code.ApiResp) error {
+func (h *HttpHandle) doServerInfo(apiResp *http_api.ApiResp) error {
 	var resp RespServerInfo
 
 	resp.IsLatestBlockNumber = block_parser.IsLatestBlockNumber

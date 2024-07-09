@@ -21,4 +21,5 @@ const (
 
 	MethodSubAccountList   JsonRpcMethod = "das_subAccountList"
 	MethodSubAccountVerify JsonRpcMethod = "das_subAccountVerify"
+	MethodDidCellList      JsonRpcMethod = "das_didCellList"
 )

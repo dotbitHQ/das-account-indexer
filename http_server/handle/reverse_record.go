@@ -2,7 +2,6 @@ package handle
 
 import (
 	"das-account-indexer/config"
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -26,7 +25,7 @@ type RespReverseRecord struct {
 	DisplayName  string `json:"display_name"`
 }
 
-func (h *HttpHandle) JsonRpcReverseRecord(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcReverseRecord(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqReverseRecord
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -49,7 +48,7 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 	var (
 		funcName = "ReverseRecord"
 		req      ReqReverseRecord
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 		clientIp = GetClientIp(ctx)
 	)
@@ -69,7 +68,7 @@ func (h *HttpHandle) ReverseRecord(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, apiResp *code.ApiResp) *core.DasAddressHex {
+func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, apiResp *http_api.ApiResp) *core.DasAddressHex {
 	if req.Type != "blockchain" {
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, fmt.Sprintf("type [%s] is invalid", req.Type))
 		return nil
@@ -115,7 +114,7 @@ func checkReqKeyInfo(daf *core.DasAddressFormat, req *core.ChainTypeAddress, api
 	return &addrHex
 }
 
-func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doReverseRecord(req *ReqReverseRecord, apiResp *http_api.ApiResp) error {
 	var resp RespReverseRecord
 	res := checkReqKeyInfo(h.DasCore.Daf(), &req.ChainTypeAddress, apiResp)
 	if apiResp.ErrNo != http_api.ApiCodeSuccess {

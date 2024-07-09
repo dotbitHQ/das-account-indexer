@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -32,7 +31,7 @@ type RespAddressAccount struct {
 	ExpiredAt    uint64 `json:"expired_at"`
 }
 
-func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqAccountList
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -55,7 +54,7 @@ func (h *HttpHandle) AccountList(ctx *gin.Context) {
 	var (
 		funcName = "AccountList"
 		req      ReqAccountList
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -74,7 +73,7 @@ func (h *HttpHandle) AccountList(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *http_api.ApiResp) error {
 	var resp RespAccountList
 	resp.AccountList = make([]RespAddressAccount, 0)
 

@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -28,7 +27,7 @@ type BatchAccountRecord struct {
 	ErrMsg    string       `json:"err_msg"`
 }
 
-func (h *HttpHandle) JsonRpcBatchAccountRecords(p json.RawMessage, apiResp *code.ApiResp) {
+func (h *HttpHandle) JsonRpcBatchAccountRecords(p json.RawMessage, apiResp *http_api.ApiResp) {
 	var req []ReqBatchAccountRecords
 	err := json.Unmarshal(p, &req)
 	if err != nil {
@@ -51,7 +50,7 @@ func (h *HttpHandle) BatchAccountRecords(ctx *gin.Context) {
 	var (
 		funcName = "BatchAccountRecords"
 		req      ReqBatchAccountRecords
-		apiResp  code.ApiResp
+		apiResp  http_api.ApiResp
 		err      error
 	)
 
@@ -70,7 +69,7 @@ func (h *HttpHandle) BatchAccountRecords(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp *http_api.ApiResp) error {
 	var resp RespBatchAccountRecords
 	resp.List = make([]BatchAccountRecord, 0)
 

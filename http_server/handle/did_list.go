@@ -9,6 +9,7 @@ import (
 	"github.com/dotbitHQ/das-lib/core"
 	"github.com/dotbitHQ/das-lib/http_api"
 	"github.com/gin-gonic/gin"
+	"github.com/nervosnetwork/ckb-sdk-go/address"
 	"github.com/scorpiotzh/toolib"
 	"net/http"
 )
@@ -78,16 +79,27 @@ func (h *HttpHandle) doDidList(ctx context.Context, req *ReqDidList, apiResp *ht
 	var resp RespDidList
 	data := make([]DidData, 0)
 
+	args := ""
 	addrHex, err := req.FormatChainTypeAddress(h.DasCore.NetType(), true)
 	if err != nil {
-		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "address invalid")
-		return fmt.Errorf("FormatChainTypeAddress err: %s", err.Error())
+		if req.KeyInfo.CoinType == common.CoinTypeCKB {
+			if addrP, err := address.Parse(req.KeyInfo.Key); err == nil {
+				args = common.Bytes2Hex(addrP.Script.Args)
+			} else {
+				apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "address invalid")
+				return fmt.Errorf("FormatChainTypeAddress err: %s", err.Error())
+			}
+		} else {
+			apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "address invalid")
+			return fmt.Errorf("FormatChainTypeAddress err: %s", err.Error())
+		}
 	} else if addrHex.DasAlgorithmId != common.DasAlgorithmIdAnyLock {
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "address invalid")
 		return nil
+	} else {
+		args = common.Bytes2Hex(addrHex.ParsedAddress.Script.Args)
 	}
 
-	args := common.Bytes2Hex(addrHex.ParsedAddress.Script.Args)
 	res, err := h.DbDao.QueryDidCell(args, req.DidType, req.GetLimit(), req.GetOffset())
 	if err != nil {
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "search did cell list err")

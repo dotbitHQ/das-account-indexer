@@ -109,9 +109,9 @@ func (d *DbDao) QueryDidCell(args string, didType tables.DidCellStatus, limit, o
 	sql := d.db.Where(" args= ?", args)
 	timestamp := tables.GetDidCellRecycleExpiredAt()
 	if didType == tables.DidCellStatusNormal {
-		sql.Where("expired_at > ", timestamp)
+		sql.Where("expired_at > ?", timestamp)
 	} else if didType == tables.DidCellStatusExpired {
-		sql.Where("expired_at <= ", timestamp)
+		sql.Where("expired_at <= ?", timestamp)
 	}
 	if limit > 0 {
 		err = sql.Limit(limit).Offset(offset).Find(&didList).Error
@@ -125,9 +125,9 @@ func (d *DbDao) QueryDidCellTotal(args string, didType tables.DidCellStatus) (co
 	sql := d.db.Model(tables.TableDidCellInfo{}).Where(" args= ?", args)
 	timestamp := tables.GetDidCellRecycleExpiredAt()
 	if didType == tables.DidCellStatusNormal {
-		sql.Where("expired_at > ", timestamp)
+		sql.Where("expired_at > ?", timestamp)
 	} else if didType == tables.DidCellStatusExpired {
-		sql.Where("expired_at <= ", timestamp)
+		sql.Where("expired_at <= ?", timestamp)
 	}
 	err = sql.Count(&count).Error
 	return

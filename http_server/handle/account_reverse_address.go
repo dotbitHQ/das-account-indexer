@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
@@ -38,7 +39,7 @@ func (h *HttpHandle) JsonRpcAccountReverseAddress(p json.RawMessage, apiResp *co
 		return
 	}
 
-	if err = h.doAccountReverseAddress(&req[0], apiResp); err != nil {
+	if err = h.doAccountReverseAddress(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doAccountReverseAddress err:", err.Error())
 	}
 }
@@ -52,21 +53,21 @@ func (h *HttpHandle) AccountReverseAddress(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doAccountReverseAddress(&req, &apiResp); err != nil {
-		log.Error("doAccountReverseAddress err:", err.Error(), funcName)
+	if err = h.doAccountReverseAddress(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doAccountReverseAddress err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doAccountReverseAddress(ctx context.Context, req *ReqAccountReverseAddress, apiResp *code.ApiResp) error {
 	var resp RespAccountReverseAddress
 	resp.List = make([]core.ChainTypeAddress, 0)
 
@@ -85,7 +86,7 @@ func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiR
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "Failed to get reverse list")
 		return fmt.Errorf("GetReverseListByAccount err: %s", err.Error())
 	}
-	log.Info("doAccountReverseAddress:", len(list), req.Account, accountId)
+	log.Info(ctx, "doAccountReverseAddress:", len(list), req.Account, accountId)
 	if len(list) == 0 {
 		apiResp.ApiRespOK(resp)
 		return nil
@@ -117,7 +118,7 @@ func (h *HttpHandle) doAccountReverseAddress(req *ReqAccountReverseAddress, apiR
 			ChainType:         0,
 		})
 		if err != nil {
-			log.Error("HexToNormal err:", err.Error(), v.AlgorithmId, v.Address)
+			log.Error(ctx, "HexToNormal err:", err.Error(), v.AlgorithmId, v.Address)
 			continue
 		}
 		if v.AlgorithmId == accInfo.OwnerAlgorithmId && strings.EqualFold(v.Address, accInfo.Owner) {

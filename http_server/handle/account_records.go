@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
@@ -43,7 +44,7 @@ func (h *HttpHandle) JsonRpcAccountRecords(p json.RawMessage, apiResp *code.ApiR
 		return
 	}
 
-	if err = h.doAccountRecords(&req[0], apiResp, common.ConvertRecordsAddressCoinType); err != nil {
+	if err = h.doAccountRecords(h.Ctx, &req[0], apiResp, common.ConvertRecordsAddressCoinType); err != nil {
 		log.Error("doAccountRecords err:", err.Error())
 	}
 }
@@ -58,14 +59,14 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doAccountRecords(&req, &apiResp, common.ConvertRecordsAddressCoinType); err != nil {
+	if err = h.doAccountRecords(ctx.Request.Context(), &req, &apiResp, common.ConvertRecordsAddressCoinType); err != nil {
 		log.Error("doAccountRecords err:", err.Error(), funcName)
 	}
 
@@ -74,21 +75,21 @@ func (h *HttpHandle) AccountRecords(ctx *gin.Context) {
 
 type ConvertRecordsFunc func(string) string
 
-func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiResp, convertRecordsFunc ConvertRecordsFunc) error {
+func (h *HttpHandle) doAccountRecords(ctx context.Context, req *ReqAccountRecords, apiResp *code.ApiResp, convertRecordsFunc ConvertRecordsFunc) error {
 	var resp RespAccountRecords
 	resp.Records = make([]DataRecord, 0)
 
 	req.Account = strings.TrimSpace(req.Account)
 	req.Account = FormatSharpToDot(req.Account)
 	if err := checkAccount(req.Account, apiResp); err != nil {
-		log.Error("checkAccount err: ", err.Error())
+		log.Error(ctx, "checkAccount err: ", err.Error())
 		return nil
 	}
 
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
-		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
+		log.Error(ctx, "FindAccountInfoByAccountName err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account info err")
 		return nil
 	} else if accountInfo.Id == 0 {
@@ -103,7 +104,7 @@ func (h *HttpHandle) doAccountRecords(req *ReqAccountRecords, apiResp *code.ApiR
 
 	list, err := h.DbDao.FindAccountRecordsByAccountId(accountId)
 	if err != nil {
-		log.Error("FindAccountRecords err:", err.Error(), req.Account)
+		log.Error(ctx, "FindAccountRecords err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records info err")
 		return nil
 	}

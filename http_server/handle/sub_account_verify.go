@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/http_server/code"
 	"encoding/json"
 	"fmt"
@@ -35,7 +36,7 @@ func (h *HttpHandle) JsonRpcSubAccountVerify(p json.RawMessage, apiResp *code.Ap
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		return
 	}
-	if err = h.doSubAccountVerify(&req[0], apiResp); err != nil {
+	if err = h.doSubAccountVerify(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doSubAccountVerify err:", err.Error())
 	}
 }
@@ -49,21 +50,21 @@ func (h *HttpHandle) SubAccountVerify(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
 	log.Info("ApiReq:", funcName, toolib.JsonString(req))
 
-	if err = h.doSubAccountVerify(&req, &apiResp); err != nil {
-		log.Error("doSubAccountList err:", err.Error(), funcName)
+	if err = h.doSubAccountVerify(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doSubAccountList err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doSubAccountVerify(ctx context.Context, req *ReqSubAccountVerify, apiResp *code.ApiResp) error {
 	var resp RespSubAccountVerify
 	accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	var subAccountId string
@@ -78,7 +79,7 @@ func (h *HttpHandle) doSubAccountVerify(req *ReqSubAccountVerify, apiResp *code.
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, err.Error())
 		return fmt.Errorf("formatAddress err: %s", err.Error())
 	}
-	log.Info("formatAddress:", req.Address, addrHex.ChainType, addrHex.AddressHex)
+	log.Info(ctx, "formatAddress:", req.Address, addrHex.ChainType, addrHex.AddressHex)
 
 	res, err := h.DbDao.GetSubAccByParentAccountIdOfAddress(accountId, subAccountId, addrHex.AddressHex, req.VerifyType)
 	if err != nil {

@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
@@ -42,7 +43,7 @@ func (h *HttpHandle) JsonRpcBatchAccountRecords(p json.RawMessage, apiResp *code
 		return
 	}
 
-	if err = h.doBatchAccountRecords(&req[0], apiResp); err != nil {
+	if err = h.doBatchAccountRecords(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doBatchAccountRecords err:", err.Error())
 	}
 }
@@ -56,21 +57,21 @@ func (h *HttpHandle) BatchAccountRecords(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doBatchAccountRecords(&req, &apiResp); err != nil {
-		log.Error("doBatchAccountRecords err:", err.Error(), funcName)
+	if err = h.doBatchAccountRecords(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doBatchAccountRecords err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp *code.ApiResp) error {
+func (h *HttpHandle) doBatchAccountRecords(ctx context.Context, req *ReqBatchAccountRecords, apiResp *code.ApiResp) error {
 	var resp RespBatchAccountRecords
 	resp.List = make([]BatchAccountRecord, 0)
 
@@ -84,7 +85,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 		req.Accounts[i] = strings.TrimSpace(req.Accounts[i])
 		req.Accounts[i] = FormatSharpToDot(req.Accounts[i])
 		if err := checkAccount(req.Accounts[i], apiResp); err != nil {
-			log.Error("checkAccount err: ", err.Error(), v)
+			log.Error(ctx, "checkAccount err: ", err.Error(), v)
 			return nil
 		}
 		accountId := common.Bytes2Hex(common.GetAccountIdByAccount(req.Accounts[i]))
@@ -99,7 +100,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	// get accounts
 	list, err := h.DbDao.FindAccountInfoListByAccountIds(accountIds)
 	if err != nil {
-		log.Error("FindAccountInfoListByAccountIds err:", err.Error())
+		log.Error(ctx, "FindAccountInfoListByAccountIds err:", err.Error())
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find accounts err")
 		return nil
 	}
@@ -129,7 +130,7 @@ func (h *HttpHandle) doBatchAccountRecords(req *ReqBatchAccountRecords, apiResp 
 	// get records
 	records, err := h.DbDao.FindRecordsByAccountIds(okIds)
 	if err != nil {
-		log.Error("FindRecordsByAccountIds err:", err.Error())
+		log.Error(ctx, "FindRecordsByAccountIds err:", err.Error())
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find records err")
 		return nil
 	}

@@ -2,7 +2,6 @@ package handle
 
 import (
 	"context"
-	"das-account-indexer/http_server/code"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"

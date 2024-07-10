@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -39,7 +40,7 @@ func (h *HttpHandle) JsonRpcReverseRecordV2(p json.RawMessage, apiResp *http_api
 		return
 	}
 
-	if err = h.doReverseRecordV2(&req[0], apiResp); err != nil {
+	if err = h.doReverseRecordV2(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doReverseRecordV2 err:", err.Error())
 	}
 }
@@ -53,21 +54,21 @@ func (h *HttpHandle) ReverseRecordV2(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doReverseRecordV2(&req, &apiResp); err != nil {
-		log.Error("doReverseRecordV2 err:", err.Error(), funcName)
+	if err = h.doReverseRecordV2(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doReverseRecordV2 err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doReverseRecordV2(ctx context.Context, req *ReqReverseRecordV2, apiResp *http_api.ApiResp) error {
 	var resp RespReverseRecordV2
 	var chainType common.ChainType
 	var addressHex string
@@ -75,7 +76,7 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 
 	addrHex, err := req.FormatChainTypeAddress(h.DasCore.NetType(), false)
 	if err != nil {
-		log.Error("FormatChainTypeAddress err:", req.KeyInfo.Key)
+		log.Error(ctx, "FormatChainTypeAddress err:", req.KeyInfo.Key)
 		apiResp.ApiRespOK(resp)
 		return nil
 	}
@@ -84,7 +85,7 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 	case common.DasAlgorithmIdAnyLock:
 		res, err := addrHex.FormatAnyLock()
 		if err != nil {
-			log.Error("addrHex.FormatAnyLock err: %s", err.Error())
+			log.Error(ctx, "addrHex.FormatAnyLock err: %s", err.Error())
 			apiResp.ApiRespOK(resp)
 			return nil
 		}
@@ -95,7 +96,7 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 		chainType = addrHex.ChainType
 		addressHex = addrHex.AddressHex
 	case common.DasAlgorithmIdBitcoin:
-		log.Info("doReverseRecordV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
+		log.Info(ctx, "doReverseRecordV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
 		switch addrHex.DasSubAlgorithmId {
 		case common.DasSubAlgorithmIdBitcoinP2PKH, common.DasSubAlgorithmIdBitcoinP2WPKH:
 			chainType = addrHex.ChainType
@@ -106,12 +107,12 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 			btcAddr = req.KeyInfo.Key
 		}
 	default:
-		log.Error("default address invalid")
+		log.Error(ctx, "default address invalid")
 		apiResp.ApiRespOK(resp)
 		return nil
 	}
 
-	log.Info("doReverseRecordV2:", chainType, addressHex, req.KeyInfo.Key, btcAddr)
+	log.Info(ctx, "doReverseRecordV2:", chainType, addressHex, req.KeyInfo.Key, btcAddr)
 
 	// reverse
 	reverse, err := h.DbDao.FindLatestReverseRecord(chainType, addressHex, btcAddr)
@@ -143,7 +144,7 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 		// did cell
 		didAnyLock, err := h.getAnyLockAddressHex(accountId)
 		if err != nil {
-			log.Warn("getAnyLockAddressHex err: %s", err)
+			log.Warn(ctx, "getAnyLockAddressHex err: %s", err)
 		} else {
 			owner = didAnyLock.AddressHex
 			manager = didAnyLock.AddressHex
@@ -152,7 +153,7 @@ func (h *HttpHandle) doReverseRecordV2(req *ReqReverseRecordV2, apiResp *http_ap
 		owner = accountInfo.Owner
 		manager = accountInfo.Manager
 	}
-	log.Info("owner manager:", owner, manager)
+	log.Info(ctx, "owner manager:", owner, manager)
 
 	if strings.EqualFold(addressHex, owner) || strings.EqualFold(addressHex, manager) {
 		resp.Account = accountInfo.Account

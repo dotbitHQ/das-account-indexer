@@ -61,15 +61,15 @@ func (h *HttpHandle) DidList(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName, clientIp)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, clientIp, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, clientIp, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doDidList(ctx, &req, &apiResp); err != nil {
-		log.Error(ctx, "doDidList err:", err.Error(), funcName, clientIp)
+	if err = h.doDidList(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error(ctx.Request.Context(), "doDidList err:", err.Error(), funcName, clientIp)
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)

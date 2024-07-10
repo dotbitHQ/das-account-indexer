@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/block_parser"
 	"encoding/json"
 	"github.com/dotbitHQ/das-lib/common"
@@ -16,7 +17,7 @@ type RespServerInfo struct {
 }
 
 func (h *HttpHandle) JsonRpcServerInfo(p json.RawMessage, apiResp *http_api.ApiResp) {
-	if err := h.doServerInfo(apiResp); err != nil {
+	if err := h.doServerInfo(h.Ctx, apiResp); err != nil {
 		log.Error("doServerInfo err:", err.Error())
 	}
 }
@@ -29,16 +30,16 @@ func (h *HttpHandle) ServerInfo(ctx *gin.Context) {
 		clientIp = GetClientIp(ctx)
 	)
 
-	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp)
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, ctx.Request.Context())
 
-	if err = h.doServerInfo(&apiResp); err != nil {
-		log.Error("doServerInfo err:", err.Error(), funcName)
+	if err = h.doServerInfo(ctx.Request.Context(), &apiResp); err != nil {
+		log.Error("doServerInfo err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doServerInfo(apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doServerInfo(ctx context.Context, apiResp *http_api.ApiResp) error {
 	var resp RespServerInfo
 
 	resp.IsLatestBlockNumber = block_parser.IsLatestBlockNumber

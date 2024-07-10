@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/config"
 	"das-account-indexer/tables"
 	"encoding/json"
@@ -43,7 +44,7 @@ func (h *HttpHandle) JsonRpcBatchReverseRecordV2(p json.RawMessage, apiResp *htt
 		return
 	}
 
-	if err = h.doBatchReverseRecordV2(&req[0], apiResp); err != nil {
+	if err = h.doBatchReverseRecordV2(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doBatchReverseRecordV2 err:", err.Error())
 	}
 }
@@ -57,21 +58,21 @@ func (h *HttpHandle) BatchReverseRecordV2(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doBatchReverseRecordV2(&req, &apiResp); err != nil {
-		log.Error("doBatchReverseRecordV2 err:", err.Error(), funcName)
+	if err = h.doBatchReverseRecordV2(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doBatchReverseRecordV2 err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doBatchReverseRecordV2(ctx context.Context, req *ReqBatchReverseRecordV2, apiResp *http_api.ApiResp) error {
 	var resp RespBatchReverseRecordV2
 
 	resp.List = make([]BatchReverseRecordV2, 0)
@@ -87,7 +88,7 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 	for _, v := range req.BatchKeyInfo {
 		addrHex, err := v.FormatChainTypeAddress(config.Cfg.Server.Net, false)
 		if err != nil {
-			log.Warn("FormatChainTypeAddress err: %s", err.Error())
+			log.Warn(ctx, "FormatChainTypeAddress err: %s", err.Error())
 			listKeyInfo = append(listKeyInfo, nil)
 			listBtcAddr = append(listBtcAddr, "")
 			continue
@@ -96,7 +97,7 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 		case common.DasAlgorithmIdAnyLock:
 			anyLockAddrHex, err := addrHex.FormatAnyLock()
 			if err != nil {
-				log.Warn("FormatAnyLock err: %s", err.Error())
+				log.Warn(ctx, "FormatAnyLock err: %s", err.Error())
 				listKeyInfo = append(listKeyInfo, nil)
 				listBtcAddr = append(listBtcAddr, "")
 				continue
@@ -108,7 +109,7 @@ func (h *HttpHandle) doBatchReverseRecordV2(req *ReqBatchReverseRecordV2, apiRes
 			listKeyInfo = append(listKeyInfo, addrHex)
 			listBtcAddr = append(listBtcAddr, "")
 		case common.DasAlgorithmIdBitcoin:
-			log.Info("doReverseInfoV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
+			log.Info(ctx, "doReverseInfoV2:", addrHex.DasAlgorithmId, addrHex.DasSubAlgorithmId, addrHex.AddressHex)
 			switch addrHex.DasSubAlgorithmId {
 			case common.DasSubAlgorithmIdBitcoinP2PKH, common.DasSubAlgorithmIdBitcoinP2WPKH:
 				listKeyInfo = append(listKeyInfo, addrHex)

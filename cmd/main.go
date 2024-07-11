@@ -12,6 +12,7 @@ import (
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
 	"github.com/dotbitHQ/das-lib/txbuilder"
+	"github.com/go-redis/redis"
 	"github.com/nervosnetwork/ckb-sdk-go/rpc"
 	"github.com/scorpiotzh/mylog"
 	"github.com/scorpiotzh/toolib"
@@ -36,6 +37,11 @@ func main() {
 				Name:    "config",
 				Aliases: []string{"c"},
 				Usage:   "Load configuration from `FILE`",
+			},
+			&cli.StringFlag{
+				Name:    "mode",
+				Aliases: []string{"m"},
+				Usage:   "Server Type, ``(default): api and timer server, `api`: api server, `timer`: timer server",
 			},
 		},
 		Action: runServer,
@@ -113,6 +119,47 @@ func runServer(ctx *cli.Context) error {
 	// tx builder
 	txBuilderBase := txbuilder.NewDasTxBuilderBase(ctxServer, dasCore, nil, "")
 
+	//service mode
+	mode := ctx.String("mode")
+
+	if mode == "api" {
+		if err := initApiServer(txBuilderBase, dasCore, dbDao, red); err != nil {
+			return fmt.Errorf("initApiServer err : %s", err.Error())
+		}
+	} else if mode == "timer" {
+		if err := initTimer(dasCore, dbDao); err != nil {
+			return fmt.Errorf("initTimer err : %s", err.Error())
+		}
+	} else {
+		if err := initTimer(dasCore, dbDao); err != nil {
+			return fmt.Errorf("initTimer err : %s", err.Error())
+		}
+		if err := initApiServer(txBuilderBase, dasCore, dbDao, red); err != nil {
+			return fmt.Errorf("initApiServer err : %s", err.Error())
+		}
+	}
+
+	// ============= end service =============
+	// exit
+	toolib.ExitMonitoring(func(sig os.Signal) {
+		log.Warn("ExitMonitoring:", sig.String())
+		if watcher != nil {
+			log.Warn("close watcher ... ")
+			_ = watcher.Close()
+		}
+		cancel()
+		//hs.Shutdown()
+		wgServer.Wait()
+		exit <- struct{}{}
+	})
+
+	<-exit
+	log.Warn("success exit server. bye bye!")
+	return nil
+}
+
+func initTimer(dasCore *core.DasCore, dbDao *dao.DbDao) error {
+
 	// block parser
 	bp := block_parser.BlockParser{
 		DasCore:            dasCore,
@@ -128,7 +175,10 @@ func runServer(ctx *cli.Context) error {
 		return fmt.Errorf("RunParser err: %s", err.Error())
 	}
 	log.Info("block parser ok")
+	return nil
+}
 
+func initApiServer(txBuilderBase *txbuilder.DasTxBuilderBase, dasCore *core.DasCore, dbDao *dao.DbDao, red *redis.Client) error {
 	builderConfigCell, err := dasCore.ConfigCellDataBuilderByTypeArgsList(
 		common.ConfigCellTypeArgsPreservedAccount00,
 		common.ConfigCellTypeArgsPreservedAccount01,
@@ -152,7 +202,9 @@ func runServer(ctx *cli.Context) error {
 		common.ConfigCellTypeArgsPreservedAccount19,
 		common.ConfigCellTypeArgsUnavailable,
 	)
-
+	if err != nil {
+		return fmt.Errorf("ConfigCellDataBuilderByTypeArgsList err: %s", err.Error())
+	}
 	// http server
 	hs := &http_server.HttpServer{
 		Ctx: ctxServer,
@@ -171,22 +223,5 @@ func runServer(ctx *cli.Context) error {
 	}
 	hs.Run()
 	log.Info("http server ok")
-
-	// ============= end service =============
-	// exit
-	toolib.ExitMonitoring(func(sig os.Signal) {
-		log.Warn("ExitMonitoring:", sig.String())
-		if watcher != nil {
-			log.Warn("close watcher ... ")
-			_ = watcher.Close()
-		}
-		cancel()
-		hs.Shutdown()
-		wgServer.Wait()
-		exit <- struct{}{}
-	})
-
-	<-exit
-	log.Warn("success exit server. bye bye!")
 	return nil
 }

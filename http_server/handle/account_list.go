@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -45,7 +46,7 @@ func (h *HttpHandle) JsonRpcAccountList(p json.RawMessage, apiResp *http_api.Api
 		return
 	}
 
-	if err = h.doAccountList(&req[0], apiResp); err != nil {
+	if err = h.doAccountList(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doAccountList err:", err.Error())
 	}
 }
@@ -59,21 +60,21 @@ func (h *HttpHandle) AccountList(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
 	log.Info("ApiReq:", funcName, toolib.JsonString(req))
 
-	if err = h.doAccountList(&req, &apiResp); err != nil {
-		log.Error("doAccountList err:", err.Error(), funcName)
+	if err = h.doAccountList(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doAccountList err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doAccountList(ctx context.Context, req *ReqAccountList, apiResp *http_api.ApiResp) error {
 	var resp RespAccountList
 	resp.AccountList = make([]RespAddressAccount, 0)
 
@@ -88,7 +89,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *http_api.ApiRes
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "address invalid")
 		return fmt.Errorf("FormatChainTypeAddress err: %s", err.Error())
 	}
-	log.Info("doAccountList:", addrHex.ChainType, addrHex.AddressHex)
+	log.Info(ctx, "doAccountList:", addrHex.ChainType, addrHex.AddressHex)
 
 	if addrHex.DasAlgorithmId == common.DasAlgorithmIdAnyLock {
 		didCells, err := h.DbDao.QueryDidCell(addrHex.AddressHex, tables.DidCellStatusNormal, req.GetLimit(), req.GetOffset())
@@ -132,7 +133,7 @@ func (h *HttpHandle) doAccountList(req *ReqAccountList, apiResp *http_api.ApiRes
 	} else {
 		list, err := h.DbDao.FindAccountNameListByAddress(addrHex.ChainType, addrHex.AddressHex, req.Role)
 		if err != nil {
-			log.Error("FindAccountListByAddress err:", err.Error(), req.KeyInfo)
+			log.Error(ctx, "FindAccountListByAddress err:", err.Error(), req.KeyInfo)
 			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account list err")
 			return fmt.Errorf("FindAccountListByAddress err: %s", err.Error())
 		}

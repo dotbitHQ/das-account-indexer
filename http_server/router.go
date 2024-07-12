@@ -17,6 +17,7 @@ func (h *HttpServer) initRouter() {
 	if h.AddressIndexer != "" {
 		// indexer api
 		h.engineIndexer.Use(toolib.MiddlewareCors())
+		h.engineIndexer.Use(http_api.ReqIdMiddleware())
 		h.engineIndexer.POST("", cacheHandle, h.H.QueryIndexer)
 		v1Indexer := h.engineIndexer.Group("v1")
 		{

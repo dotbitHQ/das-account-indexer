@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/tables"
 	"encoding/json"
 	"fmt"
@@ -53,7 +54,7 @@ func (h *HttpHandle) JsonRpcSubAccountList(p json.RawMessage, apiResp *http_api.
 		return
 	}
 
-	if err = h.doSubAccountList(&req[0], apiResp); err != nil {
+	if err = h.doSubAccountList(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doSubAccountList err:", err.Error())
 	}
 }
@@ -67,21 +68,21 @@ func (h *HttpHandle) SubAccountList(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
 	log.Info("ApiReq:", funcName, toolib.JsonString(req))
 
-	if err = h.doSubAccountList(&req, &apiResp); err != nil {
-		log.Error("doSubAccountList err:", err.Error(), funcName)
+	if err = h.doSubAccountList(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doSubAccountList err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doSubAccountList(req *ReqSubAccountList, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doSubAccountList(ctx context.Context, req *ReqSubAccountList, apiResp *http_api.ApiResp) error {
 	var resp RespSubAccountList
 	resp.SubAccountList = make([]SubAccountInfo, 0)
 

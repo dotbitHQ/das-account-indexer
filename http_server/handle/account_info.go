@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"context"
 	"das-account-indexer/config"
 	"das-account-indexer/tables"
 	"encoding/json"
@@ -59,7 +60,7 @@ func (h *HttpHandle) JsonRpcAccountInfo(p json.RawMessage, apiResp *http_api.Api
 		return
 	}
 
-	if err = h.doAccountInfo(&req[0], apiResp); err != nil {
+	if err = h.doAccountInfo(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doAccountInfo err:", err.Error())
 	}
 }
@@ -74,21 +75,21 @@ func (h *HttpHandle) AccountInfo(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doAccountInfo(&req, &apiResp); err != nil {
-		log.Error("doAccountInfo err:", err.Error(), funcName)
+	if err = h.doAccountInfo(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doAccountInfo err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)
 }
 
-func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doAccountInfo(ctx context.Context, req *ReqAccountInfo, apiResp *http_api.ApiResp) error {
 	var resp RespAccountInfo
 
 	accountId := req.AccountId
@@ -96,14 +97,14 @@ func (h *HttpHandle) doAccountInfo(req *ReqAccountInfo, apiResp *http_api.ApiRes
 		req.Account = strings.TrimSpace(req.Account)
 		req.Account = FormatSharpToDot(req.Account)
 		if err := checkAccount(req.Account, apiResp); err != nil {
-			log.Error("checkAccount err: ", err.Error())
+			log.Error(ctx, "checkAccount err: ", err.Error())
 			return nil
 		}
 		accountId = common.Bytes2Hex(common.GetAccountIdByAccount(req.Account))
 	}
 	accountInfo, err := h.DbDao.FindAccountInfoByAccountId(accountId)
 	if err != nil {
-		log.Error("FindAccountInfoByAccountName err:", err.Error(), req.Account)
+		log.Error(ctx, "FindAccountInfoByAccountName err:", err.Error(), req.Account)
 		apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account info err")
 		return nil
 	} else if accountInfo.Id == 0 {

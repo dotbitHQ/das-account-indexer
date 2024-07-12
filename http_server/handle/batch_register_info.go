@@ -2,6 +2,7 @@ package handle
 
 import (
 	"bytes"
+	"context"
 	"das-account-indexer/config"
 	"encoding/binary"
 	"encoding/json"
@@ -38,15 +39,15 @@ func (h *HttpHandle) BatchRegisterInfo(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", funcName, toolib.JsonString(req))
+	log.Info("ApiReq:", funcName, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doBatchRegisterInfo(&req, &apiResp); err != nil {
-		log.Error("doBatchRegisterInfo err:", err.Error(), funcName)
+	if err = h.doBatchRegisterInfo(ctx.Request.Context(), &req, &apiResp); err != nil {
+		log.Error("doBatchRegisterInfo err:", err.Error(), funcName, ctx.Request.Context())
 	}
 	ctx.JSON(http.StatusOK, apiResp)
 }
@@ -65,12 +66,12 @@ func (h *HttpHandle) JsonRpcBatchRegisterInfo(p json.RawMessage, apiResp *http_a
 		return
 	}
 
-	if err = h.doBatchRegisterInfo(&req[0], apiResp); err != nil {
+	if err = h.doBatchRegisterInfo(h.Ctx, &req[0], apiResp); err != nil {
 		log.Error("doBatchReverseRecord err:", err.Error())
 	}
 }
 
-func (h *HttpHandle) doBatchRegisterInfo(req *ReqBatchRegisterInfo, apiResp *http_api.ApiResp) error {
+func (h *HttpHandle) doBatchRegisterInfo(ctx context.Context, req *ReqBatchRegisterInfo, apiResp *http_api.ApiResp) error {
 	accIds := make([]string, 0, len(req.BatchAccount))
 	for _, v := range req.BatchAccount {
 		accIds = append(accIds, common.Bytes2Hex(common.GetAccountIdByAccount(v)))

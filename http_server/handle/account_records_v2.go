@@ -23,7 +23,7 @@ func (h *HttpHandle) JsonRpcAccountRecordsV2(p json.RawMessage, apiResp *http_ap
 		return
 	}
 
-	if err = h.doAccountRecords(&req[0], apiResp, common.ConvertRecordsAddressKey); err != nil {
+	if err = h.doAccountRecords(h.Ctx, &req[0], apiResp, common.ConvertRecordsAddressKey); err != nil {
 		log.Error("doAccountRecords err:", err.Error())
 	}
 }
@@ -38,15 +38,15 @@ func (h *HttpHandle) AccountRecordsV2(ctx *gin.Context) {
 	)
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		log.Error("ShouldBindJSON err: ", err.Error(), funcName)
+		log.Error("ShouldBindJSON err: ", err.Error(), funcName, ctx.Request.Context())
 		apiResp.ApiRespErr(http_api.ApiCodeParamsInvalid, "params invalid")
 		ctx.JSON(http.StatusOK, apiResp)
 		return
 	}
-	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req))
+	log.Info("ApiReq:", ctx.Request.Host, funcName, clientIp, toolib.JsonString(req), ctx.Request.Context())
 
-	if err = h.doAccountRecords(&req, &apiResp, common.ConvertRecordsAddressKey); err != nil {
-		log.Error("doAccountRecords err:", err.Error(), funcName)
+	if err = h.doAccountRecords(ctx.Request.Context(), &req, &apiResp, common.ConvertRecordsAddressKey); err != nil {
+		log.Error("doAccountRecords err:", err.Error(), funcName, ctx.Request.Context())
 	}
 
 	ctx.JSON(http.StatusOK, apiResp)

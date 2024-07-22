@@ -834,13 +834,13 @@ curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "d
 **Usage**
 
 ```shell
-curl -X POST https://indexer-v1.did.id/v1/did/number
+curl -X POST https://indexer-v1.did.id/v1/did/number -d'{}'
 ```
 
 or json rpc style:
 
 ```shell
-curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_didNumber","params": []}'
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_didNumber","params": [{}]}'
 ```
 
 

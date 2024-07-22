@@ -23,6 +23,7 @@ func (h *HttpServer) initRouter() {
 		{
 			//v1Indexer.POST("/search/account", code.DoMonitorLog(code.MethodSearchAccount), cacheHandle, h.H.SearchAccount)
 			//v1Indexer.POST("/address/account", code.DoMonitorLog(code.MethodAddressAccount), cacheHandle, h.H.AddressAccount)
+			v1Indexer.POST("/did/number", code.DoMonitorLog(code.MethodDidNumber), cacheHandle, h.H.DidNumber)
 			v1Indexer.POST("/server/info", code.DoMonitorLog(code.MethodServerInfo), cacheHandle, h.H.ServerInfo)
 			v1Indexer.POST("/account/info", code.DoMonitorLog(code.MethodAccountInfo), cacheHandle, h.H.AccountInfo)
 			v1Indexer.POST("/account/list", code.DoMonitorLog(code.MethodAccountList), cacheHandle, h.H.AccountList)

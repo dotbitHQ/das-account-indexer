@@ -4,6 +4,7 @@ type JsonRpcMethod = string
 
 const (
 	MethodVersion    JsonRpcMethod = "das_version"
+	MethodDidNumber  JsonRpcMethod = "das_didNumber"
 	MethodServerInfo JsonRpcMethod = "das_serverInfo"
 
 	MethodSearchAccount  JsonRpcMethod = "das_searchAccount"

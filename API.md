@@ -12,6 +12,7 @@
     * [Get Batch register Info](#get-batch-register-info)
     * [Get Did Cell List](#get-did-cell-list)
     * [Get Account Records Info V2](#get-account-records-info-v2)
+    * [Get Did Number](#get-did-number)
 
 * [<em>Deprecated API List</em>](#deprecated-api-list)
     * [<em>Get Account Basic Info And Records</em>](#get-account-basic-info-and-records-deprecated)
@@ -806,6 +807,42 @@ or json rpc style:
 ```shell
 curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_subAccountList","params": [{"account":"0x.bit","page":1,"size":20}]}'
 ```
+
+
+### Get Did Number
+
+**Request**
+* host: `indexer-v1.did.id`
+* path: `/v1/did/number`
+* param: none
+
+**Response**
+
+```json
+{
+  "err_no": 0,
+  "err_msg": "",
+  "data": {
+    "total": 0,
+    "tl_did": 0,
+    "sl_did": "0" ,
+    "dobs": 0
+  }
+}
+```
+
+**Usage**
+
+```shell
+curl -X POST https://indexer-v1.did.id/v1/did/number
+```
+
+or json rpc style:
+
+```shell
+curl -X POST https://indexer-v1.did.id -d'{"jsonrpc": "2.0","id": 1,"method": "das_didNumber","params": []}'
+```
+
 
 ## _Deprecated API List_
 

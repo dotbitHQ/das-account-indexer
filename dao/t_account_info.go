@@ -445,3 +445,22 @@ func (d *DbDao) AccountUpgrade(accountInfo tables.TableAccountInfo, didCellInfo 
 		return nil
 	})
 }
+
+func (d *DbDao) GetTotalTLDid() (count int64, err error) {
+	err = d.db.Model(tables.TableAccountInfo{}).
+		Where("parent_account_id=''").Count(&count).Error
+	return
+}
+
+func (d *DbDao) GetTotalSLDid() (count int64, err error) {
+	err = d.db.Model(tables.TableAccountInfo{}).
+		Where("parent_account_id!=''").Count(&count).Error
+	return
+}
+
+func (d *DbDao) GetTotalDobs() (count int64, err error) {
+	timestamp := tables.GetDidCellRecycleExpiredAt()
+	err = d.db.Model(tables.TableDidCellInfo{}).
+		Where("expired_at>?", timestamp).Count(&count).Error
+	return
+}

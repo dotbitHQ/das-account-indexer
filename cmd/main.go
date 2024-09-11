@@ -8,6 +8,7 @@ import (
 	"das-account-indexer/http_server"
 	"das-account-indexer/http_server/handle"
 	"das-account-indexer/prometheus"
+	"encoding/json"
 	"fmt"
 	"github.com/dotbitHQ/das-lib/common"
 	"github.com/dotbitHQ/das-lib/core"
@@ -101,6 +102,7 @@ func runServer(ctx *cli.Context) error {
 		core.WithDasContractCodeHash(env.ContractCodeHash),
 		core.WithDasNetType(config.Cfg.Server.Net),
 		core.WithTHQCodeHash(env.THQCodeHash),
+		core.WithDasRedis(red),
 	}
 	dasCore := core.NewDasCore(ctxServer, &wgServer, ops...)
 	dasCore.InitDasContract(env.MapContract)
@@ -114,6 +116,10 @@ func runServer(ctx *cli.Context) error {
 	dasCore.RunAsyncDasConfigCell(time.Minute * 2) // config cell outpoint
 	dasCore.RunAsyncDasSoScript(time.Minute * 5)   // so
 
+	dasCore.RunSetConfigCellByCache([]core.CacheConfigCellKey{
+		core.CacheConfigCellKeyCharSet,
+		core.CacheConfigCellKeyReservedAccounts,
+	})
 	log.Info("das contract ok")
 
 	// tx builder
@@ -202,8 +208,25 @@ func initApiServer(txBuilderBase *txbuilder.DasTxBuilderBase, dasCore *core.DasC
 		common.ConfigCellTypeArgsPreservedAccount19,
 		common.ConfigCellTypeArgsUnavailable,
 	)
+	var mapReservedAccounts = make(map[string]struct{})
+	var mapUnAvailableAccounts = make(map[string]struct{})
 	if err != nil {
-		return fmt.Errorf("ConfigCellDataBuilderByTypeArgsList err: %s", err.Error())
+		var cacheBuilder core.CacheConfigCellReservedAccounts
+		strCache, errCache := dasCore.GetConfigCellByCache(core.CacheConfigCellKeyReservedAccounts)
+		if errCache != nil {
+			log.Error("GetConfigCellByCache err: %s", errCache.Error())
+			return fmt.Errorf("ConfigCellDataBuilderByTypeArgsList1 err: %s", err.Error())
+		} else if strCache == "" {
+			return fmt.Errorf("ConfigCellDataBuilderByTypeArgsList2 err: %s", err.Error())
+		} else if errCache = json.Unmarshal([]byte(strCache), &cacheBuilder); errCache != nil {
+			log.Error("json.Unmarshal err: %s", errCache.Error())
+			return fmt.Errorf("ConfigCellDataBuilderByTypeArgsList3 err: %s", err.Error())
+		}
+		mapReservedAccounts = cacheBuilder.MapReservedAccounts
+		mapUnAvailableAccounts = cacheBuilder.MapUnAvailableAccounts
+	} else {
+		mapReservedAccounts = builderConfigCell.ConfigCellPreservedAccountMap
+		mapUnAvailableAccounts = builderConfigCell.ConfigCellUnavailableAccountMap
 	}
 	// http server
 	hs := &http_server.HttpServer{
@@ -217,8 +240,8 @@ func initApiServer(txBuilderBase *txbuilder.DasTxBuilderBase, dasCore *core.DasC
 			DbDao:                  dbDao,
 			DasCore:                dasCore,
 			TxBuilderBase:          txBuilderBase,
-			MapReservedAccounts:    builderConfigCell.ConfigCellPreservedAccountMap,
-			MapUnAvailableAccounts: builderConfigCell.ConfigCellUnavailableAccountMap,
+			MapReservedAccounts:    mapReservedAccounts,
+			MapUnAvailableAccounts: mapUnAvailableAccounts,
 		},
 	}
 	hs.Run()

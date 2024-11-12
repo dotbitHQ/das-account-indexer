@@ -3,7 +3,7 @@ module das-account-indexer
 go 1.18
 
 require (
-	github.com/dotbitHQ/das-lib v1.2.1-0.20240913121048-5646fbd9ec80
+	github.com/dotbitHQ/das-lib v1.2.1-0.20241111071227-c7dd4fc25eca
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
@@ -49,6 +49,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogf/gf/v2 v2.3.3 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect

@@ -103,7 +103,7 @@ func (d *DbDao) TransferAccountToDid(accountInfo tables.TableAccountInfo, didCel
 	})
 }
 
-func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, records []tables.TableRecordsInfo, accountIdList []string) error {
+func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, records []tables.TableRecordsInfo, accountIdList []string, didCellList []tables.TableDidCellInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Clauses(clause.OnConflict{
 			DoUpdates: clause.AssignmentColumns([]string{
@@ -124,6 +124,11 @@ func (d *DbDao) UpdateAccountInfoList(accounts []tables.TableAccountInfo, record
 
 		if len(records) > 0 {
 			if err := tx.Create(&records).Error; err != nil {
+				return err
+			}
+		}
+		if len(didCellList) > 0 {
+			if err := tx.Create(&didCellList).Error; err != nil {
 				return err
 			}
 		}
@@ -394,7 +399,7 @@ func (d *DbDao) GetAccountByAccIds(accIds []string) (list []*tables.TableAccount
 	return
 }
 
-func (d *DbDao) BidExpiredAccountAuction(accountInfo tables.TableAccountInfo, recordsInfos []tables.TableRecordsInfo) error {
+func (d *DbDao) BidExpiredAccountAuction(accountInfo tables.TableAccountInfo, recordsInfos []tables.TableRecordsInfo, didCellList []tables.TableDidCellInfo) error {
 	return d.db.Transaction(func(tx *gorm.DB) error {
 		//update account_info
 		if err := tx.Select("status", "expired_at", "registered_at", "block_number", "outpoint", "owner_chain_type", "owner", "owner_algorithm_id", "owner_sub_aid", "manager_chain_type", "manager", "manager_algorithm_id", "manager_sub_aid").
@@ -409,6 +414,11 @@ func (d *DbDao) BidExpiredAccountAuction(accountInfo tables.TableAccountInfo, re
 		//default record
 		if len(recordsInfos) > 0 {
 			if err := tx.Create(&recordsInfos).Error; err != nil {
+				return err
+			}
+		}
+		if len(didCellList) > 0 {
+			if err := tx.Create(&didCellList).Error; err != nil {
 				return err
 			}
 		}

@@ -73,7 +73,56 @@ func (b *BlockParser) ActionConfirmProposal(req *FuncTransactionHandleReq) (resp
 		}
 	}
 
-	if err = b.DbDao.UpdateAccountInfoList(accounts, records, accountIdList); err != nil {
+	// did cell
+	_, req.TxDidCellMap, err = b.DasCore.TxToDidCellEntityAndAction(req.Tx)
+	if err != nil {
+		resp.Err = fmt.Errorf("TxToDidCellEntityAndAction err: %s", err.Error())
+		return
+	}
+	txDidEntityWitness, err := witness.GetDidEntityFromTx(req.Tx)
+	if err != nil {
+		resp.Err = fmt.Errorf("witness.GetDidEntityFromTx err: %s", err.Error())
+		return
+	}
+	var didCellList []tables.TableDidCellInfo
+	var didCellRecords []tables.TableRecordsInfo
+	for k, v := range req.TxDidCellMap.Outputs {
+		_, cellDataNew, err := v.GetDataInfo()
+		if err != nil {
+			resp.Err = fmt.Errorf("GetDataInfo new err: %s[%s]", err.Error(), k)
+			return
+		}
+		acc := cellDataNew.Account
+		accId := common.Bytes2Hex(common.GetAccountIdByAccount(acc))
+		tmp := tables.TableDidCellInfo{
+			BlockNumber:  req.BlockNumber,
+			Outpoint:     common.OutPointStruct2String(v.OutPoint),
+			AccountId:    accId,
+			Account:      acc,
+			Args:         common.Bytes2Hex(v.Lock.Args),
+			LockCodeHash: v.Lock.CodeHash.Hex(),
+			ExpiredAt:    cellDataNew.ExpireAt,
+		}
+		didCellList = append(didCellList, tmp)
+		if w, yes := txDidEntityWitness.Outputs[v.Index]; yes {
+			for _, r := range w.DidCellWitnessDataV0.Records {
+				didCellRecords = append(didCellRecords, tables.TableRecordsInfo{
+					AccountId: accId,
+					Account:   acc,
+					Key:       r.Key,
+					Type:      r.Type,
+					Label:     r.Label,
+					Value:     r.Value,
+					Ttl:       strconv.FormatUint(uint64(r.TTL), 10),
+				})
+			}
+		}
+	}
+	if len(didCellList) > 0 {
+		records = didCellRecords
+	}
+
+	if err = b.DbDao.UpdateAccountInfoList(accounts, records, accountIdList, didCellList); err != nil {
 		resp.Err = fmt.Errorf("UpdateAccountInfo err: %s", err.Error())
 		return
 	}

@@ -52,20 +52,67 @@ func (b *BlockParser) ActionBidExpiredAccountAuction(req *FuncTransactionHandleR
 
 	var recordsInfos []tables.TableRecordsInfo
 
-	recordList := builder.Records
-	for _, v := range recordList {
-		recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
-			AccountId: accountId,
-			Account:   account,
-			Key:       v.Key,
-			Type:      v.Type,
-			Label:     v.Label,
-			Value:     v.Value,
-			Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
-		})
+	// did cell
+	var didCellList []tables.TableDidCellInfo
+	if refundLock := builder.GetRefundLock(); refundLock != nil {
+		_, req.TxDidCellMap, err = b.DasCore.TxToDidCellEntityAndAction(req.Tx)
+		if err != nil {
+			resp.Err = fmt.Errorf("TxToDidCellEntityAndAction err: %s", err.Error())
+			return
+		}
+		txDidEntityWitness, err := witness.GetDidEntityFromTx(req.Tx)
+		if err != nil {
+			resp.Err = fmt.Errorf("witness.GetDidEntityFromTx err: %s", err.Error())
+			return
+		}
+
+		for k, v := range req.TxDidCellMap.Outputs {
+			_, cellDataNew, err := v.GetDataInfo()
+			if err != nil {
+				resp.Err = fmt.Errorf("GetDataInfo new err: %s[%s]", err.Error(), k)
+				return
+			}
+			acc := cellDataNew.Account
+			accId := common.Bytes2Hex(common.GetAccountIdByAccount(acc))
+			tmp := tables.TableDidCellInfo{
+				BlockNumber:  req.BlockNumber,
+				Outpoint:     common.OutPointStruct2String(v.OutPoint),
+				AccountId:    accId,
+				Account:      acc,
+				Args:         common.Bytes2Hex(v.Lock.Args),
+				LockCodeHash: v.Lock.CodeHash.Hex(),
+				ExpiredAt:    cellDataNew.ExpireAt,
+			}
+			didCellList = append(didCellList, tmp)
+			if w, yes := txDidEntityWitness.Outputs[v.Index]; yes {
+				for _, r := range w.DidCellWitnessDataV0.Records {
+					recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
+						AccountId: accId,
+						Account:   acc,
+						Key:       r.Key,
+						Type:      r.Type,
+						Label:     r.Label,
+						Value:     r.Value,
+						Ttl:       strconv.FormatUint(uint64(r.TTL), 10),
+					})
+				}
+			}
+		}
+	} else {
+		for _, v := range builder.Records {
+			recordsInfos = append(recordsInfos, tables.TableRecordsInfo{
+				AccountId: accountId,
+				Account:   account,
+				Key:       v.Key,
+				Type:      v.Type,
+				Label:     v.Label,
+				Value:     v.Value,
+				Ttl:       strconv.FormatUint(uint64(v.TTL), 10),
+			})
+		}
 	}
 
-	if err := b.DbDao.BidExpiredAccountAuction(accountInfo, recordsInfos); err != nil {
+	if err := b.DbDao.BidExpiredAccountAuction(accountInfo, recordsInfos, didCellList); err != nil {
 		log.Error("ActionBidExpiredAccountAuction err:", err.Error(), toolib.JsonString(accountInfo))
 		resp.Err = fmt.Errorf("ActionBidExpiredAccountAuction err: %s", err.Error())
 	}

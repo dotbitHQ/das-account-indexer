@@ -151,11 +151,32 @@ func (d *DbDao) FindAccountListByAddress(chainType common.ChainType, address str
 	return
 }
 
-func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address, role string) (list []tables.TableAccountInfo, err error) {
+func (d *DbDao) FindAccountNameListByAddress(chainType common.ChainType, address, role string, limit, offset int) (list []tables.TableAccountInfo, err error) {
 	if role == "" || role == "owner" {
-		err = d.db.Select("account,registered_at,expired_at").Where(" owner_chain_type=? AND owner=? AND `status`!=? and expired_at >= ?", chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).Find(&list).Error
+		err = d.db.Select("account,registered_at,expired_at").
+			Where(" owner_chain_type=? AND owner=? AND `status`!=? and expired_at >= ?",
+				chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).
+			Order("account").Limit(limit).Offset(offset).Find(&list).Error
 	} else if role == "manager" {
-		err = d.db.Select("account,registered_at,expired_at").Where(" manager_chain_type=? AND manager=? AND `status`!=? and expired_at >= ?", chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).Find(&list).Error
+		err = d.db.Select("account,registered_at,expired_at").
+			Where(" manager_chain_type=? AND manager=? AND `status`!=? and expired_at >= ?",
+				chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).
+			Order("account").Limit(limit).Offset(offset).Find(&list).Error
+	}
+	return
+}
+
+func (d *DbDao) FindTotalAccountNameListByAddress(chainType common.ChainType, address, role string) (count int64, err error) {
+	if role == "" || role == "owner" {
+		err = d.db.Model(tables.TableAccountInfo{}).
+			Where(" owner_chain_type=? AND owner=? AND `status`!=? and expired_at >= ?",
+				chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).
+			Count(&count).Error
+	} else if role == "manager" {
+		err = d.db.Model(tables.TableAccountInfo{}).
+			Where(" manager_chain_type=? AND manager=? AND `status`!=? and expired_at >= ?",
+				chainType, address, tables.AccountStatusOnLock, time.Now().Unix()-90*86400).
+			Count(&count).Error
 	}
 	return
 }

@@ -131,7 +131,7 @@ func (h *HttpHandle) doAccountList(ctx context.Context, req *ReqAccountList, api
 		}
 		resp.Total = total
 	} else {
-		list, err := h.DbDao.FindAccountNameListByAddress(addrHex.ChainType, addrHex.AddressHex, req.Role)
+		list, err := h.DbDao.FindAccountNameListByAddress(addrHex.ChainType, addrHex.AddressHex, req.Role, req.GetLimit(), req.GetOffset())
 		if err != nil {
 			log.Error(ctx, "FindAccountListByAddress err:", err.Error(), req.KeyInfo)
 			apiResp.ApiRespErr(http_api.ApiCodeDbError, "find account list err")
@@ -147,6 +147,12 @@ func (h *HttpHandle) doAccountList(ctx context.Context, req *ReqAccountList, api
 			}
 			resp.AccountList = append(resp.AccountList, tmp)
 		}
+		total, err := h.DbDao.FindTotalAccountNameListByAddress(addrHex.ChainType, addrHex.AddressHex, req.Role)
+		if err != nil {
+			apiResp.ApiRespErr(http_api.ApiCodeDbError, "search account total err")
+			return fmt.Errorf("FindTotalAccountNameListByAddress err: %s", err.Error())
+		}
+		resp.Total = total
 	}
 
 	apiResp.ApiRespOK(resp)

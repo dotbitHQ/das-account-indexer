@@ -132,6 +132,17 @@ func (b *BlockParser) parsingBlockData(block *types.Block) error {
 			}
 		} else {
 			req.Action = builder.Action
+			if req.Action == common.DasActionWithdrawFromWallet {
+				if yes, _ := isCurrentVersionTx(tx, common.DasContractNameDidCellType); yes {
+					didCellAction, res, err := b.DasCore.TxToDidCellEntityAndAction(tx)
+					if err != nil {
+						return fmt.Errorf("TxToDidCellEntityAndAction err: %s", err.Error())
+					} else if didCellAction != "" {
+						req.Action = didCellAction
+						req.TxDidCellMap = res
+					}
+				}
+			}
 		}
 		if req.Action != "" {
 			handle, ok := b.MapTransactionHandle[req.Action]
